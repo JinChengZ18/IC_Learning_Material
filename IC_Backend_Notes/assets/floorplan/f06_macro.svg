@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="839.52pt" height="558.72pt" viewBox="0 0 839.52 558.72" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-06-22T14:59:36.779881</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 558.72 
+L 839.52 558.72 
+L 839.52 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 5.76 552.96 
+L 833.76 552.96 
+L 833.76 5.76 
+L 5.76 5.76 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 25.92 541.44 
+L 813.6 541.44 
+Q 822.24 541.44 822.24 532.8 
+L 822.24 25.92 
+Q 822.24 17.28 813.6 17.28 
+L 25.92 17.28 
+Q 17.28 17.28 17.28 25.92 
+L 17.28 532.8 
+Q 17.28 541.44 25.92 541.44 
+L 25.92 541.44 
+z
+" clip-path="url(#p650b80ad67)" style="fill: none; stroke: #cbd5e1; stroke-width: 1.4; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 56.16 502.56 
+L 783.36 502.56 
+L 783.36 56.16 
+L 56.16 56.16 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #ffffff; stroke: #475569; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 74.16 484.56 
+L 765.36 484.56 
+L 765.36 74.16 
+L 74.16 74.16 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #dbeafe; opacity: 0.45"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #1e3a8a" transform="translate(448.916578 310.107703)">Std-Cell Region</text>
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #1e3a8a" transform="translate(469.524 328.298016)">标准单元区</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #9d174d" x="192.96" y="254.16" transform="rotate(-0 192.96 254.16)">引脚朝 core →</text>
+   </g>
+   <g id="line2d_1">
+    <path d="M 300.96 200.16 
+L 463.392 315.072 
+" clip-path="url(#p650b80ad67)" style="fill: none; stroke-dasharray: 3.3,3.3; stroke-dashoffset: 0; stroke: #14b8a6; stroke-width: 1.1"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 300.96 164.16 
+L 463.392 315.072 
+" clip-path="url(#p650b80ad67)" style="fill: none; stroke-dasharray: 3.3,3.3; stroke-dashoffset: 0; stroke: #14b8a6; stroke-width: 1.1"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 300.96 128.16 
+L 463.392 315.072 
+" clip-path="url(#p650b80ad67)" style="fill: none; stroke-dasharray: 3.3,3.3; stroke-dashoffset: 0; stroke: #14b8a6; stroke-width: 1.1"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 95 230.56 
+L 293.72 230.56 
+Q 302.36 230.56 302.36 221.92 
+L 302.36 95.2 
+Q 302.36 86.56 293.72 86.56 
+L 95 86.56 
+Q 86.36 86.56 86.36 95.2 
+L 86.36 221.92 
+Q 86.36 230.56 95 230.56 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #0f172a; opacity: 0.16"/>
+    <path d="M 93.6 228.96 
+L 292.32 228.96 
+Q 300.96 228.96 300.96 220.32 
+L 300.96 93.6 
+Q 300.96 84.96 292.32 84.96 
+L 93.6 84.96 
+Q 84.96 84.96 84.96 93.6 
+L 84.96 220.32 
+Q 84.96 228.96 93.6 228.96 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #ccfbf1; stroke: #14b8a6; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 548.6 230.56 
+L 747.32 230.56 
+Q 755.96 230.56 755.96 221.92 
+L 755.96 95.2 
+Q 755.96 86.56 747.32 86.56 
+L 548.6 86.56 
+Q 539.96 86.56 539.96 95.2 
+L 539.96 221.92 
+Q 539.96 230.56 548.6 230.56 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #0f172a; opacity: 0.16"/>
+    <path d="M 547.2 228.96 
+L 745.92 228.96 
+Q 754.56 228.96 754.56 220.32 
+L 754.56 93.6 
+Q 754.56 84.96 745.92 84.96 
+L 547.2 84.96 
+Q 538.56 84.96 538.56 93.6 
+L 538.56 220.32 
+Q 538.56 228.96 547.2 228.96 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #ccfbf1; stroke: #14b8a6; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 95 475.36 
+L 272.12 475.36 
+Q 280.76 475.36 280.76 466.72 
+L 280.76 354.4 
+Q 280.76 345.76 272.12 345.76 
+L 95 345.76 
+Q 86.36 345.76 86.36 354.4 
+L 86.36 466.72 
+Q 86.36 475.36 95 475.36 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #0f172a; opacity: 0.16"/>
+    <path d="M 93.6 473.76 
+L 270.72 473.76 
+Q 279.36 473.76 279.36 465.12 
+L 279.36 352.8 
+Q 279.36 344.16 270.72 344.16 
+L 93.6 344.16 
+Q 84.96 344.16 84.96 352.8 
+L 84.96 465.12 
+Q 84.96 473.76 93.6 473.76 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #ffffff; stroke: #14b8a6; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 105.84 231.12 
+L 114.48 231.12 
+L 114.48 219.6 
+L 105.84 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 138.96 231.12 
+L 147.6 231.12 
+L 147.6 219.6 
+L 138.96 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 172.08 231.12 
+L 180.72 231.12 
+L 180.72 219.6 
+L 172.08 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 205.2 231.12 
+L 213.84 231.12 
+L 213.84 219.6 
+L 205.2 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 238.32 231.12 
+L 246.96 231.12 
+L 246.96 219.6 
+L 238.32 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 271.44 231.12 
+L 280.08 231.12 
+L 280.08 219.6 
+L 271.44 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 559.44 231.12 
+L 568.08 231.12 
+L 568.08 219.6 
+L 559.44 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 592.56 231.12 
+L 601.2 231.12 
+L 601.2 219.6 
+L 592.56 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_17">
+    <path d="M 625.68 231.12 
+L 634.32 231.12 
+L 634.32 219.6 
+L 625.68 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 658.8 231.12 
+L 667.44 231.12 
+L 667.44 219.6 
+L 658.8 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 691.92 231.12 
+L 700.56 231.12 
+L 700.56 219.6 
+L 691.92 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="patch_20">
+    <path d="M 725.04 231.12 
+L 733.68 231.12 
+L 733.68 219.6 
+L 725.04 219.6 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0f766e" x="192.96" y="139.76625" transform="rotate(-0 192.96 139.76625)">SRAM</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0f766e; opacity: 0.92" x="192.96" y="191.669297" transform="rotate(-0 192.96 191.669297)">hard IP</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 16px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0f766e" x="646.56" y="139.76625" transform="rotate(-0 646.56 139.76625)">SRAM</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 11px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0f766e; opacity: 0.92" x="646.56" y="191.669297" transform="rotate(-0 646.56 191.669297)">hard IP</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0f766e" x="182.16" y="413.090859" transform="rotate(-0 182.16 413.090859)">PLL / IP</text>
+   </g>
+   <g id="text_8">
+    <g id="patch_21">
+     <path d="M 382.491562 159.887812 
+L 457.028437 159.887812 
+Q 460.868437 159.887812 460.868437 156.047812 
+L 460.868437 143.472187 
+Q 460.868437 139.632187 457.028437 139.632187 
+L 382.491562 139.632187 
+Q 378.651562 139.632187 378.651562 143.472187 
+L 378.651562 156.047812 
+Q 378.651562 159.887812 382.491562 159.887812 
+z
+" style="fill: #fce7f3; stroke: #db2777; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 12px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #9d174d" x="419.76" y="153.064687" transform="rotate(-0 419.76 153.064687)">channel 通道</text>
+   </g>
+   <g id="patch_22">
+    <path d="M 318.24 437.76 
+L 326.88 437.76 
+Q 329.76 437.76 329.76 434.88 
+L 329.76 426.24 
+Q 329.76 423.36 326.88 423.36 
+L 318.24 423.36 
+Q 315.36 423.36 315.36 426.24 
+L 315.36 434.88 
+Q 315.36 437.76 318.24 437.76 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #14b8a6"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 12.5px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #475569" x="341.28" y="434.002383" transform="rotate(-0 341.28 434.002383)">Macro / 硬 IP</text>
+   </g>
+   <g id="patch_23">
+    <path d="M 318.24 470.88 
+L 326.88 470.88 
+Q 329.76 470.88 329.76 468 
+L 329.76 459.36 
+Q 329.76 456.48 326.88 456.48 
+L 318.24 456.48 
+Q 315.36 456.48 315.36 459.36 
+L 315.36 468 
+Q 315.36 470.88 318.24 470.88 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #db2777"/>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 12.5px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #475569" x="341.28" y="467.122383" transform="rotate(-0 341.28 467.122383)">引脚 / channel</text>
+   </g>
+   <g id="patch_24">
+    <path d="M 318.24 504 
+L 326.88 504 
+Q 329.76 504 329.76 501.12 
+L 329.76 492.48 
+Q 329.76 489.6 326.88 489.6 
+L 318.24 489.6 
+Q 315.36 489.6 315.36 492.48 
+L 315.36 501.12 
+Q 315.36 504 318.24 504 
+z
+" clip-path="url(#p650b80ad67)" style="fill: #008080"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 12.5px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #475569" x="341.28" y="500.505078" transform="rotate(-0 341.28 500.505078)">数据流 flyline</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p650b80ad67">
+   <rect x="5.76" y="5.76" width="828" height="547.2"/>
+  </clipPath>
+ </defs>
+</svg>

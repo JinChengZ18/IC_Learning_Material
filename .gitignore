@@ -1,0 +1,17 @@
+# 大文件 / 归档：不纳入版本控制
+# _BiliKit ~3.3GB（B站下载/模型/ffmpeg）；Courses ~370MB（课程归档）
+_BiliKit/
+Courses/
+# 无关的个人文档
+highlights.docx
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 校对中间件（可由 _SlideKit 脚本重新生成）
+slides/_preview/
+_qa/
+
+# 编辑器自动导出的 PDF 快照（内容已在 .md 源文件里）
+*.pdf

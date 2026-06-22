@@ -1,0 +1,3 @@
+matplotlib>=3.7
+# 仅需 matplotlib（含其依赖 numpy）。绘制架构/原理图并导出 PNG+SVG。
+# 安装：  python -m pip install -r requirements.txt
