@@ -42,21 +42,25 @@ def hflow(ax, specs, y, x0, x1, h, gap=0.28, fs=H1, sub_fs=BODY, arrow=T.INK2, l
 
 # F01 流程定位 ------------------------------------------------------------- #
 def f01_position():
-    fig, ax = T.canvas(13, 5.4)
-    ax.text(0.5, 4.95, "RTL → 综合 → [ Floorplan · Power · Place · CTS · Route ] → Signoff → GDSII",
-            ha="left", va="center", color=T.INK, fontsize=H2, fontweight="bold")
-    specs = [
-        ("Netlist", "门级网表", "neutral", "soft"),
-        ("Floorplan", "布图规划", "logic", "solid"),
-        ("Power Plan", "电源规划", "power", "soft"),
-        ("Placement", "布局", "logic", "soft"),
-        ("CTS", "时钟树", "clock", "soft"),
-        ("Routing", "布线", "memory", "soft"),
-        ("Signoff", "STA/DRC/LVS", "neutral", "soft"),
-    ]
-    nodes = hflow(ax, specs, y=2.1, x0=0.4, x1=12.6, h=2.3, fs=H1, sub_fs=BODY)
-    T.bracket(ax, nodes[1]["x"], nodes[5]["x"] + nodes[5]["w"], 1.95,
-              "物理实现 Physical Implementation（决定 PPA 上限）", depth=0.5, color=T.BLUE_D, fs=BODY)
+    fig, ax = T.canvas(13, 5.2)
+    T.sechead(ax, 0.5, 4.7, "①", "Floorplan 在数字后端 (PnR) 流程中的位置")
+    items = [("逻辑综合", "Synthesis", "neutral", False),
+             ("布图规划", "Floorplan", "clock", True),
+             ("布局", "Placement", "neutral", False),
+             ("时钟树", "CTS", "neutral", False),
+             ("布线", "Routing", "neutral", False)]
+    T.flowrow(ax, items, y=3.05, x0=0.5, x1=12.5, h=1.25, title_fs=H2, sub_fs=CAP)
+    ax.text(0.5, 2.35, "Floorplan 主要任务", ha="left", va="center", color=T.INK, fontsize=BODY, fontweight="bold")
+    subs = ["① die / core 几何", "② 宏摆放 & 朝向", "③ 电源规划 PG", "④ 多电压 / blockage"]
+    n, gap = len(subs), 0.7
+    sw = (12.0 - gap * (n - 1)) / n
+    sx, ends = 0.5, []
+    for s in subs:
+        T.rect(ax, sx, 0.95, sw, 1.05, fc=T.SOFT["clock"], ec=T.VIOLET, lw=1.4, rounding=0.1, z=2)
+        ax.text(sx + sw / 2, 1.47, s, ha="center", va="center", color=T.VIOLET_D, fontsize=BODY, fontweight="bold", zorder=3)
+        ends.append(sx + sw); sx += sw + gap
+    for i in range(n - 1):
+        ax.text(ends[i] + gap / 2, 1.47, "→", ha="center", va="center", color=T.MUTED, fontsize=15)
     return T.save(fig, OUT, "f01_position")
 
 
@@ -85,10 +89,10 @@ def f02_why():
     T.tag(ax, cx - r + 0.05, cy - r * 0.85 - 0.32, "Power", role="power", fs=BODY)
     T.tag(ax, cx + r - 0.05, cy - r * 0.85 - 0.32, "Area", role="memory", fs=BODY)
     ax.text(cx, cy - r * 0.05, "PPA\n权衡", ha="center", va="center", color=T.INK, fontsize=H1, fontweight="bold", zorder=3)
-    ax.text(7.9, 2.55, "三类典型代价", ha="left", color=T.INK, fontsize=H2, fontweight="bold")
-    for i, (t, c) in enumerate([("利用率↑ → 拥塞绕不出", T.ROSE), ("宏乱放 → 时序收不回", T.AMBER), ("PG 不足 → IR/EM 超标", T.VIOLET)]):
-        T.rect(ax, 7.9, 1.9 - i * 0.52, 0.24, 0.24, fc=c, ec="none", z=4)
-        ax.text(8.28, 2.02 - i * 0.52, t, ha="left", va="center", color=T.INK2, fontsize=BODY)
+    ax.text(7.85, 3.2, "三类典型代价", ha="left", color=T.INK, fontsize=H2, fontweight="bold")
+    costs = [("利用率定高 → 拥塞绕不出", "io"), ("宏乱放 → 时序收不回", "power"), ("PG 不足 → IR / EM 超标", "clock")]
+    for i, (t, role) in enumerate(costs):
+        T.infocard(ax, 7.85, 2.45 - i * 0.85, 4.3, 0.72, t, role=role, title_fs=BODY)
     return T.save(fig, OUT, "f02_why")
 
 
@@ -197,28 +201,34 @@ def f05_rows():
 
 # F06 宏摆放原则 ----------------------------------------------------------- #
 def f06_macro():
-    fig, ax = T.canvas(13, 7.6)
-    cx, cy, cw, ch = 0.7, 0.7, 9.0, 6.2
+    fig, ax = T.canvas(13.5, 7.2)
+    cx, cy, cw, ch = 0.6, 0.6, 7.4, 6.0
     T.rect(ax, cx, cy, cw, ch, fc=T.WHITE, ec=T.INK2, lw=2.0, z=1)
-    T.rect(ax, cx + 0.25, cy + 0.25, cw - 0.5, ch - 0.5, fc=T.BLUE_L, ec="none", z=1, alpha=0.45)
-    ax.text(cx + cw * 0.6, cy + ch * 0.4, "Std-Cell Region\n标准单元区", ha="center", va="center",
+    T.rect(ax, cx + 0.25, cy + 0.25, cw - 0.5, ch - 0.5, fc=T.BLUE_L, ec="none", z=1, alpha=0.4)
+    ax.text(cx + cw * 0.58, cy + ch * 0.4, "Std-Cell Region\n标准单元区", ha="center", va="center",
             color=T.BLUE_D, fontsize=H2, fontweight="bold", zorder=2)
-    m1 = T.node(ax, cx + 0.4, cy + ch - 2.3, 2.7, 1.9, "SRAM", sub="hard IP", role="memory", z=4, fs=H1, sub_fs=CAP)
-    m2 = T.node(ax, cx + cw - 3.1, cy + ch - 2.3, 2.7, 1.9, "SRAM", sub="hard IP", role="memory", z=4, fs=H1, sub_fs=CAP)
-    T.node(ax, cx + 0.4, cy + 0.4, 2.5, 1.6, "PLL / IP", role="memory", variant="outline", z=4, fs=H2)
+    m1 = T.node(ax, cx + 0.35, cy + ch - 2.1, 2.3, 1.75, "SRAM", sub="hard IP", role="memory", z=4, fs=H2, sub_fs=CAP)
+    m2 = T.node(ax, cx + cw - 2.65, cy + ch - 2.1, 2.3, 1.75, "SRAM", sub="hard IP", role="memory", z=4, fs=H2, sub_fs=CAP)
+    T.node(ax, cx + 0.35, cy + 0.35, 2.1, 1.5, "PLL / IP", role="memory", variant="outline", z=4, fs=BODY)
     for m in (m1, m2):
-        for k in range(6):
-            px = m["x"] + 0.3 + k * (m["w"] - 0.6) / 5
-            T.rect(ax, px - 0.06, m["y"] - 0.03, 0.12, 0.16, fc=T.ROSE, ec="none", z=5)
-    ax.text(m1["cx"], m1["y"] - 0.36, "引脚朝 core →", ha="center", color=T.ROSE_D, fontsize=CAP)
-    for dyf in (0.4, 0.9, 1.4):
-        T.line(ax, m1["x"] + m1["w"], m1["y"] + dyf, cx + cw * 0.55, cy + ch * 0.4, color=T.TEAL, lw=1.1, ls=(0, (3, 3)), z=3)
-    T.tag(ax, (m1["x"] + m1["w"] + m2["x"]) / 2, cy + ch - 1.25, "channel 通道", role="io", fs=CAP)
-    bx = cx + cw + 0.5
-    ax.text(bx, cy + ch - 0.2, "摆放要点", ha="left", va="top", color=T.INK, fontsize=H2, fontweight="bold")
-    ax.text(bx, cy + ch - 0.9, "• 大宏沿边 / 沿角\n• 引脚朝 core\n• 按数据流就近(flyline)\n• 对称背靠背、规整阵列\n• 留 channel 走 PG/信号",
-            ha="left", va="top", color=T.INK2, fontsize=BODY, linespacing=1.8)
-    T.legend(ax, [("memory", "Macro / 硬 IP"), ("io", "引脚 / channel"), ("teal", "数据流 flyline")], bx, cy + 1.2, fs=CAP, dy=0.46)
+        for k in range(5):
+            px = m["x"] + 0.3 + k * (m["w"] - 0.6) / 4
+            T.rect(ax, px - 0.05, m["y"] - 0.03, 0.1, 0.15, fc=T.ROSE, ec="none", z=5)
+    for dyf in (0.35, 0.8, 1.25):
+        T.line(ax, m1["x"] + m1["w"], m1["y"] + dyf, cx + cw * 0.55, cy + ch * 0.4, color=T.TEAL, lw=1.0, ls=(0, (3, 3)), z=3)
+    T.tag(ax, (m1["x"] + m1["w"] + m2["x"]) / 2, cy + ch - 1.15, "channel", role="io", fs=CAP)
+    # 右：5 张原则卡（参考图风格）
+    px = cx + cw + 0.5
+    pw = 13.5 - px - 0.4
+    cards = [("① 沿边 / 沿角", "中间连续区留给标准单元", "memory"),
+             ("② 引脚朝 core", "避免信号绕过宏本体", "io"),
+             ("③ 按数据流就近", "flyline 指导 / auto placer", "clock"),
+             ("④ 对称背靠背", "规整阵列，便于 PG / 布线", "power"),
+             ("⑤ 留 channel", "或 channel-less 紧贴拼接", "neutral")]
+    chh, g = 1.04, 0.18
+    top = cy + ch - chh
+    for i, (t, d, role) in enumerate(cards):
+        T.infocard(ax, px, top - i * (chh + g), pw, chh, t, d, role=role, title_fs=H2 - 1, detail_fs=CAP)
     return T.save(fig, OUT, "f06_macro")
 
 
@@ -263,12 +273,14 @@ def f08_power():
         yy = cy + 0.62 + k * 0.14
         T.line(ax, x0, yy, x1, yy, color=(T.AMBER if k % 2 else T.INK), lw=0.8, z=2)
     bx = cx + cw + 0.55
-    ax.text(bx, cy + ch - 0.15, "供电骨架（逐层）", ha="left", va="top", color=T.INK, fontsize=H2, fontweight="bold")
-    for i, (t, c) in enumerate([("Power Ring 电源环", T.AMBER), ("Power Stripe 电源条", T.AMBER),
-                                 ("纵横交织成 Mesh", T.INK), ("Std-cell Rails (M1)", T.INK), ("via 连接金属层", T.ROSE)]):
-        T.rect(ax, bx, cy + ch - 0.95 - i * 0.58, 0.26, 0.26, fc=c, ec="none", z=4)
-        ax.text(bx + 0.42, cy + ch - 0.82 - i * 0.58, t, ha="left", va="center", color=T.INK2, fontsize=BODY)
-    ax.text(bx, cy + 1.35, "mesh 越密 → IR 越小，\n但越占布线资源（权衡）", ha="left", va="top", color=T.MUTED, fontsize=CAP, linespacing=1.7)
+    pw = 13.5 - bx - 0.35
+    ax.text(bx, cy + ch - 0.05, "供电骨架（逐层）", ha="left", va="top", color=T.INK, fontsize=H2, fontweight="bold")
+    layers = [("Power Ring 电源环", "power"), ("Power Stripe 电源条", "power"),
+              ("纵横交织成 Mesh", "neutral"), ("Std-cell Rails (M1)", "neutral"), ("via 连接金属层", "io")]
+    top = cy + ch - 0.95
+    for i, (t, role) in enumerate(layers):
+        T.infocard(ax, bx, top - i * 0.84, pw, 0.72, t, role=role, title_fs=BODY)
+    ax.text(bx, cy + 0.95, "mesh 越密 → IR 越小，\n但越占布线资源（权衡）", ha="left", va="top", color=T.MUTED, fontsize=CAP, linespacing=1.7)
     return T.save(fig, OUT, "f08_power")
 
 

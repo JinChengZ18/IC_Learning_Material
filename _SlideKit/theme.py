@@ -249,6 +249,68 @@ def flow(ax, items, y, x0, x1, h=1.7, gap=0.32, fs=13.5, sub_fs=9.5, z=2,
     return nodes
 
 
+# --------------------------------------------------------------------------- #
+# 参考信息图风格图元（卡片 / chevron 流程 / 分节标题）—— 柔和、留白克制、层级分明
+# --------------------------------------------------------------------------- #
+SOFT = {  # 各角色的极浅卡片底色
+    "logic": "#EEF2FF", "memory": "#ECFDF5", "power": "#FFF7ED",
+    "io": "#FDF2F8", "clock": "#F5F3FF", "neutral": "#F3F4F6",
+}
+CARD_EDGE = "#E5E7EB"
+
+
+def infocard(ax, x, y, w, h, title, detail=None, role="neutral", highlight=False,
+             title_fs=15, detail_fs=11.5, z=2):
+    """参考图的核心卡片：浅色底 + 粗体深色标题 + 该色系的细节行。highlight=粗色描边。"""
+    ec = MAIN[role] if highlight else CARD_EDGE
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.1",
+                 fc=SOFT[role], ec=ec, lw=2.6 if highlight else 1.4, zorder=z))
+    if detail:
+        ax.text(x + 0.3, y + h - 0.32, title, ha="left", va="top", color=INK,
+                fontsize=title_fs, fontweight="bold", zorder=z + 1)
+        ax.text(x + 0.3, y + 0.28, detail, ha="left", va="bottom", color=ROLE[role][2],
+                fontsize=detail_fs, zorder=z + 1)
+    else:  # 单行卡：标题垂直居中
+        ax.text(x + 0.3, y + h / 2, title, ha="left", va="center", color=INK,
+                fontsize=title_fs, fontweight="bold", zorder=z + 1)
+    return dict(x=x, y=y, w=w, h=h, cx=x + w / 2, cy=y + h / 2,
+                right=(x + w, y + h / 2), left=(x, y + h / 2), top=(x + w / 2, y + h), bottom=(x + w / 2, y))
+
+
+def chevron(ax, x, y, color=MUTED, size=16):
+    ax.text(x, y, "›", ha="center", va="center", color=color, fontsize=size, fontweight="bold", zorder=4)
+
+
+def flowrow(ax, items, y, x0, x1, h, gap=0.55, title_fs=14, sub_fs=10):
+    """chevron 横向流程：items=[(主, 次, role, highlight), …]，框之间用 › 分隔。返回锚点。"""
+    n = len(items)
+    w = (x1 - x0 - gap * (n - 1)) / n
+    nodes, x = [], x0
+    for (main, sub, role, hl) in items:
+        ec = MAIN[role] if hl else CARD_EDGE
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.1",
+                     fc=(SOFT[role] if hl else "#F8F9FB"), ec=ec, lw=2.4 if hl else 1.4, zorder=2))
+        tc = MAIN[role] if hl else INK
+        cx, cy = x + w / 2, y + h / 2
+        if sub:
+            ax.text(cx, cy + 0.22, main, ha="center", va="center", color=tc, fontsize=title_fs, fontweight="bold", zorder=3)
+            ax.text(cx, cy - 0.28, sub, ha="center", va="center", color=(MAIN[role] if hl else MUTED), fontsize=sub_fs, zorder=3)
+        else:
+            ax.text(cx, cy, main, ha="center", va="center", color=tc, fontsize=title_fs, fontweight="bold", zorder=3)
+        nodes.append(dict(x=x, y=y, w=w, h=h, cx=cx, cy=cy, right=(x + w, cy), left=(x, cy)))
+        x += w + gap
+    for a, b in zip(nodes[:-1], nodes[1:]):
+        chevron(ax, (a["right"][0] + b["left"][0]) / 2, a["cy"], size=18)
+    return nodes
+
+
+def sechead(ax, x, y, num, text, color=None):
+    """分节标题：带圈数字 + 粗体（如 “① 标题”）。"""
+    color = color or INK
+    ax.text(x, y, f"{num}", ha="left", va="center", color=VIOLET, fontsize=FS_H2 + 2, fontweight="bold", zorder=5)
+    ax.text(x + 0.42, y, text, ha="left", va="center", color=color, fontsize=FS_H2, fontweight="bold", zorder=5)
+
+
 def save(fig, outdir, name, png=True, svg=True, dpi=None):
     os.makedirs(outdir, exist_ok=True)
     out_png = os.path.join(outdir, name + ".png")
