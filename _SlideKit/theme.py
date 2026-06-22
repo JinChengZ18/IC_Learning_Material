@@ -57,6 +57,9 @@ MAIN = {"logic": BLUE, "memory": TEAL, "power": AMBER, "io": ROSE,
 
 BYLINE = "整理 J.C · 源自 Digital VLSI Design (DVD), A. Teman, Bar-Ilan Univ."
 
+# 字号层级（hierarchy）：主标签 > 次级 > 正文 > 脚注
+FS_H1, FS_H2, FS_BODY, FS_CAP = 19, 15, 13, 11.5
+
 
 def setup_fonts():
     plt.rcParams["font.sans-serif"] = [
