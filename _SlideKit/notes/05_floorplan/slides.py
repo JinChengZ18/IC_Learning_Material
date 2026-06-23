@@ -100,12 +100,12 @@ SPECS = [
         "  间距须满足 max well-tap distance(DRC)，否则 latch-up 风险",
         "Filler：末期填行内空隙，保供电轨与 well 连续；时机晚于 tap/endcap",
     ], VIOLET),
-    bl("IO / Pad、Bump（封装相关）", "wire-bond vs flip-chip", [
+    split("IO / Pad、Bump（封装相关）", "wire-bond vs flip-chip", "f13_iopad.png", [
         "Wire-bond：IO Pad 沿 die 四周排成 Pad Ring",
-        "  考虑信号/电源 Pad 交替、ESD、Corner Pad",
-        "Flip-Chip：信号经 Bump 面阵列从 die 表面引出",
-        "  常配 RDL 重布线层；是否需要取决封装/凸点布局",
-        "  bump 对齐封装 bump map，控间距与电源/信号比例",
+        "考虑信号/电源 Pad 交替、ESD、Corner Pad",
+        "Flip-Chip：信号经 Bump 面阵列引出",
+        "常配 RDL；是否需要取决封装/凸点布局",
+        "bump 对齐 bump map，控间距与比例",
     ], ROSE),
     bl("引脚分配 Pin Assignment", "pin 位置决定块间走线与时序", [
         "顶层：IO buffer 位置决定芯片对外引脚",
@@ -131,13 +131,12 @@ SPECS = [
         "PG 与高翻转信号线的 EM 机理不同，分别评估",
         "签核：Voltus(Cadence)/RedHawk(Ansys)/PrimeRail(Synopsys)",
     ], AMBER),
-    bl("电源门控：power switch / header / footer", "对可关断模块做 Power Gating", [
+    split("电源门控：power switch / header / footer", "对可关断模块做 Power Gating", "f14_gating.png", [
         "可关断模块插 Power Switch 实现 Power Gating",
-        "Header(PMOS)：门控 VDD—VVDD，工程上更常用",
-        "Footer(NMOS)：门控 VVSS—VSS，较少单独使用",
-        "header + footer 同用罕见",
-        "floorplan 规划 switch 阵列与 enable 菊花链走向",
-        "菊花链分时开启 → 控冲击电流与唤醒时间；规划 always-on PG",
+        "Header(PMOS)：门控 VDD—VVDD，更常用",
+        "Footer(NMOS)：门控 VVSS—VSS，较少单独用",
+        "floorplan 规划 switch 阵列与 enable 菊花链",
+        "菊花链分时开启 → 控冲击电流、规划 always-on PG",
     ], VIOLET),
     split("多电压域与 UPF", "Multi-Voltage", "f10_mv.png", [
         "不同区域不同电压(或可关断) → 省功耗",
@@ -155,15 +154,14 @@ SPECS = [
         "自动预算：allocate_budgets / deriveTimingBudget / ETM",
         "budget 含 IO delay + 时钟不确定度 + 驱动/负载",
     ], BLUE),
-    bl("拥塞 / IR 早期预估与迭代闭环", "Floorplan 不是一遍过", [
-        "拥塞早估：GR 估 GCell 需求/资源 → 拥塞图 + Overflow",
-        "全局拥塞：区域整体需求超资源(利用率高/stripe 密)",
-        "局部/pin-access 拥塞：引脚密集处可达性",
+    split("拥塞 / IR 早期预估与迭代闭环", "Floorplan 不是一遍过", "f15_loop.png", [
+        "拥塞早估：GR 估 GCell 需求/资源 → 拥塞图",
+        "全局拥塞 vs 局部 / pin-access 拥塞",
         "热点：macro notch、窄 channel、pin 密集",
-        "缓解：降利用率、加宽 channel、partial blockage、优化 pin",
-        "IR 早估：静态 PG 分析定位高压降区，加密 mesh/via",
-        "迭代闭环：floorplan → 试布局/GR → 评估 → 回退调整",
-    ], AMBER, two=True),
+        "缓解：降利用率、加宽 channel、partial blockage",
+        "IR 早估：静态 PG 分析定位高压降区，加密 mesh",
+        "迭代闭环：floorplan → 试布局/GR → 评估 → 回退",
+    ], AMBER),
     split("输入 / 输出 与 文件作用", "吃什么、吐什么", "f12_io.png", [
         "输入：netlist、LEF、lib、SDC、UPF、预算",
         "输出：带宏摆放+PG+blockage 的 DEF",

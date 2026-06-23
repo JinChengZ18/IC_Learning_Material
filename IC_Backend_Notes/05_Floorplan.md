@@ -188,6 +188,8 @@ END core
 
 ## Slide 11 · IO / Pad、Bump 与引脚分配（上）
 
+![Wire-bond vs Flip-Chip](assets/floorplan/f13_iopad.png)
+
 **知识点**
 
 - **Wire-bond（引线键合）**：IO Pad 沿 die 四周排成 **Pad Ring**；需考虑信号/电源 Pad 交替、**ESD**、**Corner Pad**
@@ -270,6 +272,8 @@ globalNetConnect VDD -type pgpin -pin VDD -all
 
 ## Slide 15 · 电源门控：power switch / header / footer
 
+![电源门控 header / footer](assets/floorplan/f14_gating.png)
+
 **知识点**
 
 - 对可关断模块插 **Power Switch** 实现 **Power Gating（功率门控）**
@@ -343,6 +347,8 @@ set_load 0.05 [get_ports data_out]
 ---
 
 ## Slide 18 · 拥塞 / IR 早期预估与迭代闭环
+
+![Floorplan 迭代闭环](assets/floorplan/f15_loop.png)
 
 **知识点**
 

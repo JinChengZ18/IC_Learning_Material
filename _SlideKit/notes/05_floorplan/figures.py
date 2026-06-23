@@ -332,9 +332,62 @@ def f12_io():
     return T.save(fig, OUT, "f12_io")
 
 
+# F13 IO/Pad 与 Bump（4:3）------------------------------------------------ #
+def f13_iopad():
+    fig, ax = T.canvas(8.6, 6)
+    ax.text(2.2, 5.6, "Wire-bond 引线键合", ha="center", color=T.INK, fontsize=H2, fontweight="bold")
+    dx, dy, s = 0.5, 1.3, 3.3
+    T.rect(ax, dx, dy, s, s, fc=T.WHITE, ec=T.INK2, lw=2, z=1)
+    _pads(ax, dx, dy, s, 6, 0.32)
+    ax.text(dx + s / 2, dy + s / 2, "die", ha="center", va="center", color=T.MUTED, fontsize=BODY)
+    ax.text(2.2, 0.85, "IO Pad 沿四周排成 Pad Ring", ha="center", color=T.INK2, fontsize=CAP)
+    ax.text(6.4, 5.6, "Flip-Chip 倒装焊", ha="center", color=T.INK, fontsize=H2, fontweight="bold")
+    fx, fy = 4.7, 1.3
+    T.rect(ax, fx, fy, s, s, fc=T.WHITE, ec=T.INK2, lw=2, z=1)
+    for r in range(5):
+        for c in range(5):
+            ax.plot([fx + 0.55 + c * 0.55], [fy + 0.55 + r * 0.55], "o", color=T.ROSE, ms=9, zorder=3)
+    ax.text(6.4, 0.85, "信号经 Bump 面阵列引出（常配 RDL）", ha="center", color=T.INK2, fontsize=CAP)
+    return T.save(fig, OUT, "f13_iopad")
+
+
+# F14 电源门控 header / footer（~1:1 纵向）-------------------------------- #
+def f14_gating():
+    fig, ax = T.canvas(6.6, 6.8)
+    cx = 2.5
+    T.node(ax, cx - 1.4, 5.75, 2.8, 0.8, "VDD 真实电源", role="power", variant="soft", fs=BODY)
+    T.node(ax, cx - 1.4, 4.55, 2.8, 0.8, "Header（PMOS）", role="power", fs=BODY)
+    ax.text(cx + 1.55, 4.95, "→ VVDD", ha="left", color=T.AMBER_D, fontsize=CAP)
+    T.node(ax, cx - 1.6, 2.6, 3.2, 1.5, "可关断逻辑", role="clock", fs=H2)
+    T.node(ax, cx - 1.4, 1.35, 2.8, 0.8, "Footer（NMOS）", role="memory", fs=BODY)
+    ax.text(cx + 1.55, 1.75, "→ VVSS", ha="left", color=T.TEAL_D, fontsize=CAP)
+    T.node(ax, cx - 1.4, 0.3, 2.8, 0.8, "VSS 真实地", role="neutral", fs=BODY)
+    for y0, y1 in [(5.75, 5.35), (4.55, 4.1), (2.6, 2.15), (1.35, 1.1)]:
+        T.arrow(ax, (cx, y0), (cx, y1), color=T.MUTED, lw=1.8, scale=12)
+    ax.text(5.0, 3.35, "header\n更常用\n(漏电好)", ha="center", va="center", color=T.MUTED, fontsize=CAP)
+    return T.save(fig, OUT, "f14_gating")
+
+
+# F15 Floorplan 迭代闭环（~1:1）------------------------------------------ #
+def f15_loop():
+    fig, ax = T.canvas(7.4, 6.6)
+    n1 = T.node(ax, 2.4, 5.0, 2.6, 1.1, "Floorplan", sub="定 die/macro/PG", role="logic", z=4, fs=H2, sub_fs=CAP)
+    n2 = T.node(ax, 4.9, 2.7, 2.4, 1.1, "试布局 + GR", role="memory", z=4, fs=BODY)
+    n3 = T.node(ax, 2.4, 0.4, 2.6, 1.1, "评估", sub="拥塞 / 时序 / IR", role="io", z=4, fs=H2, sub_fs=CAP)
+    n4 = T.node(ax, 0.1, 2.7, 2.4, 1.1, "回退调整", role="power", z=4, fs=BODY)
+    T.arrow(ax, n1["right"], n2["top"], color=T.INK2, lw=2.2, rad=-0.35)
+    T.arrow(ax, n2["bottom"], n3["right"], color=T.INK2, lw=2.2, rad=-0.35)
+    T.arrow(ax, n3["left"], n4["bottom"], color=T.INK2, lw=2.2, rad=-0.35)
+    T.arrow(ax, n4["top"], n1["left"], color=T.INK2, lw=2.2, rad=-0.35)
+    ax.text(3.7, 3.25, "迭代\n闭环", ha="center", va="center", color=T.MUTED, fontsize=BODY, fontweight="bold")
+    ax.text(3.7, 6.35, "收敛后才进详细 Placement", ha="center", color=T.INK, fontsize=BODY, fontweight="bold")
+    return T.save(fig, OUT, "f15_loop")
+
+
 def main():
     figs = [f01_position, f02_why, f03_geometry, f04_util, f05_rows, f06_macro,
-            f07_halo, f08_power, f09_irem, f10_mv, f11_budget, f12_io]
+            f07_halo, f08_power, f09_irem, f10_mv, f11_budget, f12_io,
+            f13_iopad, f14_gating, f15_loop]
     print("Output:", OUT)
     for fn in figs:
         print("  saved:", os.path.basename(fn()))
