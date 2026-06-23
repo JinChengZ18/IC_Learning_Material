@@ -26,21 +26,22 @@ import matplotlib.patheffects as pe
 # --------------------------------------------------------------------------- #
 # 语义调色板（Vibrant）：每个角色 = (浅填充, 饱和主色, 深文字)
 # --------------------------------------------------------------------------- #
-BLUE   = "#2563EB"; BLUE_L   = "#DBEAFE"; BLUE_D   = "#1E3A8A"
-TEAL   = "#14B8A6"; TEAL_L   = "#CCFBF1"; TEAL_D   = "#0F766E"
-AMBER  = "#F59E0B"; AMBER_L  = "#FEF3C7"; AMBER_D  = "#92400E"
-ROSE   = "#DB2777"; ROSE_L   = "#FCE7F3"; ROSE_D   = "#9D174D"   # 品红 / IO / 高亮
-VIOLET = "#7C3AED"; VIOLET_L = "#EDE9FE"; VIOLET_D = "#5B21B6"   # 时钟 / 特殊
+# 高对比 IC 学术配色（对齐 local-doc/PPT-template.pptx 与 DVD 讲座的高饱和 accent）
+BLUE   = "#00A2FF"; BLUE_L   = "#D4EEFF"; BLUE_D   = "#005FA3"   # 逻辑/信号（讲座标题蓝）
+TEAL   = "#15C39A"; TEAL_L   = "#D2F5EC"; TEAL_D   = "#0A7C61"   # 存储/Macro
+AMBER  = "#FF9500"; AMBER_L  = "#FFE9CC"; AMBER_D  = "#A85E00"   # 电源/PG（橙）
+ROSE   = "#FF3B30"; ROSE_L   = "#FFD8D5"; ROSE_D   = "#B3211A"   # IO/高亮/关键网（红）
+VIOLET = "#A259FF"; VIOLET_L = "#ECDBFF"; VIOLET_D = "#6A2EB8"   # 时钟/特殊（讲座 nav 紫）
 
-INK    = "#1E293B"   # 主文字（墨色）
-INK2   = "#475569"   # 次文字
-MUTED  = "#64748B"   # 脚注/弱化
-LINE   = "#CBD5E1"   # 浅描边/网格
-GRID   = "#E2E8F0"   # 更浅网格
-SLATE_L = "#F1F5F9"  # 中性浅填充
+INK    = "#101828"   # 主文字（更深，提高对比）
+INK2   = "#344054"   # 次文字
+MUTED  = "#667085"   # 脚注/弱化
+LINE   = "#C2C9D2"   # 浅描边/网格
+GRID   = "#E4E7EC"   # 更浅网格
+SLATE_L = "#EEF1F4"  # 中性浅填充
 WHITE  = "#FFFFFF"
 PAPER  = "#FFFFFF"   # 图底色
-SHADOW = "#0F172A"   # 投影基色（配合低 alpha）
+SHADOW = "#101828"   # 投影基色（配合低 alpha）
 
 # 角色 → (fill, edge, text)；node(variant='soft') 默认用之
 ROLE = {
@@ -252,11 +253,11 @@ def flow(ax, items, y, x0, x1, h=1.7, gap=0.32, fs=13.5, sub_fs=9.5, z=2,
 # --------------------------------------------------------------------------- #
 # 参考信息图风格图元（卡片 / chevron 流程 / 分节标题）—— 柔和、留白克制、层级分明
 # --------------------------------------------------------------------------- #
-SOFT = {  # 各角色的极浅卡片底色
-    "logic": "#EEF2FF", "memory": "#ECFDF5", "power": "#FFF7ED",
-    "io": "#FDF2F8", "clock": "#F5F3FF", "neutral": "#F3F4F6",
+SOFT = {  # 各角色的浅卡片底色（略提饱和度以增对比）
+    "logic": "#DCEFFF", "memory": "#D6F5EC", "power": "#FFEBD2",
+    "io": "#FFDEDB", "clock": "#EEE0FF", "neutral": "#EEF1F4",
 }
-CARD_EDGE = "#E5E7EB"
+CARD_EDGE = "#D0D5DD"
 
 
 def infocard(ax, x, y, w, h, title, detail=None, role="neutral", highlight=False,

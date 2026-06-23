@@ -89,31 +89,7 @@
 
 ---
 
-## Slide 6 · 利用率与长宽比
-
-![利用率与长宽比](assets/floorplan/f04_util.png)
-
-**知识点**
-
-- 利用率分**两个口径**（务必分清）：
-
-```text
-Total Util     = (Σ std_cell_area + Σ macro_area) / Core_area
-Effective Util = Σ std_cell_area / (Core_area − blockage − macro_halo − keepout − …)
-```
-
-- **工具报告的 “utilization” 多指有效利用率**（更贴近实际可放置密度）
-- 经验初值 **0.5–0.8**，并非固定 60–75%：高 macro 占比 / IP 密集 / datapath 可 >0.8；高拥塞 / 高活动留余量可低至 0.5–0.6
-- 易混点：**目标利用率 ≠ placement 后的局部实际密度（placement density）**
-- **长宽比 Aspect Ratio** = core 的高/宽；**约定各工具可能相反**（宽/高 vs 高/宽），以工具文档为准
-- 比值 **≈ 1.0**（方正）最利于布线均衡与时钟树平衡；长条形长边易拥塞、skew 难控
-- 工具参数：ICC2 `initialize_floorplan -side_ratio {1 1}`；Innovus `floorPlan -r 1.0 ...`
-
-> 备注：利用率“过高拥塞、过低浪费”，是常考题。
-
----
-
-## Slide 7 · 标准单元行 / site / 翻转共享供电轨
+## Slide 6 · 标准单元行 / site / 翻转共享供电轨
 
 ![标准单元行/site/翻转共享供电轨](assets/floorplan/f05_rows.png)
 
@@ -134,6 +110,30 @@ END core
 - `SYMMETRY` 取值（X/Y/R90）描述单元自身镜像方式；行间共享靠**相邻行上下镜像**，具体轴向以工具/库文档为准
 
 > 备注：关键机关——“同名轨落行边界、被两行共享”。
+
+---
+
+## Slide 7 · 利用率与长宽比
+
+![利用率与长宽比](assets/floorplan/f04_util.png)
+
+**知识点**
+
+- 利用率分**两个口径**（务必分清）：
+
+```text
+Total Util     = (Σ std_cell_area + Σ macro_area) / Core_area
+Effective Util = Σ std_cell_area / (Core_area − blockage − macro_halo − keepout − …)
+```
+
+- **工具报告的 “utilization” 多指有效利用率**（更贴近实际可放置密度）
+- 经验初值 **0.5–0.8**，并非固定 60–75%：高 macro 占比 / IP 密集 / datapath 可 >0.8；高拥塞 / 高活动留余量可低至 0.5–0.6
+- 易混点：**目标利用率 ≠ placement 后的局部实际密度（placement density）**
+- **长宽比 Aspect Ratio** = core 的高/宽；**约定各工具可能相反**（宽/高 vs 高/宽），以工具文档为准
+- 比值 **≈ 1.0**（方正）最利于布线均衡与时钟树平衡；长条形长边易拥塞、skew 难控
+- 工具参数：ICC2 `initialize_floorplan -side_ratio {1 1}`；Innovus `floorPlan -r 1.0 ...`
+
+> 备注：利用率“过高拥塞、过低浪费”，是常考题。
 
 ---
 
