@@ -127,20 +127,34 @@ def _title_block(slide, title, sub, accent=PRIMARY):
         _txt(slide, (0.87, 1.18, 11.8, 0.5), [sub], sizes=[14], colors=[SUB_C])
 
 
-def _page(slide, n, total):
-    # 页脚标签也在版式（母版）上，这里只填每页不同的页码
-    _txt(slide, (10.8, 7.06, 2.2, 0.4), [f"{n:02d} / {total:02d}"], sizes=[10], colors=[PAGE_C], align=PP_ALIGN.RIGHT)
+def _page(slide):
+    """底部右侧：插入 PowerPoint 原生【幻灯片编号字段】(slidenum)，随增删/重排页自动更新；
+    比手写 'N/24' 更省事——加页不用改总数。页脚标签在版式上，二者不重叠（左/右分置）。"""
+    tb = slide.shapes.add_textbox(Inches(10.8), Inches(7.05), Inches(2.2), Inches(0.4))
+    tf = tb.text_frame; tf.word_wrap = False
+    tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = Pt(0)
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.RIGHT
+    fld = p._p.makeelement(qn("a:fld"), {"id": "{8B7AE7E1-4F6F-4B3A-9E2D-1A2B3C4D5E6F}", "type": "slidenum"})
+    rPr = fld.makeelement(qn("a:rPr"), {"lang": "en-US", "sz": "1000"})
+    sf = rPr.makeelement(qn("a:solidFill"), {}); cl = sf.makeelement(qn("a:srgbClr"), {"val": PAGE_C})
+    sf.append(cl); rPr.append(sf)
+    rPr.append(rPr.makeelement(qn("a:latin"), {"typeface": YAHEI}))
+    t = fld.makeelement(qn("a:t"), {}); t.text = "1"
+    fld.append(rPr); fld.append(t)
+    p._p.append(fld)
+    return tb
 
 
-def _layout_chrome(prs, lay):
+def _layout_chrome(prs, lay, page_label):
     """把每页重复出现的"母版件"放到【版式】上——内容/导览页自动继承，新增页自动带样式；
     要全局改样式（条色/分隔线/页脚）只改这一处，或直接在 PowerPoint 的版式视图里改。
-    python-pptx 不支持直接给版式加形状，故先在草稿页上画好，再把形状 XML 复制进版式、删草稿页。"""
+    python-pptx 不支持直接给版式加形状，故先在草稿页上画好，再把形状 XML 复制进版式、删草稿页。
+    页脚标签 page_label 随每篇笔记而变（如 'Floorplan · 布图规划' / 'Placement · 布局'），由调用方传入。"""
     scratch = prs.slides.add_slide(lay)
     before = len(scratch.shapes._spTree)
     _bar(scratch, 0.6, 0.5, 0.16, 0.62, PRIMARY)        # 左侧主色竖条
     _bar(scratch, 0.85, 1.6, 11.85, 0.022, HAIR_C)      # 全宽细分隔线
-    _txt(scratch, (0.6, 7.06, 7, 0.4), [PAGE_LABEL], sizes=[10], colors=[PAGE_C])  # 左下页脚标签
+    _txt(scratch, (0.6, 7.06, 6.5, 0.4), [page_label], sizes=[10], colors=[PAGE_C])  # 左下页脚标签（随文档变）
     lay_spTree = lay.shapes._spTree
     for el in list(scratch.shapes._spTree)[before:]:
         lay_spTree.append(copy.deepcopy(el))
@@ -260,7 +274,7 @@ def _clean_master(prs, keep):
                         ph._element.getparent().remove(ph._element)
 
 
-def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None):
+def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None, page_label=PAGE_LABEL):
     """template=<.pptx 路径> 时，基于该模板（继承其母版/主题/字体），并清掉模板自带的示例幻灯片。"""
     prs = Presentation(template) if template else Presentation()
     if template:
@@ -271,7 +285,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
     blank = (min(prs.slide_layouts, key=lambda L: len(L.placeholders)) if template
              else prs.slide_layouts[6])
     _clean_master(prs, blank)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
-    _layout_chrome(prs, blank)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
+    _layout_chrome(prs, blank, page_label)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
         k = s["kind"]
@@ -280,7 +294,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
         if k == "close":
             _close(sl, s); continue
         if k == "agenda":
-            _agenda(sl, s); _page(sl, i, total); continue
+            _agenda(sl, s); _page(sl); continue
         acc = (s.get("accent", PRIMARY) or PRIMARY).lstrip("#")
         _title_block(sl, s["title"], s.get("sub"))
         if k == "split":
@@ -319,7 +333,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
             else:
                 _txt(sl, (0.7, 1.75, 12.0, 5.3), _bullets_lines(items),
                      sizes=[15] * len(items), colors=[INK_C] * len(items), space=10, line_sp=1.25)
-        _page(sl, i, total)
+        _page(sl)
     try:
         prs.core_properties.author = author
     except Exception:
@@ -391,7 +405,7 @@ def _pclose(ax, s):
     _mtext(ax, 1.15, 6.9, s.get("src", ""), fs=10, color="#" + MUTED_C)
 
 
-def _pagenda(ax, s, i, total):
+def _pagenda(ax, s, i, page_label):
     ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
     ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc="#" + PRIMARY, ec="none", zorder=2))
     _mtext(ax, 0.85, 0.5, s["title"], fs=24, bold=True)
@@ -409,10 +423,11 @@ def _pagenda(ax, s, i, total):
         ax.add_patch(FancyBboxPatch((0.95, SLIDE_H - 6.28 - 0.6), 11.0, 0.6,
                      boxstyle="round,pad=0,rounding_size=0.06", fc="#F6E8D5", ec="#E4C79A", lw=1.2, zorder=2))
         _mtext(ax, 1.25, 6.5, s["line"], fs=12.5, bold=True, color="#8A5212")
-    _mtext(ax, 12.9, 7.1, f"{i:02d}/{total:02d}", fs=10, color=T.MUTED, ha="right")
+    _mtext(ax, 0.6, 7.1, page_label, fs=10, color="#" + PAGE_C)
+    _mtext(ax, 12.9, 7.1, str(i), fs=10, color="#" + PAGE_C, ha="right")
 
 
-def build_previews(specs, outdir, total, asset_dir=""):
+def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
     os.makedirs(outdir, exist_ok=True)
     paths = []
     T.setup_fonts()
@@ -427,13 +442,14 @@ def build_previews(specs, outdir, total, asset_dir=""):
         if k == "close":
             _pclose(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
         if k == "agenda":
-            _pagenda(ax, s, i, total); paths.append(_save_prev(fig, outdir, i)); continue
+            _pagenda(ax, s, i, page_label); paths.append(_save_prev(fig, outdir, i)); continue
         ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
         ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc="#" + PRIMARY, ec="none", zorder=2))
         _mtext(ax, 0.85, 0.5, s["title"], fs=24, bold=True)
         if s.get("sub"):
             _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
         ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
+        _mtext(ax, 0.6, 7.1, page_label, fs=10, color="#" + PAGE_C)
         if k == "split":
             style = s.get("style", "bullet")
             yy = 1.95
@@ -483,7 +499,7 @@ def build_previews(specs, outdir, total, asset_dir=""):
                 yy = 1.95
                 for b in items:
                     yy = _pbul(ax, 0.7, 1.0, yy, b, 15, accx, 52)
-        _mtext(ax, 12.9, 7.1, f"{i:02d}/{total:02d}", fs=10, color=T.MUTED, ha="right")
+        _mtext(ax, 12.9, 7.1, str(i), fs=10, color="#" + PAGE_C, ha="right")
         paths.append(_save_prev(fig, outdir, i))
     return paths
 

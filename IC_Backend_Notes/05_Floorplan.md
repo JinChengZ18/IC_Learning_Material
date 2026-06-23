@@ -1,4 +1,4 @@
-# Floorplan 布图规划 · 教案
+# Floorplan 布图规划 · 笔记
 
 > 课程原版 (English source): Adam Teman, *Digital VLSI Design (DVD)*, Bar-Ilan University · Course 83-612 · 对应 DVD Lecture 6 (Moving to the Physical Domain - Floorplan) · <https://enicslabs.com/academic-courses/dvd-english/>
 > 中文转述：《芯片设计从RTL到GDS》 · 整理：**J.C**

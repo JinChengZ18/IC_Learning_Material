@@ -20,6 +20,7 @@ PREV = os.path.join(ROOT, "slides", "_preview")
 PPTX = os.path.join(ROOT, "slides", "05_Floorplan.pptx")
 TOTAL = 24
 SRC = "整理 J.C  ·  源自 Digital VLSI Design (DVD), Prof. Adam Teman, Bar-Ilan University (83-612)"
+FOOTER = "Floorplan · 布图规划"   # 左下页脚标签（随笔记而变）；页码用母版 slidenum 字段自动生成
 
 # 统一配色：主色靛蓝，暖橙仅强调（全篇一致）
 PRIMARY = "1F3A8A"
@@ -265,10 +266,10 @@ SPECS = [
 
 
 def main():
-    D.build_previews(SPECS, PREV, TOTAL, asset_dir=ASSETS)
+    D.build_previews(SPECS, PREV, TOTAL, asset_dir=ASSETS, page_label=FOOTER)
     print("previews ->", PREV, "(", len(SPECS), "pages )")
     try:  # 主版本（干净浅母版，可被 PowerPoint 锁住）
-        print("pptx ->", D.build_pptx(SPECS, PPTX, TOTAL, asset_dir=ASSETS))
+        print("pptx ->", D.build_pptx(SPECS, PPTX, TOTAL, asset_dir=ASSETS, page_label=FOOTER))
     except Exception as e:
         print("main pptx skipped (locked?):", e)
 
