@@ -229,13 +229,24 @@ def _circ(i):
     return CIRC[i] if i < 10 else f"({i + 1})"
 
 
+def _body_items(items, style="bullet"):
+    """归一化正文条目为 (kind, text)。kind: p=散文段/lead=引导句（均无标记、整段）；b=并列▪；n=有序①。
+    item 可为 str（用 style 默认体裁）或 (kind, text) 元组——支持一页内**混合体裁**，对齐笔记结构。"""
+    default = "n" if style == "num" else ("p" if style == "prose" else "b")
+    return [(it if isinstance(it, tuple) else (default, it)) for it in items]
+
+
 def _marks(items, style="bullet"):
-    """并列内容用 ▪；递进/有序内容用 ①②③（style='num'）；叙述性内容不分点（style='prose'，无标记）。"""
-    if style == "num":
-        return [f"{_circ(i)}  {b}" for i, b in enumerate(items)]
-    if style == "prose":
-        return list(items)
-    return ["▪  " + b for b in items]
+    """pptx 正文：按每条体裁加标记前缀（散文/引导句无标记，▪ 并列，①②③ 有序——仅有序项计数）。"""
+    lines, ni = [], 0
+    for kind, text in _body_items(items, style):
+        if kind == "n":
+            lines.append(f"{_circ(ni)}  {text}"); ni += 1
+        elif kind == "b":
+            lines.append("▪  " + text)
+        else:
+            lines.append(text)
+    return lines
 
 
 def _circ_num(slide, x, y, num, d=0.46, fill=PRIMARY, fg="FFFFFF", fs=15):
@@ -565,15 +576,28 @@ def _dlabel(slide, x, y, text, color="#1A1F2B", fs=11, ha="center", bold=False):
     return tb
 
 
+def _dia_yshift(dia, BH):
+    """把图内容在框内**竖直居中**的偏移（避免内容偏上、底部留大片空白）。"""
+    ys = []
+    for b in dia.get("boxes", []):
+        ys += [b[1], b[1] + b[3]]
+    for a in dia.get("arrows", []):
+        ys += [a[1], a[3]]
+    for L in dia.get("labels", []):
+        ys.append(L[1])
+    return (BH / 2.0 - (min(ys) + max(ys)) / 2.0) if ys else 0.0
+
+
 def _dia_native(slide, dia, box):
     """把一份图布局(boxes/arrows/labels，左下原点、坐标即英寸)画成 PowerPoint 原生形状。"""
     X, Ytop, BW, BH = box
+    sh = _dia_yshift(dia, BH)                   # 竖直居中
 
     def px(x):
         return X + x
 
     def py(y):
-        return Ytop + (BH - y)                 # 左下原点 → 幻灯片左上原点
+        return Ytop + (BH - (y + sh))          # 左下原点 → 幻灯片左上原点（含居中偏移）
     fs = dia.get("fs", 12)
     for x, yb, w, h, text, role, variant in dia.get("boxes", []):
         _dbox(slide, px(x), py(yb + h), w, h, text, role, variant, fs=fs)
@@ -589,12 +613,13 @@ def _dia_prev(ax, dia, box):
     """同一份布局的 matplotlib 预览（与原生形状一致，作为唯一的版面校对）。"""
     X, Ytop, BW, BH = box
     by = SLIDE_H - Ytop - BH
+    sh = _dia_yshift(dia, BH)                   # 竖直居中
 
     def mx(x):
         return X + x
 
     def my(y):
-        return by + y
+        return by + y + sh
     ax.add_patch(Rectangle((X, by), BW, BH, fc="none", ec="#E2E8F0", lw=1, zorder=1))
     fs = dia.get("fs", 12)
     lh = fs / 72.0 * 1.18
@@ -1123,18 +1148,23 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
         ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
         _mtext(ax, 0.6, 7.1, page_label, fs=10, color="#" + PAGE_C)
         if k == "split":
-            style = s.get("style", "bullet")
-            maxu = 26 if style == "prose" else 24
-            blh, bgap = (0.40, 0.22) if style == "prose" else (0.40, 0.16)
-            sc = _fit_scale(s["bullets"], maxu, 1.95, 6.98, blh, bgap)   # 模拟 pptx 自动缩字号
-            yy = 1.95
-            for bi, b in enumerate(s["bullets"]):
-                if style == "prose":                       # 叙述性内容：整段、无标记、段间留白
-                    yy = _pbul(ax, 0.7, 0.7, yy, b, 14 * sc, mark_c, maxu, lh=blh * sc, gap=bgap * sc, mark="")
-                else:
-                    mk = _circ(bi) if style == "num" else "▪"
-                    yy = _pbul(ax, 0.7, 1.05, yy, b, 14 * sc, mark_c, maxu, lh=blh * sc, gap=bgap * sc, mark=mk)
-            if yy > 7.05:                                   # 缩到底仍溢出才告警
+            items = _body_items(s["bullets"], s.get("style", "bullet"))   # 支持混合体裁
+            total = 0.0                                     # 估算正文总高求 shrink（散文 maxu26/gap0.20，要点 maxu24/gap0.14）
+            for kind, text in items:
+                mu = 26 if kind in ("p", "lead") else 24
+                gp = 0.20 if kind in ("p", "lead") else 0.14
+                total += len(_wrap(text, mu)) * 0.40 + gp
+            avail = 6.98 - 1.95
+            sc = max(0.58, avail / total) if total > avail else 1.0
+            yy, ni = 1.95, 0
+            for kind, text in items:
+                if kind in ("p", "lead"):                   # 散文 / 引导句：整段、无标记、段间留白
+                    yy = _pbul(ax, 0.7, 0.7, yy, text, 14 * sc, mark_c, 26, lh=0.40 * sc, gap=0.20 * sc, mark="")
+                elif kind == "n":                           # 有序 ①②③（仅有序项计数）
+                    yy = _pbul(ax, 0.7, 1.05, yy, text, 14 * sc, mark_c, 24, lh=0.40 * sc, gap=0.14 * sc, mark=_circ(ni)); ni += 1
+                else:                                       # 并列 ▪
+                    yy = _pbul(ax, 0.7, 1.05, yy, text, 14 * sc, mark_c, 24, lh=0.40 * sc, gap=0.14 * sc, mark="▪")
+            if yy > 7.05:
                 _oflow_mark(ax)
             if s.get("figs"):
                 fig_no = _psplit_figs(ax, s["figs"], asset_dir, fig_no, s.get("figs_v", False))
