@@ -432,6 +432,25 @@ def _refs(slide, s):
         _txt(slide, (0.7, 1.78, 12.0, 5.2), lines, sizes=[12.5] * len(lines), colors=[INK_C] * len(lines), space=9, line_sp=1.2, auto_fit=True)
 
 
+def _split_figs(sl, figs, asset_dir, fig_no):
+    """split 右栏并排渲染多张图（1–3），每张带图注「图 N · …」+ 可选来源。返回更新后的 fig_no。"""
+    n = len(figs)
+    x0, wtot, y0, gap = 6.0, 6.85, 1.7, 0.22
+    cw = (wtot - gap * (n - 1)) / n
+    img_h = 4.55 if n == 1 else (3.7 if n == 2 else 3.0)
+    cap_fs = 12 if n == 1 else (10 if n == 2 else 9)
+    for i, fgd in enumerate(figs):
+        x = x0 + i * (cw + gap)
+        _pic(sl, os.path.join(asset_dir, fgd["f"]), (x, y0, cw, img_h))
+        fig_no += 1
+        yy = y0 + img_h + 0.08
+        if fgd.get("cap"):
+            _txt(sl, (x, yy, cw, 0.62), [f"图 {fig_no} · {fgd['cap']}"], sizes=[cap_fs], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+        if fgd.get("credit"):
+            _txt(sl, (x, yy + 0.6, cw, 0.3), ["来源：" + fgd["credit"]], sizes=[8], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+    return fig_no
+
+
 _REQUIRED = {
     "cover": ["title"], "title": ["title"], "close": ["title"],
     "agenda": ["title", "sections"],
@@ -731,17 +750,20 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
         if k == "split":
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
                  sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16, auto_fit=True)
-            cap = s.get("caption")
-            box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
-            if s.get("diagram"):                       # 原生框图（可编辑形状），否则插图片
-                _dia_native(sl, DIAGRAMS[s["diagram"]](), box)
+            if s.get("figs"):                          # 多图（每图带图注 + 来源）
+                fig_no = _split_figs(sl, s["figs"], asset_dir, fig_no)
             else:
-                _pic(sl, os.path.join(asset_dir, s["figure"]), box)
-            if cap:
-                fig_no += 1
-                _txt(sl, (6.0, 6.48, 6.85, 0.5), [f"图 {fig_no}. {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
-            if s.get("credit"):              # 文献插图来源标注（恰当处）
-                _txt(sl, (6.0, 6.98, 6.85, 0.3), ["来源：" + s["credit"]], sizes=[9], colors=[MUTED_C], align=PP_ALIGN.RIGHT)
+                cap = s.get("caption")
+                box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)
+                if s.get("diagram"):                   # 原生框图（可编辑形状），否则插图片
+                    _dia_native(sl, DIAGRAMS[s["diagram"]](), box)
+                else:
+                    _pic(sl, os.path.join(asset_dir, s["figure"]), box)
+                if cap:
+                    fig_no += 1
+                    _txt(sl, (6.0, 6.34, 6.85, 0.5), [f"图 {fig_no} · {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+                if s.get("credit"):          # 文献插图来源标注（恰当处）
+                    _txt(sl, (6.0, 6.86, 6.85, 0.3), ["来源：" + s["credit"]], sizes=[9], colors=[MUTED_C], align=PP_ALIGN.RIGHT)
         elif k == "table":
             _table(sl, s)
         elif k == "chart":
@@ -1010,6 +1032,32 @@ def _prefs(ax, s):
     return mx
 
 
+def _psplit_figs(ax, figs, asset_dir, fig_no):
+    """预览端：split 右栏并排多图 + 图注（与 _split_figs 镜像）。"""
+    n = len(figs)
+    x0, wtot, y0, gap = 6.0, 6.85, 1.7, 0.22
+    cw = (wtot - gap * (n - 1)) / n
+    img_h = 4.55 if n == 1 else (3.7 if n == 2 else 3.0)
+    cap_fs = 11 if n == 1 else (9 if n == 2 else 8)
+    for i, fgd in enumerate(figs):
+        x = x0 + i * (cw + gap)
+        p = os.path.join(asset_dir, fgd["f"])
+        if not os.path.isfile(p):
+            _mmissing(ax, p, (x, y0, cw, img_h))
+        else:
+            iw, ih = Image.open(p).size
+            fx, ft, fw, fh = fit((x, y0, cw, img_h), iw, ih)
+            ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
+            ax.add_patch(Rectangle((x, SLIDE_H - y0 - img_h), cw, img_h, fc="none", ec="#E2E8F0", lw=1, zorder=1))
+        fig_no += 1
+        yy = y0 + img_h + 0.24
+        for ln in _wrap(f"图 {fig_no} · {fgd['cap']}", _maxu(cw, cap_fs)):
+            _mtext(ax, x + cw / 2, yy, ln, fs=cap_fs, color="#" + MUTED_C, ha="center"); yy += cap_fs / 72.0 * 1.5
+        if fgd.get("credit"):
+            _mtext(ax, x + cw / 2, yy + 0.03, "来源：" + fgd["credit"], fs=8, color="#" + MUTED_C, ha="center")
+    return fig_no
+
+
 def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
     os.makedirs(outdir, exist_ok=True)
     validate_specs(specs, asset_dir)
@@ -1054,24 +1102,27 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                     yy = _pbul(ax, 0.7, 1.05, yy, b, 14 * sc, mark_c, maxu, lh=blh * sc, gap=bgap * sc, mark=mk)
             if yy > 7.05:                                   # 缩到底仍溢出才告警
                 _oflow_mark(ax)
-            cap = s.get("caption")
-            box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
-            if s.get("diagram"):
-                _dia_prev(ax, DIAGRAMS[s["diagram"]](), box)
+            if s.get("figs"):
+                fig_no = _psplit_figs(ax, s["figs"], asset_dir, fig_no)
             else:
-                p = os.path.join(asset_dir, s["figure"])
-                if not os.path.isfile(p):
-                    _mmissing(ax, p, box)
+                cap = s.get("caption")
+                box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)
+                if s.get("diagram"):
+                    _dia_prev(ax, DIAGRAMS[s["diagram"]](), box)
                 else:
-                    iw, ih = Image.open(p).size
-                    fx, ft, fw, fh = fit(box, iw, ih)
-                    ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
-                    ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
-            if cap:
-                fig_no += 1
-                _mtext(ax, 6.0 + 6.85 / 2.0, 6.62, f"图 {fig_no}. {cap}", fs=11, color="#" + MUTED_C, ha="center")
-            if s.get("credit"):
-                _mtext(ax, 12.85, 7.02, "来源：" + s["credit"], fs=9, color="#" + MUTED_C, ha="right")
+                    p = os.path.join(asset_dir, s["figure"])
+                    if not os.path.isfile(p):
+                        _mmissing(ax, p, box)
+                    else:
+                        iw, ih = Image.open(p).size
+                        fx, ft, fw, fh = fit(box, iw, ih)
+                        ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
+                        ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
+                if cap:
+                    fig_no += 1
+                    _mtext(ax, 6.0 + 6.85 / 2.0, 6.46, f"图 {fig_no} · {cap}", fs=11, color="#" + MUTED_C, ha="center")
+                if s.get("credit"):
+                    _mtext(ax, 12.85, 6.92, "来源：" + s["credit"], fs=9, color="#" + MUTED_C, ha="right")
         elif k == "table":
             _ptable(ax, s)
         elif k == "chart":

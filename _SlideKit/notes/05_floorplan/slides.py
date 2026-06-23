@@ -25,11 +25,22 @@ PRIMARY = D.PRIMARY
 ACCENT = D.ACCENT
 
 
-def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None):
+def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None, caption=None, figs=None):
     d = {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": PRIMARY, "style": style}
     if diagram:                 # 右栏改用 PPT 原生框图（可编辑形状）；fig 仍保留供笔记 md 与预览回退
         d["diagram"] = diagram
-    if credit:                  # 引用文献插图时的来源标注（图下小字「来源：…」）；见 refs 页与 tools/extract_figs.py
+    if credit:                  # 单图来源标注（图下小字「来源：…」）；见 refs 页与 tools/extract_figs.py
+        d["credit"] = credit
+    if caption:                 # 单图图注（图下「图 N · …」）
+        d["caption"] = caption
+    if figs:                    # 多图：[{"f":路径,"cap":图注,"credit":来源}]，右栏并排渲染、各带图注
+        d["figs"] = figs
+    return d
+
+
+def fg(f, cap, credit=None):    # 多图条目助手
+    d = {"f": f, "cap": cap}
+    if credit:
         d["credit"] = credit
     return d
 
@@ -118,11 +129,12 @@ SPECS = [
         "原因有二：一是 IO 不像逻辑晶体管随工艺快速缩小，IO 单元与焊盘面积非常贵；二是 IO 不只传信号还负责供电，电源 / 地焊盘的数量与位置直接影响 IR 压降与 EM。",
         "选尺寸先判断是核心受限还是焊盘受限：核心受限由逻辑规模、宏与布线资源决定芯片大小，重点优化利用率与摆放；焊盘受限由 IO 数量、焊盘间距与封装引脚决定、晶粒已不能再小，重点优化 IO 环与封装协同。",
     ], style="prose", credit="Intel i9-13900K die · Fritzchens Fritz / JmsDoug · CC0 · Wikimedia"),
-    split("2.2 利用率与试布线", "两个口径 + 必须试布线验证", "f04_util.png", [
+    split("2.2 利用率与试布线", "两个口径 + 必须试布线验证", "ext_congest_verihgn_ccby.png", [
         "Floorplan 阶段的利用率通常指标准单元占核心区面积的比例，常见初值约 70%。",
         "利用率太高会带来布线拥塞、合法化与优化自由度不足、引脚密集处局部拥塞，以及电源网格与信号抢资源；太低则浪费面积、拉长平均互连。",
         "工程上要区分总利用率（含宏）与有效利用率（扣除阻挡、宏留边、禁布区）；但不能只凭利用率定尺寸——完成初始估算后还要跑试布线或全局布线估拥塞，再决定是否放大核心、调综合、移宏或改引脚。",
-    ], style="prose"),
+    ], style="prose", caption="拥塞如何形成：逻辑块 → 布线竞争 → 拥塞热力图",
+        credit="VeriHGN, Hu et al. · arXiv:2603.11075 · CC BY 4.0"),
     split("2.3 网表唯一化", "物理实现前每个子模块只引用一次", "f16_uniquify.png", [
         "进入物理域前，网表必须唯一化——每个子模块只被引用一次。这是因为物理优化要按实例独立移动、插缓冲器、做优化。",
         "如果两个实例共享同一个模块定义，工具想优化 m1/u1 时就可能同时改变 m2/u1，物理优化边界不清晰。",
@@ -135,7 +147,12 @@ SPECS = [
         "宏与宏、宏与边界之间留足信号、电源、时钟通道",
         "必要时旋转宏改善引脚可达性，并避免引脚对着窄通道或角落",
         "位置确定后标记为固定；引线键合下高功耗宏勿放中心太深，否则供电路径长、IR 压力大",
-    ], style="num"),
+    ], style="num", figs=[
+        fg("ext_die_ultrasparc_ccbysa.jpg", "真实 die：8 核 + L2 缓存等存储宏沿核区分布",
+           "UltraSPARC T1 · ZyMOS / Fritzchens Fritz · CC BY-SA 3.0"),
+        fg("ext_floorplan_compare_ccbysa.png", "宏摆放对比：人工分区 vs 规则 AI",
+           "Copparihollmann · CC BY-SA 4.0 · Wikimedia"),
+    ]),
     tbl("2.5 布局区域：表达放置意图", "越硬越易局部拥塞，仅用于必要结构性意图", ["类型", "含义", "强度"], [
         ["软引导 soft guide", "希望这些单元聚在一起，但无固定区域", "最软"],
         ["引导区域 guide", "尽量放在指定区域", "较软"],
@@ -171,11 +188,12 @@ SPECS = [
         "代价：引脚分配 / 穿通更关键，时序约束预算更复杂",
         "代价：模块抽象 ILM / ETM 需要维护",
     ], diagram="hier"),
-    split("3.2 时序预算与 ILM", "顶层约束映射到模块边界", "f11_budget.png", [
+    split("3.2 时序预算与 ILM", "顶层约束映射到模块边界", "ext_block_floorplan_parsac_ccbysa.png", [
         "芯片级约束必须映射成模块级约束。例如顶层某输入到模块的路径预算为 1.5 ns，模块实现时就要在模块边界建立对应的输入 / 输出延迟、时钟不确定性、负载与驱动单元约束。",
         "预算合理时，各模块独立收敛后全芯片才容易收敛；预算不合理时，单个模块看似通过，全芯片仍可能失败。",
         "接口逻辑模型（ILM）保留模块边界附近与接口相关的逻辑、隐藏内部细节；抽取时序模型（ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析更快、更可控。",
-    ], style="prose"),
+    ], style="prose", caption="层次化分块布图：紧凑块边界 b1–b11 + B*-tree 表示",
+        credit="PARSAC, Mostafa et al. · arXiv:2405.05495 · CC BY-SA 4.0"),
     split("3.3 引脚分配与穿通", "顶层 IO 与模块 pin 影响点不同", "ext_wirebond_ccbysa.jpg", [
         "顶层 IO 摆放决定芯片对外接口位置，影响封装、ESD、电源焊盘与芯片边界；模块级引脚分配则决定层次化模块之间如何连接，影响模块间布线、时序预算、feedthrough 与全芯片收敛。",
         "模块级引脚的约束常包括布线层、引脚间距与尺寸、重叠规则、网络分组、引脚引导区域、数据流方向，以及试布线的边界穿越情况。",
@@ -275,17 +293,23 @@ SPECS = [
             "defIn != floorPlan  (read DEF vs create)",
         ], ACCENT),
     ]},
-    {"kind": "refs", "title": "参考文献 References", "sub": "本讲内容与图示来源", "accent": PRIMARY, "refs": [
+    {"kind": "refs", "title": "参考文献 References", "sub": "本讲内容来源", "accent": PRIMARY, "refs": [
         "Adam Teman. Digital VLSI Design (DVD), Lecture 6 — Import Design and Floorplan. Bar-Ilan University (83-612). enicslabs.com/academic-courses/dvd-english",
         "J. M. Rabaey, A. Chandrakasan, B. Nikolić. Digital Integrated Circuits: A Design Perspective. Prentice Hall.",
         "N. H. E. Weste, D. M. Harris. CMOS VLSI Design: A Circuits and Systems Perspective. Addison-Wesley.",
         "IDESA / EPFL — Digital IC design tutorials.",
         "Cadence Innovus / Synopsys ICC2 / Fusion Compiler User Guides（命令与流程参考）.",
-        "图 1.1 Intel 80486DX2 die — Smial, CC BY 3.0, Wikimedia Commons.",
+    ]},
+    {"kind": "refs", "title": "图片来源 Image Credits", "sub": "全部为开放许可（CC0 / CC BY / CC BY-SA / 公有领域），均经来源页核验、按许可署名", "accent": PRIMARY, "refs": [
+        "图 1.1 Intel 80486DX2 die（功能块标注）— Smial, CC BY 3.0, Wikimedia Commons.",
         "图 2.1 Intel Core i9-13900K die shot — Fritzchens Fritz / JmsDoug, CC0, Wikimedia Commons.",
+        "图 2.2 布线拥塞形成（VeriHGN）— R. Hu et al., arXiv:2603.11075, doi:10.48550/arXiv.2603.11075, CC BY 4.0.",
+        "图 2.4 UltraSPARC T1 die（核 + L2 存储宏）— ZyMOS / Fritzchens Fritz, CC BY-SA 3.0, Wikimedia Commons.",
+        "图 2.4 宏摆放对比（人工 vs 规则 AI）— Copparihollmann, CC BY-SA 4.0, Wikimedia Commons.",
+        "图 3.2 层次化分块布图（PARSAC）— H. Mostafa et al., arXiv:2405.05495, doi:10.48550/arXiv.2405.05495, CC BY-SA 4.0.",
         "图 3.3 Wire-bonding close-up — Mister rf, CC BY-SA 4.0, Wikimedia Commons.",
-        "图 4.1 Bitfury 顶层金属供电网 — ZeptoBars, CC BY 3.0, Wikimedia Commons.",
-        "图 4.2 Static IR-drop map — Seo et al. (WACA-UNet), arXiv:2507.19197, CC BY 4.0.",
+        "图 4.1 Bitfury 芯片顶层金属供电网 — ZeptoBars, CC BY 3.0, Wikimedia Commons.",
+        "图 4.2 Static IR-drop map（WACA-UNet）— Y. Seo et al., arXiv:2507.19197, doi:10.48550/arXiv.2507.19197, CC BY 4.0.",
     ]},
     {"kind": "close", "title": "谢谢 · Thanks",
      "sub": "下一讲：Placement 标准单元布局",
