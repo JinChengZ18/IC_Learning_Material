@@ -18,7 +18,7 @@ ROOT = os.path.abspath(os.path.join(_SK, "..", "IC_Backend_Notes"))
 ASSETS = os.path.join(ROOT, "assets", "floorplan")
 PREV = os.path.join(ROOT, "slides", "_preview")
 PPTX = os.path.join(ROOT, "slides", "05_Floorplan.pptx")
-SRC = "整理 J.C  ·  源自 Digital VLSI Design (DVD), Prof. Adam Teman, Bar-Ilan University (83-612)"
+BYLINE = "整理 J.C"   # 封面/封底署名（作者水印）。课程出处等引用统一放参考文献(refs)页，不硬编码进标题页
 FOOTER = "Floorplan · 布图规划"   # 左下页脚标签（随笔记而变）；页码用母版 slidenum 字段
 
 PRIMARY = D.PRIMARY
@@ -51,10 +51,10 @@ def section(num, title, sub, items):
 
 SPECS = [
     {"kind": "cover", "title": "Floorplan 布图规划",
-     "tag": "数字 IC 后端 · 从 RTL 到 GDS · DVD Lecture 6",
+     "tag": "数字 IC 后端 · 从 RTL 到 GDS",
      "sub": "把逻辑网表落成可实现的物理骨架",
      "line": "一步错，步步错 —— Floorplan 决定 PPA 上限",
-     "src": SRC},
+     "src": BYLINE},
 
     {"kind": "agenda", "title": "本讲导览  Agenda", "sub": "按工程决策顺序展开的五章",
      "sections": [
@@ -86,13 +86,11 @@ SPECS = [
         ["EM 风险", "电流密度、金属宽度、过孔阵列、高功耗集中区"],
     ]),
     split("1.3 Floorplan 的目标", "本质是逻辑→物理的映射", "f01_position.png", [
-        "映射：netlist（谁连谁）→ floorplan（谁放哪、怎么连、怎么供电）",
-        "同时服务三个目标：减小芯片面积",
-        "减小关键路径延迟",
-        "减小布线拥塞",
-        "三者天然冲突：压面积→拥塞，留宽通道→浪费，强网格→抢信号",
-        "因此是面积/时序/拥塞/供电的第一轮工程取舍",
-    ], style="num", diagram="pnr"),
+        "Floorplan 本质是一个映射：把“谁连谁”的逻辑网表，落成实例、IO、宏单元与电源网络在芯片上如何摆放、连接与供电。",
+        "它要同时服务三个目标——减小芯片面积、减小关键路径延迟、减小布线拥塞。",
+        "但三者天然冲突：面积压太紧会拥塞，通道留太宽会浪费面积，电源网格做太强又抢走信号布线资源。",
+        "因此 Floorplan 是在面积、时序、拥塞与供电可靠性之间做的第一轮工程取舍。",
+    ], style="prose", diagram="pnr"),
     tbl("1.4 全芯片设计视角", "floorplan 要同时回答的 8 类问题", ["对象", "Floorplan 阶段要回答的问题"], [
         ["芯片尺寸", "晶粒 / 模块有多大，长宽比如何"],
         ["核心放置区", "标准单元可放置区在哪里，利用率多少"],
@@ -117,13 +115,10 @@ SPECS = [
             ["2.1 IO 环与芯片尺寸", "2.2 利用率与试布线", "2.3 网表唯一化", "2.4 硬宏摆放",
              "2.5 布局区域", "2.6 阻挡与留边", "2.7 布线阻挡与好 Floorplan"]),
     split("2.1 IO 环与芯片尺寸", "由外到内 + 核心受限 / 焊盘受限", "f03_geometry.png", [
-        "几何由外到内：Die ＞ IO/Pad Ring ＞ Core ＞（宏 + 标准单元行）",
-        "IO 引脚由前端 / 系统 / 封装提出，但物理设计必须参与评审",
-        "原因一：IO 不像逻辑随工艺缩小，IO 单元与焊盘面积非常贵",
-        "原因二：IO 还负责供电，电源 / 地焊盘的数量与位置直接影响 IR 与 EM",
-        "核心受限：尺寸由逻辑规模 / 宏 / 布线资源决定 → 优化利用率、宏摆放与布线资源",
-        "焊盘受限：尺寸由 IO 数 / 焊盘间距 / 封装决定，晶粒不能再小 → 优化 IO 环与封装协同",
-    ]),
+        "芯片几何由外到内：晶粒 Die ＞ IO / 焊盘环 ＞ 核心区 Core ＞（宏单元 + 标准单元行）。IO 引脚常由前端、系统或封装侧先提出，但物理设计必须参与评审。",
+        "原因有二：一是 IO 不像逻辑晶体管随工艺快速缩小，IO 单元与焊盘面积非常贵；二是 IO 不只传信号还负责供电，电源 / 地焊盘的数量与位置直接影响 IR 压降与 EM。",
+        "选尺寸先判断是核心受限还是焊盘受限：核心受限由逻辑规模、宏与布线资源决定芯片大小，重点优化利用率与摆放；焊盘受限由 IO 数量、焊盘间距与封装引脚决定、晶粒已不能再小，重点优化 IO 环与封装协同。",
+    ], style="prose"),
     split("2.2 利用率与试布线", "两个口径 + 必须试布线验证", "f04_util.png", [
         "Floorplan 阶段的利用率通常指标准单元占核心区面积的比例，常见初值约 70%。",
         "利用率太高会带来布线拥塞、合法化与优化自由度不足、引脚密集处局部拥塞，以及电源网格与信号抢资源；太低则浪费面积、拉长平均互连。",
@@ -178,14 +173,10 @@ SPECS = [
         "代价：模块抽象 ILM / ETM 需要维护",
     ], diagram="hier"),
     split("3.2 时序预算与 ILM", "顶层约束映射到模块边界", "f11_budget.png", [
-        "芯片级约束必须映射成模块级约束",
-        "示例：顶层某输入到模块的路径预算 1.5 ns，模块实现时要在边界还原它",
-        "在模块边界建立输入 / 输出延迟、时钟不确定度、负载与驱动单元约束",
-        "预算合理 → 各模块独立收敛后，全芯片才容易收敛",
-        "预算不合理 → 单模块看似通过，全芯片仍可能失败",
-        "ILM（接口逻辑模型）只保留接口相关逻辑、隐藏模块内部细节",
-        "ETM（抽取时序模型）也提供抽象时序模型；二者都让全芯片分析更快可控",
-    ]),
+        "芯片级约束必须映射成模块级约束。例如顶层某输入到模块的路径预算为 1.5 ns，模块实现时就要在模块边界建立对应的输入 / 输出延迟、时钟不确定性、负载与驱动单元约束。",
+        "预算合理时，各模块独立收敛后全芯片才容易收敛；预算不合理时，单个模块看似通过，全芯片仍可能失败。",
+        "接口逻辑模型（ILM）保留模块边界附近与接口相关的逻辑、隐藏内部细节；抽取时序模型（ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析更快、更可控。",
+    ], style="prose"),
     split("3.3 引脚分配与穿通", "顶层 IO 与模块 pin 影响点不同", "f13_iopad.png", [
         "顶层 IO 摆放决定芯片对外接口位置，影响封装、ESD、电源焊盘与芯片边界；模块级引脚分配则决定层次化模块之间如何连接，影响模块间布线、时序预算、feedthrough 与全芯片收敛。",
         "模块级引脚的约束常包括布线层、引脚间距与尺寸、重叠规则、网络分组、引脚引导区域、数据流方向，以及试布线的边界穿越情况。",
@@ -265,7 +256,7 @@ SPECS = [
         ["EM 违例", "电流密度、金属宽度、过孔阵列", "加宽金属、并联过孔、分散高功耗模块"],
         ["PG 未连通", "全局电源名、宏电源 / 地引脚、专用布线", "校正 VDD/GND 命名并补专用布线"],
     ]),
-    {"kind": "cards2", "title": "附录 · EDA 命令速查（ICC2 / Innovus）", "sub": "选项随版本而异；坑：Innovus margin 四值为 LBRT", "accent": PRIMARY, "cards": [
+    {"kind": "cards2", "title": "附录 · EDA 命令速查（ICC2 / Innovus）", "sub": "选项随工具版本而异；Innovus margin 四值顺序为 L / B / R / T", "accent": PRIMARY, "cards": [
         ("Synopsys · ICC2 / Fusion Compiler", [
             "initialize_floorplan \\",
             "  -core_utilization 0.70 -side_ratio {1 1}",
@@ -285,7 +276,7 @@ SPECS = [
             "defIn != floorPlan  (read DEF vs create)",
         ], ACCENT),
     ]},
-    {"kind": "refs", "title": "参考文献 References", "sub": "本讲内容与图示来源（引用文献插图时图下另标“来源：…”）", "accent": PRIMARY, "refs": [
+    {"kind": "refs", "title": "参考文献 References", "sub": "本讲内容与图示来源", "accent": PRIMARY, "refs": [
         "Adam Teman. Digital VLSI Design (DVD), Lecture 6 — Import Design and Floorplan. Bar-Ilan University, Course 83-612. https://enicslabs.com/academic-courses/dvd-english/",
         "J. M. Rabaey, A. Chandrakasan, B. Nikolić. Digital Integrated Circuits: A Design Perspective. Prentice Hall.",
         "N. H. E. Weste, D. M. Harris. CMOS VLSI Design: A Circuits and Systems Perspective. Addison-Wesley.",
@@ -293,9 +284,9 @@ SPECS = [
         "Cadence Innovus User Guide; Synopsys IC Compiler II / Fusion Compiler User Guide（命令与流程参考）.",
     ]},
     {"kind": "close", "title": "谢谢 · Thanks",
-     "sub": "下一讲：Placement 标准单元布局（DVD Lecture 7）",
+     "sub": "下一讲：Placement 标准单元布局",
      "line": "Floorplan 是迭代回环：试布局 → 评估拥塞/时序/IR → 回退调整 → 收敛后再进详细布局",
-     "src": SRC},
+     "src": BYLINE},
 ]
 
 TOTAL = len(SPECS)
