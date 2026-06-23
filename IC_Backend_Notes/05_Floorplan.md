@@ -44,6 +44,7 @@
 
 - 物理实现（P&R）中**第一个确定版图骨架**的主要步骤
 - 之前还有“设计导入 / 初始化”：读库（LEF / Liberty / NDM）、读网表、加载 **SDC** 约束与 **UPF/CPF** 功耗意图、初始化设计
+- **网表唯一化（uniquify）**：物理实现前网表必须**唯一**——每个子模块只被引用一次，否则无法独立优化（如改 `m1/u1` 会牵连 `m2/u1`）；综合或 import 时完成
 - 位置：综合产出**门级网表之后**、详细 **Placement 之前**
 - 主要任务（6 项）：① die/core **几何**；② **宏（Macro/Hard IP）**位置与朝向；③ **IO/Pad/Bump** 与引脚分配；④ **PG 电源网络**骨架（环/条/网）；⑤ **多电压域**划分与电压岛边界；⑥ 各类 **blockage** 与 **halo/keepout** 预留
 - 一句话：把“逻辑网表”映射成“物理布局骨架”，为 Placement / CTS / Routing 划定边界条件
@@ -84,6 +85,7 @@
 | 核心到 IO 间距 | Core-to-IO Spacing | Core 边界到 Pad 内沿的距离，留给电源环 / IO 走线 |
 
 - 嵌套关系：**Die ⊃ Pad Ring ⊃ Core ⊃ (Macro + 标准单元行 Rows)**
+- **Core-limited vs Pad-limited**：芯片尺寸由 **core 面积**决定（核受限）还是由 **IO/Pad 环周长**决定（焊盘受限）——IO 不随摩尔定律缩小，pad 受限时面积很“贵”
 
 > 备注：让学生记住“层层嵌套、由外到内”。
 
@@ -150,8 +152,9 @@ Effective Util = Σ std_cell_area / (Core_area − blockage − macro_halo − k
   3. **预留 channel**：宏间留通道走 PG/时钟/信号；另有 **channel-less（紧贴 abutted）** 风格，省面积但对 pin access 要求高
   4. **引脚朝 core**：避免信号绕过整个 macro 本体
   5. **朝向与对称**：R0/R90/R180/R270 + 镜像 MX/MY 共 8 种朝向；常把两块对称宏引脚相对、背靠背摆放，共享 channel、对齐成规整阵列
+  6. **摆好后标记 FIXED**；功耗大的宏（wire-bond）远离芯片中心、靠近边界电源 pad（降 IR drop），且彼此拉开（避 EM）
 
-> 备注：摆放不当 = 绕线障碍 + 长走线 → 拥塞与时序。
+> 备注：摆放不当 = 绕线障碍 + 长走线 → 拥塞与时序。摆放手法常优于自动。
 
 ---
 
@@ -167,6 +170,7 @@ Effective Util = Σ std_cell_area / (Core_area − blockage − macro_halo − k
   - **soft**：粗放（coarse）阶段禁放，但优化/合法化阶段可放 buffer/inverter
   - **partial**：按密度上限限制（如该区最多 40%）；与 density screen 概念相近，但实现/命名因工具而异，**不等价**
 - **Routing Blockage**：禁某些层布线，可指定层范围（如 M1–M3），有 hard/partial
+- **Placement Region（聚类约束，区别于 blockage）**：`soft guide`（尽量聚拢，无固定区）/ `guide`（尽量放指定区）/ `region`（必须放该区，他人亦可）/ `fence`（必须放该区且排他）——用来“帮”工具把某类逻辑放一起
 - 经验：macro 引脚一侧加 halo，给 pin access 留空间，避免 pin 拥塞/绕不出
 
 > 备注：halo 跟着 macro，blockage 钉在坐标——区分清楚。
@@ -331,6 +335,7 @@ create_voltage_area -power_domain PD_CPU -region {{100 100} {400 400}} VA_CPU
 - 预算合理 → 各 block 独立收敛后顶层即可收敛；不合理 → 反复迭代
 - **pin 位置与 budget 耦合**：pin 离驱动/接收逻辑越远，块内走线越长、可用 budget 越少
 - 自动预算：ICC2 `allocate_budgets` / `estimate_timing`；Innovus `deriveTimingBudget`；或 `create_block_abstraction` + ETM（Extracted Timing Model）
+- **ILM（Interface Logic Model）**：只保留**接口逻辑**、抽掉块内部，简化并加速顶层时序收敛（层次化设计常用）
 - block SDC budget 不只 input/output delay，还含时钟不确定度、时钟延迟、驱动单元/输入转换、负载：
 
 ```tcl
