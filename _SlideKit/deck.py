@@ -241,6 +241,25 @@ def _close(slide, s):
     _txt(slide, (1.15, 6.85, 11.6, 0.4), [s.get("src", "")], sizes=[11], colors=[MUTED_C])
 
 
+def _clean_master(prs, keep):
+    """清掉默认模板自带的占位符（日期/页脚/页码/标题/正文）并删掉未使用的版式：
+    否则默认占位符会与自定义母版件重叠（日期框压住页脚标签），且默认模板是 4:3、占位符按
+    4:3 排布，在 16:9 母版视图里显得不对。只保留实际使用的那张空白版式（已 16:9、放了母版件）。"""
+    for m in prs.slide_masters:
+        for ph in list(m.placeholders):                       # 母版上的占位符
+            ph._element.getparent().remove(ph._element)
+        for lay in list(m.slide_layouts):
+            if lay._element is keep._element:                 # 保留并清干净这张要用的版式
+                for ph in list(lay.placeholders):
+                    ph._element.getparent().remove(ph._element)
+            else:                                             # 删掉其余未用版式（4:3）
+                try:
+                    m.slide_layouts.remove(lay)
+                except Exception:
+                    for ph in list(lay.placeholders):
+                        ph._element.getparent().remove(ph._element)
+
+
 def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None):
     """template=<.pptx 路径> 时，基于该模板（继承其母版/主题/字体），并清掉模板自带的示例幻灯片。"""
     prs = Presentation(template) if template else Presentation()
@@ -251,6 +270,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
     prs.slide_width = Inches(SLIDE_W); prs.slide_height = Inches(SLIDE_H)
     blank = (min(prs.slide_layouts, key=lambda L: len(L.placeholders)) if template
              else prs.slide_layouts[6])
+    _clean_master(prs, blank)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
     _layout_chrome(prs, blank)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
