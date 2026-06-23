@@ -323,7 +323,6 @@ def f12_io():
         y = 6.0 - (i // 2) * 0.95
         T.node(ax, x, y - 0.78, 1.85, 0.78, label, role="neutral", fs=CAP - 0.5, z=3, shadow=False)
     eng = T.node(ax, 4.7, 4.0, 2.6, 1.6, "Floorplan", sub="ICC2 / Innovus", role="logic", variant="solid", z=4, fs=H2, sub_fs=CAP)
-    ax.text(2.3, 3.2, "↓ 吃进", ha="center", color=T.MUTED, fontsize=CAP)
     outs = [("DEF：宏 + PG + blockage", "memory"), ("Floorplan DB (NDM/OA)", "memory"), ("可布线性 / 时序初评", "io")]
     for i, (label, role) in enumerate(outs):
         T.infocard(ax, 0.4, 2.4 - i * 0.92, 6.9, 0.78, label, role=role, title_fs=CAP)
