@@ -18,7 +18,7 @@
 8. [工作条件与多模多角 MMMC](#8-工作条件与多模多角-mmmc)
 9. [完整 SDC 示例脚本（带中文注释）](#9-完整-sdc-示例脚本带中文注释)
 10. [本章小结](#10-本章小结)
-11. [易混淆点 / 面试高频考点](#11-易混淆点--面试高频考点)
+11. [易混淆点 · 课后自测](#11-易混淆点--课后自测)
 
 ---
 
@@ -269,7 +269,7 @@ set_clock_uncertainty -setup 0.30 -from [get_clocks clkA] -to [get_clocks clkB]
 - **setup 和 hold 检查都会用到 uncertainty**：setup 检查时从 required 侧减去（缩小裕量），hold 检查时加到 required 侧（收紧要求），**两者都使分析更保守**——并非只在 setup 用。
 - **综合 & 布局前阶段（理想时钟）**：时钟树还没建，skew 用 uncertainty 整体预留（如 setup 含 jitter+skew 预留+margin，hold 主要含 skew 预留+margin）。
 - **CTS 之后（传播时钟）**：真实 skew 由时钟树计算，uncertainty 中应**去掉 skew 分量，只留 jitter + margin**，否则重复扣减、过约束。
-- **uncertainty ≠ latency**：uncertainty 是“波动/裕量”，latency 是“延迟”，二者完全不同（见 3.5、面试考点）。
+- **uncertainty ≠ latency**：uncertainty 是“波动/裕量”，latency 是“延迟”，二者完全不同（见 3.5、课后自测）。
 
 ### 3.5 set_clock_latency —— 时钟延迟
 
@@ -420,7 +420,7 @@ set_load [load_of slow_lib/BUFX4/A] [get_ports data_out]
 | 输出负载 | `set_load` | 建模输出电容 |
 
 **常见坑**：
-- **`-clock` 参考时钟选错** = IO 路径全错（高频面试/实战坑，见考点）。
+- **`-clock` 参考时钟选错** = IO 路径全错（高频实战坑，见自测）。
 - 没设 `set_load` → 输出延迟乐观；没设 `set_driving_cell` → 输入延迟乐观。两者都让 STA 失真。
 - input/output delay 漏掉 `-min` → hold 检查不充分。
 
@@ -847,7 +847,7 @@ set_operating_conditions -library slow_lib WORST   ;# setup 用慢角
 
 ---
 
-## 11. 易混淆点 / 面试高频考点
+## 11. 易混淆点 · 课后自测
 
 ### 11.1 约束不全 vs 过约束（over-constrain）
 
@@ -874,7 +874,7 @@ set_operating_conditions -library slow_lib WORST   ;# setup 用慢角
 - **`set_multicycle_path N -setup` 默认会把 hold 捕获沿推到第 (N−1) 个周期**，导致 hold 要求“保持 N−1 个周期”——几乎必 hold 违例。
 - **为什么 hold 默认跟随？** 因为 hold 检查的捕获沿**锚定在 setup 捕获沿的前一个时钟沿**；setup 捕获沿被推到第 N 沿后，hold 捕获沿自然移到第 (N−1) 沿。理解这一点就能推导出“hold 配 N−1”而非死记。
 - **正确做法**：成对设置 `set_multicycle_path (N−1) -hold`，把 hold 沿拉回发起沿。
-- 面试常问：“设了 setup MCP=3 不设 hold 会怎样？” → **答：hold 捕获沿被推到第 2 沿，等于要求数据保持 2 个周期，产生大量 hold 违例或掩盖真实问题。**
+- 常考：“设了 setup MCP=3 不设 hold 会怎样？” → **答：hold 捕获沿被推到第 2 沿，等于要求数据保持 2 个周期，产生大量 hold 违例或掩盖真实问题。**
 
 ### 11.5 uncertainty 与 latency 的区别
 

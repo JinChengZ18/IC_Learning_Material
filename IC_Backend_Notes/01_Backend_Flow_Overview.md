@@ -548,7 +548,7 @@ write_changes -format icctcl -output eco.tcl
 
 ---
 
-## 8. 易混淆点 / 面试高频考点
+## 8. 易混淆点 · 课后自测
 
 | # | 问题 | 要点 |
 |---|---|---|
