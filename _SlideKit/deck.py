@@ -374,8 +374,9 @@ def _table(slide, s):
     spec: {kind:'table', table:{headers:[...], rows:[[...],...], col_align?:[l/r/c], col_w?:[..]}}"""
     t = s["table"]; headers = t["headers"]; rows = t["rows"]
     aligns = t.get("col_align"); widths = t.get("col_w")
+    note = s.get("note")                       # 表下说明文字（取自笔记的引言/定义/结论）
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, 5.05
+    x, top, w, h = 0.7, 1.78, 11.95, (4.25 if note else 5.05)
     gtbl = slide.shapes.add_table(nrow, ncol, Inches(x), Inches(top), Inches(w), Inches(h))
     tbl = gtbl.table
     tbl.first_row = False; tbl.horz_banding = False   # 关掉内置样式条纹，改用我们显式的斑马纹
@@ -392,6 +393,8 @@ def _table(slide, s):
         fill = "FFFFFF" if ri % 2 else "EDF0F4"
         for c in range(ncol):
             _style_cell(tbl.cell(ri, c), str(row[c]) if c < len(row) else "", size=12, fill=fill, align=al(c))
+    if note:
+        _txt(slide, (0.7, top + h + 0.14, 11.95, 1.05), [note], sizes=[11], colors=[MUTED_C], line_sp=1.16)
 
 
 def _chart(slide, s):
@@ -966,8 +969,9 @@ def _pagenda(ax, s, i, page_label):
 def _ptable(ax, s):
     t = s["table"]; headers = t["headers"]; rows = t["rows"]
     aligns = t.get("col_align"); widths = t.get("col_w")
+    note = s.get("note")
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, 5.05
+    x, top, w, h = 0.7, 1.78, 11.95, (4.25 if note else 5.05)
     cw = [w * v / float(sum(widths)) for v in widths] if widths else [w / ncol] * ncol
     xstops = [x]
     for c in range(ncol):
@@ -989,6 +993,10 @@ def _ptable(ax, s):
         fill = "#FFFFFF" if ri % 2 else "#EDF0F4"
         for c in range(ncol):
             cell(ri, c, str(row[c]) if c < len(row) else "", fill, "#" + INK_C, False)
+    if note:
+        yy = top + h + 0.32
+        for ln in _wrap(note, _maxu(11.95, 11)):
+            _mtext(ax, 0.7, yy, ln, fs=11, color="#" + MUTED_C); yy += 0.265
 
 
 def _pchart(ax, s):
