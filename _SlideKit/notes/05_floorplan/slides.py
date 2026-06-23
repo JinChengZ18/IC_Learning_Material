@@ -114,11 +114,11 @@ SPECS = [
     section("2", "几何与空间约束", "尺寸、利用率、宏、区域与阻挡",
             ["2.1 IO 环与芯片尺寸", "2.2 利用率与试布线", "2.3 网表唯一化", "2.4 硬宏摆放",
              "2.5 布局区域", "2.6 阻挡与留边", "2.7 布线阻挡与好 Floorplan"]),
-    split("2.1 IO 环与芯片尺寸", "由外到内 + 核心受限 / 焊盘受限", "f03_geometry.png", [
+    split("2.1 IO 环与芯片尺寸", "由外到内 + 核心受限 / 焊盘受限", "ext_die_i9_cc0.jpg", [
         "芯片几何由外到内：晶粒 Die ＞ IO / 焊盘环 ＞ 核心区 Core ＞（宏单元 + 标准单元行）。IO 引脚常由前端、系统或封装侧先提出，但物理设计必须参与评审。",
         "原因有二：一是 IO 不像逻辑晶体管随工艺快速缩小，IO 单元与焊盘面积非常贵；二是 IO 不只传信号还负责供电，电源 / 地焊盘的数量与位置直接影响 IR 压降与 EM。",
         "选尺寸先判断是核心受限还是焊盘受限：核心受限由逻辑规模、宏与布线资源决定芯片大小，重点优化利用率与摆放；焊盘受限由 IO 数量、焊盘间距与封装引脚决定、晶粒已不能再小，重点优化 IO 环与封装协同。",
-    ], style="prose"),
+    ], style="prose", credit="Intel i9-13900K die · Fritzchens Fritz / JmsDoug · CC0 · Wikimedia"),
     split("2.2 利用率与试布线", "两个口径 + 必须试布线验证", "f04_util.png", [
         "Floorplan 阶段的利用率通常指标准单元占核心区面积的比例，常见初值约 70%。",
         "利用率太高会带来布线拥塞、合法化与优化自由度不足、引脚密集处局部拥塞，以及电源网格与信号抢资源；太低则浪费面积、拉长平均互连。",
@@ -177,11 +177,11 @@ SPECS = [
         "预算合理时，各模块独立收敛后全芯片才容易收敛；预算不合理时，单个模块看似通过，全芯片仍可能失败。",
         "接口逻辑模型（ILM）保留模块边界附近与接口相关的逻辑、隐藏内部细节；抽取时序模型（ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析更快、更可控。",
     ], style="prose"),
-    split("3.3 引脚分配与穿通", "顶层 IO 与模块 pin 影响点不同", "f13_iopad.png", [
+    split("3.3 引脚分配与穿通", "顶层 IO 与模块 pin 影响点不同", "ext_wirebond_ccbysa.jpg", [
         "顶层 IO 摆放决定芯片对外接口位置，影响封装、ESD、电源焊盘与芯片边界；模块级引脚分配则决定层次化模块之间如何连接，影响模块间布线、时序预算、feedthrough 与全芯片收敛。",
         "模块级引脚的约束常包括布线层、引脚间距与尺寸、重叠规则、网络分组、引脚引导区域、数据流方向，以及试布线的边界穿越情况。",
         "在无通道或通道资源紧张的设计中 feedthrough 很关键：若信号从分区 A 经分区 B 到分区 C，而 B 没有 feedthrough，信号可能被迫绕过整个模块。解法是在 B 上生成 feedthrough 引脚 / 网络，把跨越 B 的连接拆成几段。",
-    ], style="prose"),
+    ], style="prose", credit="Wire-bond 实拍 · Mister rf · CC BY-SA 4.0 · Wikimedia"),
 
     # ===== 第 4 章 电源规划与完整性 =====
     section("4", "电源规划与完整性", "PDN、IR / EM、电源网格与宏摆放",
@@ -282,6 +282,8 @@ SPECS = [
         "N. H. E. Weste, D. M. Harris. CMOS VLSI Design: A Circuits and Systems Perspective. Addison-Wesley.",
         "IDESA / EPFL — Digital IC design tutorials.",
         "Cadence Innovus User Guide; Synopsys IC Compiler II / Fusion Compiler User Guide（命令与流程参考）.",
+        "图（2.1）Intel Core i9-13900K labelled die shot — Fritzchens Fritz / JmsDoug, CC0 公有领域, via Wikimedia Commons.",
+        "图（3.3）Aluminium wire-bonding close-up — Mister rf, CC BY-SA 4.0, via Wikimedia Commons.",
     ]},
     {"kind": "close", "title": "谢谢 · Thanks",
      "sub": "下一讲：Placement 标准单元布局",
