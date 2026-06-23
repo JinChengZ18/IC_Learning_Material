@@ -61,14 +61,6 @@ SPECS = [
         "Core 内切成等高的标准单元行 Rows",
         "嵌套：Die ＞ Pad Ring ＞ Core ＞ Macro+Rows",
     ], BLUE),
-    split("利用率与长宽比", "两个口径要分清", "f04_util.png", [
-        "Total Util = (Σ单元+Σ宏) / Core 面积",
-        "Effective Util 扣除 blockage/halo，工具多报此",
-        "经验初值 0.5–0.8，看 macro/拥塞/裕量",
-        "目标利用率 ≠ placement 后局部密度",
-        "长宽比 H/W ≈ 1 最利于布线与时钟树",
-        "长宽比约定各工具可能相反，以手册为准",
-    ], TEAL),
     split("标准单元行 / site / 翻转共享供电轨", "面积更省的小机关", "f05_rows.png", [
         "Row：等高水平行；行高=库单元高度(9T/7T)",
         "行高 ≈ track 数 × M2 pitch",
@@ -76,6 +68,14 @@ SPECS = [
         "单元宽度必须是 site 宽度的整数倍",
         "相邻行镜像翻转(FS) → 同名轨落在行边界",
         "上下两行共享同名轨 → 供电轨条数减半",
+    ], TEAL),
+    split("利用率与长宽比", "两个口径要分清", "f04_util.png", [
+        "Total Util = (Σ单元+Σ宏) / Core 面积",
+        "Effective Util 扣除 blockage/halo，工具多报此",
+        "经验初值 0.5–0.8，看 macro/拥塞/裕量",
+        "目标利用率 ≠ placement 后局部密度",
+        "长宽比 H/W ≈ 1 最利于布线与时钟树",
+        "长宽比约定各工具可能相反，以手册为准",
     ], AMBER),
     split("宏单元摆放原则", "Macro Placement", "f06_macro.png", [
         "宏 = SRAM/PLL/IP，尺寸大、形状/引脚固定",
