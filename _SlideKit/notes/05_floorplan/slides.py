@@ -25,8 +25,11 @@ PRIMARY = D.PRIMARY
 ACCENT = D.ACCENT
 
 
-def split(t, sub, fig, bullets, style="bullet"):
-    return {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": PRIMARY, "style": style}
+def split(t, sub, fig, bullets, style="bullet", diagram=None):
+    d = {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": PRIMARY, "style": style}
+    if diagram:                 # 右栏改用 PPT 原生框图（可编辑形状）；fig 仍保留供笔记 md 与预览回退
+        d["diagram"] = diagram
+    return d
 
 
 def bl(t, sub, bullets, two=False):
@@ -86,7 +89,7 @@ SPECS = [
         "减小布线拥塞",
         "三者天然冲突：压面积→拥塞，留宽通道→浪费，强网格→抢信号",
         "因此是面积/时序/拥塞/供电的第一轮工程取舍",
-    ], style="num"),
+    ], style="num", diagram="pnr"),
     tbl("1.4 全芯片设计视角", "floorplan 要同时回答的 8 类问题", ["对象", "Floorplan 阶段要回答的问题"], [
         ["芯片尺寸", "晶粒 / 模块有多大，长宽比如何"],
         ["核心放置区", "标准单元可放置区在哪里，利用率多少"],
@@ -104,7 +107,7 @@ SPECS = [
         "输出：电源网格初步设计、必要的电源预布线",
         "输出：标准单元可放置区，阻挡 / 留边 / 区域约束入库",
         "输出：可布线性、时序与电源完整性的早期评估",
-    ]),
+    ], diagram="io"),
 
     # ===== 第 2 章 几何与空间约束 =====
     section("2", "几何与空间约束", "尺寸、利用率、宏、区域与阻挡",
@@ -126,7 +129,7 @@ SPECS = [
         "进入物理域前，网表必须唯一化——每个子模块只被引用一次。这是因为物理优化要按实例独立移动、插缓冲器、做优化。",
         "如果两个实例共享同一个模块定义，工具想优化 m1/u1 时就可能同时改变 m2/u1，物理优化边界不清晰。",
         "综合后的网表必须在布局之前完成唯一化：可以由综合工具完成，也可以在设计导入阶段完成。",
-    ], style="prose"),
+    ], style="prose", diagram="uniquify"),
     split("2.4 硬宏摆放", "把大宏推到边角，留完整大矩形", "f06_macro.png", [
         "硬宏 = SRAM/ROM/PLL/模拟 IP：面积大、形状 / 引脚固定、不可拆",
         "沿边 / 沿角摆放，不在核心中心挖洞",
@@ -168,7 +171,7 @@ SPECS = [
         "代价：全芯片时序收敛更难",
         "代价：引脚分配 / 穿通更关键，时序约束预算更复杂",
         "代价：模块抽象 ILM / ETM 需要维护",
-    ]),
+    ], diagram="hier"),
     split("3.2 时序预算与 ILM", "顶层约束映射到模块边界", "f11_budget.png", [
         "芯片级约束必须映射成模块级约束",
         "在模块边界建立输入 / 输出延迟、时钟不确定度、负载、驱动单元",
@@ -246,7 +249,7 @@ SPECS = [
         "定义区域与阻挡：布局区域、布局阻挡、布线阻挡",
         "定义全局电源网：顶层 VDD/GND 映射到 IP 电源 / 地引脚",
         "电源环 → 电源网格 → 分配引脚，形成反复调整的闭环",
-    ], style="num"),
+    ], style="num", diagram="loop"),
     tbl("5.2 判断一个好 Floorplan", "让下游布局 / CTS / 布线 / 签核都有路可走", ["问题", "反查方向", "常见动作"], [
         ["布线绕不出", "利用率、宏通道、引脚可达性", "降利用率、拓宽通道、调引脚、改阻挡"],
         ["时序收不回", "宏单元 / 引脚位置、时序预算", "按数据流重摆宏，重新预算接口路径"],

@@ -20,13 +20,14 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from matplotlib.patches import Rectangle, FancyBboxPatch, Circle
+from matplotlib.patches import Rectangle, FancyBboxPatch, Circle, FancyArrowPatch
 from PIL import Image
 
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
 from pptx.oxml.ns import qn
 from pptx.chart.data import CategoryChartData
 from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
@@ -469,6 +470,221 @@ def validate_specs(specs, asset_dir=None):
     return True
 
 
+# ---------- 原生框图引擎：一份布局 → PowerPoint 原生形状 + matplotlib 预览（可编辑、不插图片）-------- #
+_DROLE = {  # role -> (浅填充, 描边/主色, 文字)  —— 派生自 theme，单一真源
+    "logic":   (T.BLUE_L,   T.BLUE,   T.BLUE_D),
+    "memory":  (T.TEAL_L,   T.TEAL,   T.TEAL_D),
+    "power":   (T.AMBER_L,  T.AMBER,  T.AMBER_D),
+    "io":      (T.ROSE_L,   T.ROSE,   T.ROSE_D),
+    "clock":   (T.VIOLET_L, T.VIOLET, T.VIOLET_D),
+    "neutral": (T.SLATE_L,  "#94A3B8", T.INK),
+}
+
+
+def _drole3(role, variant):
+    fill, line, tc = _DROLE.get(role, _DROLE["neutral"])
+    if variant == "solid":
+        return line, line, "#FFFFFF"
+    if variant == "outline":
+        return "#FFFFFF", line, tc
+    return fill, line, tc
+
+
+def _dbox(slide, x, y, w, h, text, role="neutral", variant="soft", fs=12):
+    shp = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
+    try:
+        shp.adjustments[0] = 0.12
+    except Exception:
+        pass
+    fc, ec, tc = _drole3(role, variant)
+    shp.fill.solid(); shp.fill.fore_color.rgb = _rgb(fc)
+    shp.line.color.rgb = _rgb(ec); shp.line.width = Pt(1.5)
+    shp.shadow.inherit = False
+    tf = shp.text_frame; tf.word_wrap = True
+    tf.margin_left = tf.margin_right = Pt(3); tf.margin_top = tf.margin_bottom = Pt(2)
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    for i, ln in enumerate(str(text).split("\n")):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.alignment = PP_ALIGN.CENTER
+        r = p.add_run(); r.text = ln
+        _set_font(r, size=fs, bold=True, color=tc.lstrip("#"))
+    return shp
+
+
+def _darrow(slide, x0, y0, x1, y1, color="#3A4252", w=1.5):
+    cn = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x0), Inches(y0), Inches(x1), Inches(y1))
+    cn.line.color.rgb = _rgb(color.lstrip("#")); cn.line.width = Pt(w)
+    cn.shadow.inherit = False
+    ln = cn.line._get_or_add_ln()
+    ln.append(ln.makeelement(qn("a:tailEnd"), {"type": "triangle", "w": "med", "len": "med"}))
+    return cn
+
+
+def _dlabel(slide, x, y, text, color="#1A1F2B", fs=11, ha="center", bold=False):
+    bw = 3.6
+    bx = {"left": x, "center": x - bw / 2, "right": x - bw}.get(ha, x - bw / 2)
+    tb = slide.shapes.add_textbox(Inches(bx), Inches(y - 0.2), Inches(bw), Inches(0.4))
+    tf = tb.text_frame; tf.word_wrap = False
+    tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = Pt(0)
+    p = tf.paragraphs[0]; p.alignment = _align(ha)
+    r = p.add_run(); r.text = text
+    _set_font(r, size=fs, bold=bold, color=color.lstrip("#"))
+    return tb
+
+
+def _dia_native(slide, dia, box):
+    """把一份图布局(boxes/arrows/labels，左下原点、坐标即英寸)画成 PowerPoint 原生形状。"""
+    X, Ytop, BW, BH = box
+
+    def px(x):
+        return X + x
+
+    def py(y):
+        return Ytop + (BH - y)                 # 左下原点 → 幻灯片左上原点
+    fs = dia.get("fs", 12)
+    for x, yb, w, h, text, role, variant in dia.get("boxes", []):
+        _dbox(slide, px(x), py(yb + h), w, h, text, role, variant, fs=fs)
+    for a in dia.get("arrows", []):
+        x0, y0, x1, y1 = a[:4]
+        _darrow(slide, px(x0), py(y0), px(x1), py(y1), a[4] if len(a) > 4 else "#3A4252")
+    for L in dia.get("labels", []):
+        _dlabel(slide, px(L[0]), py(L[1]), L[2], L[3] if len(L) > 3 else "#1A1F2B",
+                L[4] if len(L) > 4 else 11, L[5] if len(L) > 5 else "center", L[6] if len(L) > 6 else False)
+
+
+def _dia_prev(ax, dia, box):
+    """同一份布局的 matplotlib 预览（与原生形状一致，作为唯一的版面校对）。"""
+    X, Ytop, BW, BH = box
+    by = SLIDE_H - Ytop - BH
+
+    def mx(x):
+        return X + x
+
+    def my(y):
+        return by + y
+    ax.add_patch(Rectangle((X, by), BW, BH, fc="none", ec="#E2E8F0", lw=1, zorder=1))
+    fs = dia.get("fs", 12)
+    lh = fs / 72.0 * 1.18
+    for x, yb, w, h, text, role, variant in dia.get("boxes", []):
+        fc, ec, tc = _drole3(role, variant)
+        ax.add_patch(FancyBboxPatch((mx(x), my(yb)), w, h, boxstyle="round,pad=0,rounding_size=0.08",
+                     fc=fc, ec=ec, lw=1.5, zorder=3))
+        lines = []
+        for seg in str(text).split("\n"):
+            lines += _wrap(seg, max(1.0, (w - 0.18) * 72.0 / fs)) if seg else []
+        for i, ln in enumerate(lines):
+            ax.text(mx(x) + w / 2, my(yb) + h / 2 + ((len(lines) - 1) / 2 - i) * lh, ln,
+                    ha="center", va="center", color=tc, fontsize=fs, fontweight="bold", zorder=4)
+    for a in dia.get("arrows", []):
+        x0, y0, x1, y1 = a[:4]
+        ax.add_patch(FancyArrowPatch((mx(x0), my(y0)), (mx(x1), my(y1)), arrowstyle="-|>",
+                     mutation_scale=11, color=a[4] if len(a) > 4 else "#3A4252", lw=1.5, zorder=4, shrinkA=2, shrinkB=2))
+    for L in dia.get("labels", []):
+        ax.text(mx(L[0]), my(L[1]), L[2], ha=(L[5] if len(L) > 5 else "center"), va="center",
+                color=(L[3] if len(L) > 3 else "#1A1F2B"), fontsize=(L[4] if len(L) > 4 else 11),
+                fontweight=("bold" if (len(L) > 6 and L[6]) else "normal"), zorder=4)
+
+
+def _dia_uniquify():
+    R, RD, TD, I2 = T.ROSE, T.ROSE_D, T.TEAL_D, T.INK2
+    boxes = [
+        (1.0, 4.0, 1.4, 0.55, "top", "neutral", "soft"),
+        (0.15, 2.9, 1.3, 0.55, "m1", "logic", "soft"), (1.95, 2.9, 1.3, 0.55, "m2", "logic", "soft"),
+        (1.0, 1.8, 1.4, 0.55, "amod", "memory", "soft"), (1.0, 0.7, 1.4, 0.55, "u1", "io", "soft"),
+        (4.5, 4.0, 1.4, 0.55, "top", "neutral", "soft"),
+        (3.65, 2.9, 1.3, 0.55, "m1", "logic", "soft"), (5.45, 2.9, 1.3, 0.55, "m2", "logic", "soft"),
+        (3.65, 1.8, 1.3, 0.55, "amod1", "memory", "soft"), (5.45, 1.8, 1.3, 0.55, "amod2", "memory", "soft"),
+        (3.65, 0.7, 1.3, 0.55, "u1", "io", "soft"), (5.45, 0.7, 1.3, 0.55, "u1", "io", "soft"),
+    ]
+    arrows = [
+        (1.5, 4.0, 0.95, 3.47, I2), (1.9, 4.0, 2.45, 3.47, I2),
+        (0.95, 2.9, 1.45, 2.37, R), (2.45, 2.9, 1.95, 2.37, R), (1.7, 1.8, 1.7, 1.27, I2),
+        (5.0, 4.0, 4.45, 3.47, I2), (5.4, 4.0, 5.95, 3.47, I2),
+        (4.3, 2.9, 4.3, 2.37, I2), (6.1, 2.9, 6.1, 2.37, I2), (4.3, 1.8, 4.3, 1.27, I2), (6.1, 1.8, 6.1, 1.27, I2),
+    ]
+    labels = [
+        (1.7, 4.95, "非唯一：m1/m2 共享 amod", RD, 11.5, "center", True),
+        (5.2, 4.95, "唯一化：各自独立副本", TD, 11.5, "center", True),
+        (1.7, 0.28, "改 m1/u1 牵连 m2/u1", RD, 9.5, "center", False),
+        (5.2, 0.28, "各实例可独立优化、移动", TD, 9.5, "center", False),
+    ]
+    return {"fs": 13, "boxes": boxes, "arrows": arrows, "labels": labels}
+
+
+def _dia_hier():
+    BD, TD, MU, I2 = T.BLUE_D, T.TEAL_D, T.MUTED, T.INK2
+    boxes = [
+        (0.15, 1.35, 2.85, 3.1, "", "neutral", "outline"),
+        (0.5, 2.5, 2.15, 1.35, "整颗芯片\n一次 P&R", "logic", "soft"),
+        (3.55, 1.35, 3.15, 3.1, "", "neutral", "outline"),
+        (4.55, 3.5, 1.55, 0.65, "Top 集成", "neutral", "soft"),
+        (3.75, 2.35, 0.85, 0.8, "Blk1", "memory", "soft"), (4.7, 2.35, 0.85, 0.8, "Blk2", "memory", "soft"),
+        (5.65, 2.35, 0.85, 0.8, "Blk3", "memory", "soft"),
+        (0.15, 0.2, 6.55, 0.92, "层次化省运行时间 / 内存、利于复用；但全芯片时序收敛更难，依赖引脚 / feedthrough / 时序预算 / ILM", "neutral", "soft"),
+    ]
+    arrows = [(4.175, 3.15, 4.9, 3.5, I2), (5.125, 3.15, 5.2, 3.5, I2), (6.075, 3.15, 5.5, 3.5, I2)]
+    labels = [
+        (1.575, 4.78, "扁平 Flat", BD, 14, "center", True),
+        (5.125, 4.78, "层次化 Hierarchical", TD, 14, "center", True),
+        (1.575, 1.62, "运行慢 / 内存大", MU, 10, "center", False),
+        (4.175, 2.12, "P&R", MU, 8.5, "center", False), (5.125, 2.12, "P&R", MU, 8.5, "center", False),
+        (6.075, 2.12, "P&R", MU, 8.5, "center", False),
+    ]
+    return {"fs": 12, "boxes": boxes, "arrows": arrows, "labels": labels}
+
+
+def _dia_pnr():
+    flow = [("逻辑综合\nSynth", "neutral", "outline"), ("布图规划\nFloorplan", "clock", "soft"),
+            ("布局\nPlace", "neutral", "outline"), ("时钟树\nCTS", "neutral", "outline"),
+            ("布线\nRoute", "neutral", "outline")]
+    boxes, arrows = [], []
+    fw, gap, y = 1.15, 0.27, 4.35
+    for i, (t, role, var) in enumerate(flow):
+        x = 0.05 + i * (fw + gap)
+        boxes.append((x, y, fw, 0.72, t, role, var))
+        if i > 0:
+            arrows.append((x - gap, y + 0.36, x, y + 0.36, T.INK2))
+    tasks = [("① die / core 几何", "logic"), ("② 宏摆放 & 朝向", "memory"),
+             ("③ 电源规划 PG", "power"), ("④ 多电压 / blockage", "io")]
+    for i, (t, role) in enumerate(tasks):
+        boxes.append((0.1 + (i % 2) * 3.45, 2.45 - (i // 2) * 1.15, 3.2, 0.95, t, role, "soft"))
+    labels = [(0.1, 5.18, "Floorplan 在 PnR 流程中的位置", T.INK, 12.5, "left", True),
+              (0.1, 3.8, "Floorplan 主要任务", T.INK, 12.5, "left", True)]
+    return {"fs": 12, "boxes": boxes, "arrows": arrows, "labels": labels}
+
+
+def _dia_io():
+    ins = ["Netlist (.v)", "LEF", "Liberty (.lib)", "SDC", "UPF", "Partition / 预算"]
+    boxes = [(0.1 + (i % 2) * 1.65, 4.3 - (i // 2) * 0.78, 1.55, 0.62, t, "neutral", "soft")
+             for i, t in enumerate(ins)]
+    boxes.append((4.25, 3.25, 2.45, 1.3, "Floorplan\nICC2 / Innovus", "logic", "solid"))
+    outs = [("DEF：宏 + PG + blockage", "memory"), ("Floorplan DB (NDM/OA)", "memory"),
+            ("可布线性 / 时序初评", "io")]
+    for i, (t, role) in enumerate(outs):
+        boxes.append((0.1, 1.7 - i * 0.72, 6.6, 0.6, t, role, "soft"))
+    arrows = [(3.4, 3.95, 4.25, 3.9, T.LINE), (5.45, 3.25, 3.5, 2.35, T.INK2)]
+    labels = [(0.1, 5.0, "输入", T.INK2, 12, "left", True), (0.1, 2.45, "输出", T.INK2, 12, "left", True)]
+    return {"fs": 11.5, "boxes": boxes, "arrows": arrows, "labels": labels}
+
+
+def _dia_loop():
+    I2 = T.INK2
+    boxes = [
+        (2.3, 4.0, 2.2, 0.9, "Floorplan\n定 die/macro/PG", "logic", "soft"),
+        (4.7, 2.1, 2.0, 0.9, "试布局 + GR", "memory", "soft"),
+        (2.3, 0.3, 2.2, 0.9, "评估\n拥塞 / 时序 / IR", "io", "soft"),
+        (0.1, 2.1, 2.0, 0.9, "回退调整", "power", "soft"),
+    ]
+    arrows = [(4.5, 4.05, 5.45, 3.05, I2), (5.55, 2.1, 4.5, 1.05, I2),
+              (2.3, 1.05, 1.35, 2.05, I2), (1.35, 3.0, 2.3, 4.05, I2)]
+    labels = [(3.4, 2.55, "迭代闭环", T.MUTED, 13, "center", True),
+              (3.4, 5.05, "收敛后才进详细 Placement", T.INK, 12.5, "center", True)]
+    return {"fs": 12, "boxes": boxes, "arrows": arrows, "labels": labels}
+
+
+DIAGRAMS = {"uniquify": _dia_uniquify, "hier": _dia_hier, "pnr": _dia_pnr, "io": _dia_io, "loop": _dia_loop}
+
+
 def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None, page_label=PAGE_LABEL,
                font=None, mono_font=None):
     """从规格构建可编辑 .pptx。
@@ -516,7 +732,11 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
                  sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16, auto_fit=True)
             cap = s.get("caption")
-            _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 4.7 if cap else 5.25))
+            box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
+            if s.get("diagram"):                       # 原生框图（可编辑形状），否则插图片
+                _dia_native(sl, DIAGRAMS[s["diagram"]](), box)
+            else:
+                _pic(sl, os.path.join(asset_dir, s["figure"]), box)
             if cap:
                 fig_no += 1
                 _txt(sl, (6.0, 6.48, 6.85, 0.5), [f"图 {fig_no}. {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
@@ -818,14 +1038,17 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 _oflow_mark(ax)
             cap = s.get("caption")
             box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
-            p = os.path.join(asset_dir, s["figure"])
-            if not os.path.isfile(p):
-                _mmissing(ax, p, box)
+            if s.get("diagram"):
+                _dia_prev(ax, DIAGRAMS[s["diagram"]](), box)
             else:
-                iw, ih = Image.open(p).size
-                fx, ft, fw, fh = fit(box, iw, ih)
-                ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
-                ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
+                p = os.path.join(asset_dir, s["figure"])
+                if not os.path.isfile(p):
+                    _mmissing(ax, p, box)
+                else:
+                    iw, ih = Image.open(p).size
+                    fx, ft, fw, fh = fit(box, iw, ih)
+                    ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
+                    ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
             if cap:
                 fig_no += 1
                 _mtext(ax, 6.0 + 6.85 / 2.0, 6.62, f"图 {fig_no}. {cap}", fs=11, color="#" + MUTED_C, ha="center")
