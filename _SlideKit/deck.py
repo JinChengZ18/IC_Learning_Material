@@ -993,12 +993,14 @@ def _prefs(ax, s):
     mx = 1.95
     if len(items) > 8:
         mid = (len(items) + 1) // 2
+        scL = _fit_scale(items[:mid], 26, 1.95, 6.82, 0.40, 0.16)   # 模拟 pptx 自动缩字号（留底部余量）
+        scR = _fit_scale(items[mid:], 26, 1.95, 6.82, 0.40, 0.16)
         yy = 1.95
         for i, r in enumerate(items[:mid]):
-            yy = _pbul(ax, 0.7, 1.15, yy, r, 12, "#" + INK_C, 26, mark=f"[{i + 1}]")
+            yy = _pbul(ax, 0.7, 1.15, yy, r, 12 * scL, "#" + INK_C, 26, lh=0.40 * scL, gap=0.16 * scL, mark=f"[{i + 1}]")
         mx = yy; yy = 1.95
         for i, r in enumerate(items[mid:]):
-            yy = _pbul(ax, 6.9, 7.35, yy, r, 12, "#" + INK_C, 26, mark=f"[{mid + i + 1}]")
+            yy = _pbul(ax, 6.9, 7.35, yy, r, 12 * scR, "#" + INK_C, 26, lh=0.40 * scR, gap=0.16 * scR, mark=f"[{mid + i + 1}]")
         mx = max(mx, yy)
     else:
         yy = 1.95
