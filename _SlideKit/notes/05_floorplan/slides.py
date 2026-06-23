@@ -27,8 +27,9 @@ ACCENT = "C2772E"
 BLUE = TEAL = AMBER = ROSE = VIOLET = PRIMARY  # 内容页一律靛蓝；橙色只出现在封面/导览/收尾
 
 
-def split(t, sub, fig, bullets, acc=PRIMARY):
-    return {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": acc}
+def split(t, sub, fig, bullets, acc=PRIMARY, style="bullet"):
+    # style: "bullet"=并列(▪)；"num"=递进/有序(①②③)
+    return {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": acc, "style": style}
 
 
 def bl(t, sub, bullets, acc=PRIMARY, two=False):
@@ -42,7 +43,7 @@ SPECS = [
      "line": "一步错，步步错 —— Floorplan 决定 PPA 上限",
      "src": SRC},
 
-    {"kind": "agenda", "title": "本讲导览  Agenda", "sub": "24 页 · 每节一图/一题，知识点写在页面上",
+    {"kind": "agenda", "title": "本讲导览  Agenda", "sub": "从定位与意义，到电源完整性与迭代收敛",
      "sections": [
         ("1", "定位与意义", "Floorplan 为何决定后端 PPA 上限"),
         ("2", "芯片几何", "Die / Core / IO、行与翻转共享供电轨"),
@@ -54,15 +55,14 @@ SPECS = [
      ],
      "line": "主线：Floorplan 决定后端天花板，是“试布局→评估→回退”的迭代闭环，并非一遍过"},
 
-    split("什么是 Floorplan", "物理实现的第一步", "f01_position.png", [
-        "Floorplan 是物理实现 P&R 的第一步，先确定版图骨架",
-        "它在综合产出门级网表之后、详细布局 Placement 之前",
-        "此前先做设计导入：读库与网表，加载 SDC 与 UPF",
-        "首要任务是确定 die 与 core 的整体几何尺寸",
-        "再摆放各 macro 位置朝向，规划 IO / Pad / Bump 引脚",
-        "然后搭 PG 电源骨架、划电压域、预留各类 blockage",
-        "本质是把逻辑网表映射成物理布局骨架",
-    ]),
+    split("什么是 Floorplan", "综合之后、详细布局之前，把网表落成版图骨架的六项任务", "f01_position.png", [
+        "确定 die 与 core 的整体几何尺寸",
+        "决定各 macro 硬核的位置与朝向",
+        "规划 IO / Pad / Bump 与引脚分配",
+        "搭建 PG 电源骨架：环 / 条 / 网 / 轨",
+        "划分多电压域与电压岛边界",
+        "预留各类 blockage 与 halo / keepout",
+    ], style="num"),
     split("为什么重要：一步错，步步错", "决定 PPA 上限", "f02_why.png", [
         "Floorplan 决定芯片 PPA（性能/功耗/面积）的上限",
         "利用率定得过高，再好的布局也会拥塞、绕不出线",
@@ -79,7 +79,7 @@ SPECS = [
         "Core 内被切成等高的水平标准单元行 Rows",
         "几何层层嵌套：Die 包 Pad Ring，Pad Ring 包 Core",
     ]),
-    split("标准单元行 / site / 翻转共享供电轨", "面积更省的小机关", "f05_rows.png", [
+    split("标准单元行 / site / 翻转共享供电轨", "等高行、site 栅格与翻转共享供电轨", "f05_rows.png", [
         "Row 是 Core 切出的等高水平行，行高等于库单元高度",
         "行高约等于 track 数乘以 M2 pitch（9T 比 7T 高）",
         "Site 是行内最小放置栅格，定义在 LEF 文件中",
@@ -87,7 +87,7 @@ SPECS = [
         "相邻行镜像翻转 FS，让同名供电轨落在行边界上",
         "上下两行共享供电轨，使轨数减半、更省面积",
     ]),
-    split("利用率与长宽比", "两个口径要分清", "f04_util.png", [
+    split("利用率与长宽比", "两种利用率口径与长宽比取向", "f04_util.png", [
         "总利用率 =（标准单元面积 + macro 面积）÷ Core 面积",
         "有效利用率扣除 blockage 与 halo，工具多报此口径",
         "经验初值取 0.5–0.8，视 macro 占比、拥塞与裕量而定",
@@ -95,15 +95,14 @@ SPECS = [
         "长宽比接近 1 最利于布线与时钟树平衡",
         "长宽比定义各工具可能相反，须以官方手册为准",
     ]),
-    split("宏单元摆放原则", "Macro Placement", "f06_macro.png", [
-        "macro 指 SRAM/PLL/IP 等硬核，尺寸大、形状引脚固定",
-        "大 macro 应沿边沿角摆放，中间连续区留给标准单元",
-        "按数据流就近放置，用 flyline 飞线或 auto placer 指导",
-        "macro 间预留 channel 走线，或采用 channel-less 紧贴",
-        "macro 引脚朝向 core，避免信号绕过 macro 本体",
-        "从 8 种朝向中选定并对称背靠背，对齐成规整阵列",
-    ]),
-    split("halo / keepout 与各类 blockage", "给布线留活路", "f07_halo.png", [
+    split("宏单元摆放原则", "宏 = 大尺寸硬核（SRAM/PLL/IP），五条摆放原则", "f06_macro.png", [
+        "沿边沿角摆放，中间连续区留给标准单元",
+        "按数据流就近放置，用 flyline 或 auto placer 指导",
+        "宏间预留 channel 走线，或采用 channel-less 紧贴",
+        "引脚朝向 core，避免信号绕过宏本体",
+        "从 8 种朝向中选定，对称背靠背、对齐成阵列",
+    ], style="num"),
+    split("halo / keepout 与各类 blockage", "halo 与三类 blockage，为布线预留空间", "f07_halo.png", [
         "Halo/Keepout 是 macro 四周禁放边带，随 macro 一起移动",
         "Placement Blockage 是固定坐标的禁放区，钉在版图上",
         "hard 类型完全禁放，soft 类型优化阶段仍可放 buffer",
@@ -111,7 +110,7 @@ SPECS = [
         "Routing Blockage 禁止某些层布线，可指定具体层范围",
         "在 macro 引脚一侧加 halo，为 pin access 留出空间",
     ]),
-    bl("物理专用单元：endcap / well-tap / filler", "physical-only cell，floorplan 早期就要规划", [
+    bl("物理专用单元：endcap / well-tap / filler", "不参与逻辑，却关乎 row 与 well 连续", [
         "physical-only cell 不参与逻辑，却关乎 row 与 well 连续",
         "Endcap 放在每行两端与 macro 边界，保 well/implant 连续",
         "Well-tap 周期性插入，为衬底提供 well 偏置接触",
@@ -134,15 +133,14 @@ SPECS = [
         "信号穿过无关 block 时，须预留 feedthrough 穿通端口",
         "工具可自动优化 pin，但关键总线常需手工约束",
     ]),
-    split("电源规划：Ring → Stripe → Mesh → Rails", "PG 网络自上而下", "f08_power.png", [
-        "Power Ring 是绕 core 或 macro 的闭合环，多用顶层粗金属",
-        "Power Stripe 是横跨 core 的粗金属条，用来分担电流",
-        "Power Mesh 由 stripe 纵横交织成网，以降低等效电阻",
-        "Std-cell Rail 是沿标准单元行的 M1 供电轨，即 follow-pin",
-        "Special Route 连接 ring、stripe、pin、pad 并打 via",
-        "sroute 作用范围广，是 PG 网络成型的关键步骤",
-    ]),
-    split("IR drop 与 电迁移 EM", "签核要过的两关", "f09_irem.png", [
+    split("电源规划：Ring → Stripe → Mesh → Rails", "自上而下、由粗到细，逐级连成 PG 网络", "f08_power.png", [
+        "Power Ring：绕 core 或 macro 的闭合环，多用顶层粗金属",
+        "Power Stripe：横跨 core 的粗金属条，用来分担电流",
+        "Power Mesh：stripe 纵横交织成网，降低等效电阻",
+        "Std-cell Rail：沿标准单元行的 M1 供电轨（follow-pin）",
+        "Special Route：连接 ring/stripe/pin/pad 并打 via 成型",
+    ], style="num"),
+    split("IR drop 与 电迁移 EM", "电源完整性的两大约束", "f09_irem.png", [
         "IR drop 即 ΔV=I·R，离电源越远的单元压降越大",
         "压降过大使单元延迟增大、时序变差，甚至功能失效",
         "IR 预算常为 VDD 的百分之几，静态与动态分别约束",
@@ -157,7 +155,7 @@ SPECS = [
         "floorplan 阶段要规划 switch 阵列布局与 enable 菊花链",
         "菊花链分时开启可抑制唤醒冲击电流 inrush",
     ]),
-    split("多电压域与 UPF", "Multi-Voltage", "f10_mv.png", [
+    split("多电压域与 UPF", "多电压域与 UPF 功耗意图", "f10_mv.png", [
         "让不同区域采用不同电压或可关断，从而降低整体功耗",
         "Level Shifter 转换跨电压域信号电平，如 0.8V 与 1.0V 互转",
         "Isolation 在关断域输出端钳位，防止下游电路浮空",
@@ -165,7 +163,7 @@ SPECS = [
         "Always-on Buffer 在关断域内却接常开电源以维持通路",
         "UPF（IEEE 1801）或 CPF 描述功耗意图，floorplan 据此落地",
     ]),
-    split("时序预算与模块划分", "分而治之", "f11_budget.png", [
+    split("时序预算与模块划分", "层次化划分与时序预算分配", "f11_budget.png", [
         "层次化设计把芯片按层级切成若干 Block 或 partition",
         "将顶层路径约束拆到各 block 边界，各自生成独立 SDC",
         "预算分配合理时，各块独立收敛再带动顶层收敛",
@@ -173,7 +171,7 @@ SPECS = [
         "可用 allocate_budgets、deriveTimingBudget 或 ETM 自动分配",
         "预算含 IO delay、时钟不确定度以及驱动与负载等因素",
     ]),
-    split("拥塞 / IR 早期预估与迭代闭环", "Floorplan 不是一遍过", "f15_loop.png", [
+    split("拥塞 / IR 早期预估与迭代闭环", "拥塞与 IR 的早期预估、迭代收敛", "f15_loop.png", [
         "用全局布线 GR 估算各 GCell 的需求资源比，得到拥塞图",
         "拥塞分两类：区域整体超资源，与引脚密集处 pin-access",
         "热点常出现在 macro notch、窄 channel 与 pin 密集区",
@@ -181,7 +179,7 @@ SPECS = [
         "用静态 PG 分析早估 IR drop，定位高压降区并加密 mesh",
         "迭代闭环：floorplan、试布局加 GR、评估，再回退调整",
     ]),
-    split("输入 / 输出 与 文件作用", "吃什么、吐什么", "f12_io.png", [
+    split("输入 / 输出 与 文件作用", "输入、输出与关键文件作用", "f12_io.png", [
         "输入含门级 netlist、LEF、Liberty、SDC、UPF 与预算",
         "输出是带 macro 摆放、PG 与 blockage 的 DEF 文件",
         "还输出 Floorplan 数据库 NDM/OA 及可布线性与时序初评",
@@ -189,7 +187,7 @@ SPECS = [
         "DEF 用于交换 die/core、row、macro 位置、pin 与 PG",
         "常用工具为 Synopsys ICC2/FC 与 Cadence Innovus",
     ]),
-    {"kind": "cols2", "title": "衡量指标与常见问题", "sub": "收敛看指标，出问题反查", "accent": PRIMARY, "cols": [
+    {"kind": "cols2", "title": "衡量指标与常见问题", "sub": "关键收敛指标与常见问题对策", "accent": PRIMARY, "cols": [
         ("关键指标", [
             "Core Utilization 核心利用率保持在 0.5–0.8 区间",
             "Aspect Ratio 长宽比接近 1.0，版图尽量方正",
@@ -227,7 +225,7 @@ SPECS = [
             "defIn != floorPlan  (read DEF vs create)",
         ], PRIMARY),
     ]},
-    {"kind": "bullets", "title": "本章小结", "sub": "8 句话带走", "accent": PRIMARY, "two_col": True, "bullets": [
+    {"kind": "bullets", "title": "本章小结", "sub": "八条核心要点回顾", "accent": PRIMARY, "two_col": True, "bullets": [
         "Floorplan 是 P&R 第一步，定 die/core 几何、macro、PG 与电压域",
         "几何上要分清总利用率与有效利用率（0.5–0.8），长宽比约为 1",
         "macro 沿边沿角按 dataflow 摆放，配 channel、halo、blockage",
@@ -237,7 +235,7 @@ SPECS = [
         "时序预算把顶层约束拆到各 block，pin 位置与 budget 强耦合",
         "迭代闭环：GR 估拥塞、静态 PG 估 IR，收敛后再进 placement",
     ]},
-    {"kind": "cols2", "title": "易混淆点 · 课后自测", "sub": "16 题自测，逐题回想答案", "accent": PRIMARY, "cols": [
+    {"kind": "cols2", "title": "易混淆点 · 课后自测", "sub": "16 题自测：逐题回想要点", "accent": PRIMARY, "cols": [
         ("课后自测 1–8", [
             "Utilization 过高、过低各有何后果？",
             "Halo 与 Placement Blockage 有何区别？",

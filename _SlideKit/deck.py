@@ -147,6 +147,16 @@ def _bullets_lines(bullets):
     return ["▪  " + b for b in bullets]
 
 
+CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭"
+
+
+def _marks(items, style="bullet"):
+    """并列内容用 ▪；递进/有序内容用 ①②③（style='num'）。"""
+    if style == "num":
+        return [f"{CIRC[i]}  {b}" for i, b in enumerate(items)]
+    return ["▪  " + b for b in items]
+
+
 def _circ_num(slide, x, y, num, d=0.46, fill=PRIMARY, fg="FFFFFF", fs=15):
     sp = slide.shapes.add_shape(9, Inches(x), Inches(y), Inches(d), Inches(d))  # 9=oval
     sp.fill.solid(); sp.fill.fore_color.rgb = _rgb(fill)
@@ -185,8 +195,8 @@ def _agenda(slide, s):
         _txt(slide, (x + 0.64, y - 0.06, w, 0.45), [ttl], sizes=[16], bolds=[True], colors=[INK_C])
         _txt(slide, (x + 0.64, y + 0.40, w, 0.55), [det], sizes=[12.5], colors=[MUTED_C])
     if s.get("line"):
-        _card(slide, 0.95, 6.62, 11.45, 0.62, fill="F6E8D5", line="E4C79A")
-        _txt(slide, (1.25, 6.75, 11, 0.4), [s["line"]], sizes=[13.5], bolds=[True], colors=["8A5212"])
+        _card(slide, 0.95, 6.28, 11.0, 0.6, fill="F6E8D5", line="E4C79A")
+        _txt(slide, (1.25, 6.41, 10.6, 0.4), [s["line"]], sizes=[13], bolds=[True], colors=["8A5212"])
 
 
 def _close(slide, s):
@@ -224,7 +234,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
         acc = (s.get("accent", PRIMARY) or PRIMARY).lstrip("#")
         _title_block(sl, s["title"], s.get("sub"))
         if k == "split":
-            _txt(sl, (0.7, 1.72, 5.2, 5.4), _bullets_lines(s["bullets"]),
+            _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
                  sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.1)
             _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 5.25))
         elif k == "cards2":
@@ -297,9 +307,9 @@ def _wrap(s, maxu):
     return out or [""]
 
 
-def _pbul(ax, xb, xt, yy, text, fs, color, maxu, lh=0.40, gap=0.16):
-    """预览端：画一条带 ▪ 的可折行要点，返回下一行 y。"""
-    _mtext(ax, xb, yy, "▪", fs=fs, color=color, bold=True)
+def _pbul(ax, xb, xt, yy, text, fs, color, maxu, lh=0.40, gap=0.16, mark="▪"):
+    """预览端：画一条带标记(▪ 或 ①)的可折行要点，返回下一行 y。"""
+    _mtext(ax, xb, yy, mark, fs=fs, color=color, bold=True)
     for ln in _wrap(text, maxu):
         _mtext(ax, xt, yy, ln, fs=fs)
         yy += lh
@@ -346,9 +356,9 @@ def _pagenda(ax, s, i, total):
         _mtext(ax, x + 0.64, y - 0.02, ttl, fs=15, bold=True, color="#" + INK_C)
         _mtext(ax, x + 0.64, y + 0.42, det, fs=12, color="#" + MUTED_C)
     if s.get("line"):
-        ax.add_patch(FancyBboxPatch((0.95, SLIDE_H - 6.62 - 0.62), 11.45, 0.62,
+        ax.add_patch(FancyBboxPatch((0.95, SLIDE_H - 6.28 - 0.6), 11.0, 0.6,
                      boxstyle="round,pad=0,rounding_size=0.06", fc="#F6E8D5", ec="#E4C79A", lw=1.2, zorder=2))
-        _mtext(ax, 1.25, 6.82, s["line"], fs=13, bold=True, color="#8A5212")
+        _mtext(ax, 1.25, 6.5, s["line"], fs=12.5, bold=True, color="#8A5212")
     _mtext(ax, 12.9, 7.1, f"{i:02d}/{total:02d}", fs=10, color=T.MUTED, ha="right")
 
 
@@ -375,9 +385,11 @@ def build_previews(specs, outdir, total, asset_dir=""):
             _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
         ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
         if k == "split":
+            style = s.get("style", "bullet")
             yy = 1.95
-            for b in s["bullets"]:
-                yy = _pbul(ax, 0.7, 1.02, yy, b, 14, accx, 24)
+            for bi, b in enumerate(s["bullets"]):
+                mk = CIRC[bi] if style == "num" else "▪"
+                yy = _pbul(ax, 0.7, 1.05, yy, b, 14, accx, 24, mark=mk)
             box = (6.0, 1.7, 6.85, 5.25)
             p = os.path.join(asset_dir, s["figure"])
             iw, ih = Image.open(p).size

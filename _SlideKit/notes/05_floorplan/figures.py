@@ -31,7 +31,7 @@ def f01_position():
     T.sechead(ax, 0.4, 6.4, "①", "Floorplan 在 PnR 流程中的位置")
     items = [("逻辑综合", "Synth", "neutral", False), ("布图规划", "Floorplan", "clock", True),
              ("布局", "Place", "neutral", False), ("时钟树", "CTS", "neutral", False), ("布线", "Route", "neutral", False)]
-    T.flowrow(ax, items, y=4.6, x0=0.4, x1=8.6, h=1.25, gap=0.42, title_fs=BODY + 1, sub_fs=9)
+    T.flowrow(ax, items, y=4.5, x0=0.4, x1=8.6, h=1.4, gap=0.42, title_fs=BODY + 1, sub_fs=12.5)
     ax.text(0.4, 3.85, "Floorplan 主要任务", ha="left", va="center", color=T.INK, fontsize=BODY, fontweight="bold")
     tasks = ["① die / core 几何", "② 宏摆放 & 朝向", "③ 电源规划 PG", "④ 多电压 / blockage"]
     for i, t in enumerate(tasks):

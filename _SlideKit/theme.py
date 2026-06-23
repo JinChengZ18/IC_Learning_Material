@@ -60,7 +60,7 @@ MAIN = {"logic": BLUE, "memory": TEAL, "power": AMBER, "io": ROSE,
 BYLINE = "整理 J.C · 源自 Digital VLSI Design (DVD), A. Teman, Bar-Ilan Univ."
 
 # 字号层级（hierarchy）：主标签 > 次级 > 正文 > 脚注
-FS_H1, FS_H2, FS_BODY, FS_CAP = 19, 15, 13, 11.5
+FS_H1, FS_H2, FS_BODY, FS_CAP = 24, 19, 17, 15  # 调大：图被缩到 ~0.78 插入幻灯片，字号要够大才看得清
 
 
 def setup_fonts():
@@ -96,7 +96,7 @@ def _shadow(alpha=0.16, blur=3):
 
 
 def node(ax, x, y, w, h, title, sub=None, role="logic", variant="soft",
-         fs=15, sub_fs=10.5, rounding=0.12, lw=1.8, z=2, shadow=True,
+         fs=17, sub_fs=13, rounding=0.12, lw=1.8, z=2, shadow=True,
          header=False, weight="bold"):
     """两段色圆角块。
     variant: soft(浅填充+饱和边+深字, 默认) / solid(饱和填充+白字) / outline(白底+饱和边)。
@@ -175,16 +175,16 @@ def heading(ax, text, sub=None, x=0.55, top=None, role="logic"):
     ax.add_patch(FancyBboxPatch((x, top - 0.16), 0.34, 0.34,
                  boxstyle="round,pad=0,rounding_size=0.07", fc=MAIN[role], ec="none", zorder=5))
     ax.text(x + 0.56, top + 0.02, text, ha="left", va="center", color=INK,
-            fontsize=21, fontweight="bold", zorder=5)
+            fontsize=24, fontweight="bold", zorder=5)
     if sub:
         ax.text(x + 0.57, top - 0.5, sub, ha="left", va="center", color=MUTED,
-                fontsize=12, zorder=5)
+                fontsize=15, zorder=5)
 
 
 def caption(ax, text=BYLINE, x=None, y=0.42):
     if x is None:
         x = ax.get_xlim()[1] - 0.45
-    ax.text(x, y, text, ha="right", va="center", color=MUTED, fontsize=8.5, zorder=5)
+    ax.text(x, y, text, ha="right", va="center", color=MUTED, fontsize=11, zorder=5)
 
 
 def plate(ax, pad=0.16, ec=LINE, lw=1.4):
@@ -203,13 +203,13 @@ def ftitle(ax, text, x=0.5, y=None, role="logic", fs=22):
     ax.text(x + 0.54, y, text, ha="left", va="center", color=INK, fontsize=fs, fontweight="bold", zorder=5)
 
 
-def tag(ax, x, y, text, role="io", fs=10, ha="center"):
+def tag(ax, x, y, text, role="io", fs=13, ha="center"):
     fill, edge, txt = ROLE[role]
     ax.text(x, y, text, ha=ha, va="center", color=txt, fontsize=fs, fontweight="bold", zorder=6,
             bbox=dict(boxstyle="round,pad=0.32", fc=fill, ec=edge, lw=1.3))
 
 
-def legend(ax, items, x, y, fs=10.5, dy=0.42, swatch=0.20):
+def legend(ax, items, x, y, fs=13, dy=0.46, swatch=0.24):
     """语义色图例。items=[(role_or_color, label), ...]。"""
     yy = y
     for role_or_color, label in items:
@@ -220,14 +220,14 @@ def legend(ax, items, x, y, fs=10.5, dy=0.42, swatch=0.20):
         yy -= dy
 
 
-def annotate(ax, xy, xytext, text, color=INK2, fs=10.5, rad=-0.18, ha="left", lw=1.3):
+def annotate(ax, xy, xytext, text, color=INK2, fs=13, rad=-0.18, ha="left", lw=1.3):
     """带引线的标注。"""
     ax.add_patch(FancyArrowPatch(xytext, xy, arrowstyle="-", mutation_scale=10, lw=lw,
                  color=color, connectionstyle=f"arc3,rad={rad}", zorder=6, shrinkA=2, shrinkB=2))
     ax.text(xytext[0], xytext[1], text, ha=ha, va="center", color=color, fontsize=fs, zorder=6)
 
 
-def bracket(ax, x0, x1, y, text, color=INK2, depth=0.3, fs=12, down=True):
+def bracket(ax, x0, x1, y, text, color=INK2, depth=0.3, fs=15, down=True):
     yy = y - depth if down else y + depth
     line(ax, x0, y, x0, yy, color=color, lw=1.8)
     line(ax, x1, y, x1, yy, color=color, lw=1.8)
@@ -262,7 +262,7 @@ CARD_EDGE = "#CDD3DC"
 
 
 def infocard(ax, x, y, w, h, title, detail=None, role="neutral", highlight=False,
-             title_fs=15, detail_fs=11.5, z=2):
+             title_fs=17, detail_fs=14, z=2):
     """参考图的核心卡片：浅色底 + 粗体深色标题 + 该色系的细节行。highlight=粗色描边。"""
     ec = MAIN[role] if highlight else CARD_EDGE
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.1",
@@ -279,11 +279,11 @@ def infocard(ax, x, y, w, h, title, detail=None, role="neutral", highlight=False
                 right=(x + w, y + h / 2), left=(x, y + h / 2), top=(x + w / 2, y + h), bottom=(x + w / 2, y))
 
 
-def chevron(ax, x, y, color=MUTED, size=16):
+def chevron(ax, x, y, color=MUTED, size=20):
     ax.text(x, y, "›", ha="center", va="center", color=color, fontsize=size, fontweight="bold", zorder=4)
 
 
-def flowrow(ax, items, y, x0, x1, h, gap=0.55, title_fs=14, sub_fs=10):
+def flowrow(ax, items, y, x0, x1, h, gap=0.55, title_fs=16, sub_fs=12.5):
     """chevron 横向流程：items=[(主, 次, role, highlight), …]，框之间用 › 分隔。返回锚点。"""
     n = len(items)
     w = (x1 - x0 - gap * (n - 1)) / n
