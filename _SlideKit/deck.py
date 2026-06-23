@@ -229,9 +229,11 @@ def _circ(i):
 
 
 def _marks(items, style="bullet"):
-    """并列内容用 ▪；递进/有序内容用 ①②③（style='num'）。"""
+    """并列内容用 ▪；递进/有序内容用 ①②③（style='num'）；叙述性内容不分点（style='prose'，无标记）。"""
     if style == "num":
         return [f"{_circ(i)}  {b}" for i, b in enumerate(items)]
+    if style == "prose":
+        return list(items)
     return ["▪  " + b for b in items]
 
 
@@ -807,8 +809,11 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
             style = s.get("style", "bullet")
             yy = 1.95
             for bi, b in enumerate(s["bullets"]):
-                mk = _circ(bi) if style == "num" else "▪"
-                yy = _pbul(ax, 0.7, 1.05, yy, b, 14, mark_c, 24, mark=mk)
+                if style == "prose":                       # 叙述性内容：整段、无标记、段间留白
+                    yy = _pbul(ax, 0.7, 0.7, yy, b, 14, mark_c, 26, gap=0.22, mark="")
+                else:
+                    mk = _circ(bi) if style == "num" else "▪"
+                    yy = _pbul(ax, 0.7, 1.05, yy, b, 14, mark_c, 24, mark=mk)
             if yy > 6.98:
                 _oflow_mark(ax)
             cap = s.get("caption")

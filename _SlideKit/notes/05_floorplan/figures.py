@@ -28,7 +28,7 @@ def lerp(c1, c2, t):
 # F01 流程定位（4:3）------------------------------------------------------- #
 def f01_position():
     fig, ax = T.canvas(9, 6.8)
-    T.sechead(ax, 0.4, 6.4, "①", "Floorplan 在 PnR 流程中的位置")
+    ax.text(0.4, 6.4, "Floorplan 在 PnR 流程中的位置", ha="left", va="center", color=T.INK, fontsize=H2, fontweight="bold")
     items = [("逻辑综合", "Synth", "neutral", False), ("布图规划", "Floorplan", "clock", True),
              ("布局", "Place", "neutral", False), ("时钟树", "CTS", "neutral", False), ("布线", "Route", "neutral", False)]
     T.flowrow(ax, items, y=4.5, x0=0.4, x1=8.6, h=1.4, gap=0.42, title_fs=BODY + 1, sub_fs=12.5)
@@ -386,7 +386,7 @@ def f15_loop():
 # F16 网表唯一化（4:3）--------------------------------------------------- #
 def f16_uniquify():
     fig, ax = T.canvas(9.4, 6.2)
-    T.sechead(ax, 0.4, 5.85, "①", "唯一化：每个子模块只被引用一次")
+    ax.text(0.4, 5.85, "唯一化：每个子模块只被引用一次", ha="left", va="center", color=T.INK, fontsize=H2, fontweight="bold")
 
     def tree(x0, shared, title, role_t):
         ax.text(x0 + 1.75, 5.05, title, ha="center", color=role_t, fontsize=BODY, fontweight="bold")
