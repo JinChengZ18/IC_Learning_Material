@@ -314,15 +314,30 @@ def _close(slide, s):
     _txt(slide, (1.15, 6.85, 11.6, 0.4), [s.get("src", "")], sizes=[11], colors=[MUTED_C])
 
 
-def _section(slide, s):
-    """分节标题页（现代分隔）：左侧主色面板 + 大号章节数字，右侧章节标题 + 小节清单。"""
-    _bg(slide, BG_C)
-    _mask(slide)
-    pw = 4.5
-    _bar(slide, 0.0, 0.0, pw, SLIDE_H, PRIMARY)
-    _txt(slide, (0.0, 1.55, pw, 0.5), [s.get("eyebrow", "CHAPTER")], sizes=[16], bolds=[True],
+SEC_PW = 4.5                  # 分节页左侧主色面板宽（每页相同的静态版式件）
+SEC_EYEBROW = "CHAPTER"       # 分节页眉标（静态，默认；spec 可用 eyebrow 覆盖）
+
+
+def _section_panel(slide, eyebrow=SEC_EYEBROW):
+    """分节页的【静态】版式件：满版白底 + 左侧主色全高面板 + “CHAPTER”眉标。
+    每张分节页完全相同，故下放到分节版式（母版）上，一处可改、新章自动复用；
+    _section 只填每页不同的章节数字 / 标题 / 小节清单。"""
+    _bar(slide, 0, 0, SLIDE_W, SLIDE_H, BG_C)                  # 满版白底（盖住继承的母版件）
+    _bar(slide, 0.0, 0.0, SEC_PW, SLIDE_H, PRIMARY)           # 左侧主色全高面板
+    _txt(slide, (0.0, 1.55, SEC_PW, 0.5), [eyebrow], sizes=[16], bolds=[True],
          colors=["C5D6F7"], align=PP_ALIGN.CENTER)
-    _txt(slide, (0.0, 2.2, pw, 2.5), [str(s["num"])], sizes=[150], bolds=[True], colors=["FFFFFF"],
+
+
+def _section(slide, s, panel=True):
+    """分节标题页（现代分隔）：左侧主色面板 + 大号章节数字，右侧章节标题 + 小节清单。
+    panel=True 时自带静态面板（无分节版式可继承时的兜底）；分节版式已含面板时传 panel=False，
+    只填动态件，避免重复绘制。spec 提供自定义 eyebrow 时覆盖版式默认眉标。"""
+    if panel:
+        _section_panel(slide, s.get("eyebrow", SEC_EYEBROW))
+    elif s.get("eyebrow") and s["eyebrow"] != SEC_EYEBROW:    # 版式已画默认眉标；仅在自定义时补画覆盖
+        _txt(slide, (0.0, 1.55, SEC_PW, 0.5), [s["eyebrow"]], sizes=[16], bolds=[True],
+             colors=["C5D6F7"], align=PP_ALIGN.CENTER)
+    _txt(slide, (0.0, 2.2, SEC_PW, 2.5), [str(s["num"])], sizes=[150], bolds=[True], colors=["FFFFFF"],
          align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
     _txt(slide, (5.1, 1.95, 7.7, 1.2), [s["title"]], sizes=[36], bolds=[True], colors=[INK_C])
     if s.get("sub"):
@@ -336,15 +351,38 @@ def _section(slide, s):
         _txt(slide, (5.45, y - 0.04, 7.3, 0.4), [it], sizes=[13.5], colors=[INK_C])
 
 
-def _clean_master(prs, keep):
+def _section_layout_chrome(prs, lay):
+    """把分节页的【静态】版式件（主色面板 + 眉标）下放到【分节版式】上——所有分节页继承，
+    新增章节自动带同款分隔设计；要改面板/眉标在母版视图改一处即可。
+    与 _layout_chrome 同法：python-pptx 不能直接给版式加形状，先在草稿页画好，再把形状 XML
+    复制进版式、删草稿页。"""
+    scratch = prs.slides.add_slide(lay)
+    before = len(scratch.shapes._spTree)
+    _section_panel(scratch)                              # 满版白底 + 主色面板 + “CHAPTER”眉标
+    lay_spTree = lay.shapes._spTree
+    for el in list(scratch.shapes._spTree)[before:]:
+        lay_spTree.append(copy.deepcopy(el))
+    sldIdLst = prs.slides._sldIdLst                      # 删掉这张临时草稿页
+    sid = sldIdLst[-1]
+    rId = sid.get(qn("r:id"))
+    sldIdLst.remove(sid)
+    try:
+        prs.part.drop_rel(rId)
+    except Exception as e:
+        _log.debug("drop_rel(%s) 跳过: %s", rId, e)
+
+
+def _clean_master(prs, keep, *extra):
     """清掉默认模板自带的占位符（日期/页脚/页码/标题/正文）并删掉未使用的版式：
     否则默认占位符会与自定义母版件重叠（日期框压住页脚标签），且默认模板是 4:3、占位符按
-    4:3 排布，在 16:9 母版视图里显得不对。只保留实际使用的那张空白版式（已 16:9、放了母版件）。"""
+    4:3 排布，在 16:9 母版视图里显得不对。保留并清干净要用的版式（内容版式 keep，及可选的
+    分节版式 extra），其余未用版式（4:3）一律删除。"""
+    keepers = [k._element for k in (keep,) + tuple(e for e in extra if e is not None)]
     for m in prs.slide_masters:
         for ph in list(m.placeholders):                       # 母版上的占位符
             ph._element.getparent().remove(ph._element)
         for lay in list(m.slide_layouts):
-            if lay._element is keep._element:                 # 保留并清干净这张要用的版式
+            if lay._element in keepers:                       # 保留并清干净要用的版式
                 for ph in list(lay.placeholders):
                     ph._element.getparent().remove(ph._element)
             else:                                             # 删掉其余未用版式（4:3）
@@ -387,14 +425,40 @@ def _style_cell(cell, text, size=12, color=INK_C, bold=False, fill="FFFFFF", ali
     _cell_border(cell)
 
 
+# 表格说明文字（note）布局常量——pptx 端 _table 与预览端 _ptable 共用，确保「说明在上、表在下」两边一致。
+_TBL_X, _TBL_W = 0.7, 11.95     # 表格左缘 / 全宽
+_TBL_TOP = 1.78                 # 内容起始 y（标题/副标题之下）——正文从左上角开始
+_TBL_BOTTOM = 6.95             # 内容底线：表格 + 说明须落在此线之上
+_NOTE_FS = 13.5                # 说明字号（正文体，非脚注）
+_NOTE_LH = 0.33                # 说明行高（英寸/行）——与预览端折行一致
+_NOTE_GAP = 0.18              # 说明与其下表格之间的间距
+
+
+def _note_layout(note):
+    """计算说明文字的折行行数与占高，并返回（说明顶 y、说明高、表格顶 y、表格高）。
+    说明放在最上（_TBL_TOP），表格紧随其下；表底压到 _TBL_BOTTOM 之上。无 note 时表格占满。"""
+    if not note:
+        return None, 0.0, _TBL_TOP, 5.05
+    nlines = len(_wrap(note, _maxu(_TBL_W, _NOTE_FS)))
+    note_h = nlines * _NOTE_LH
+    tbl_top = _TBL_TOP + note_h + _NOTE_GAP
+    tbl_h = max(1.0, _TBL_BOTTOM - tbl_top)   # 兜底正高：超长说明也不致表高为负 → add_table 崩溃
+    return _TBL_TOP, note_h, tbl_top, tbl_h
+
+
 def _table(slide, s):
     """原生可编辑表格：主色表头(白字粗体) + 斑马纹正文 + 细线边框 + 数值列右对齐。
+    说明文字（note）放在表格【上方】、紧贴副标题，正文从左上角顺读到表（top-down）。
     spec: {kind:'table', table:{headers:[...], rows:[[...],...], col_align?:[l/r/c], col_w?:[..]}}"""
     t = s["table"]; headers = t["headers"]; rows = t["rows"]
     aligns = t.get("col_align"); widths = t.get("col_w")
-    note = s.get("note")                       # 表下说明文字（取自笔记的引言/定义/结论）—— 用正文字号，不是小脚注
+    note = s.get("note")                       # 表上说明文字（取自笔记的引言/定义/结论）—— 用正文字号，不是小脚注
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, (4.0 if note else 5.05)
+    note_top, note_h, top, h = _note_layout(note)
+    x, w = _TBL_X, _TBL_W
+    if note:                                   # 先画说明（最上、左上角起），表格随后下移
+        _txt(slide, (x, note_top, w, note_h + 0.1), [note], sizes=[_NOTE_FS], colors=[INK_C],
+             anchor=MSO_ANCHOR.TOP, line_sp=1.22)
     gtbl = slide.shapes.add_table(nrow, ncol, Inches(x), Inches(top), Inches(w), Inches(h))
     tbl = gtbl.table
     tbl.first_row = False; tbl.horz_banding = False   # 关掉内置样式条纹，改用我们显式的斑马纹
@@ -411,8 +475,6 @@ def _table(slide, s):
         fill = "FFFFFF" if ri % 2 else "EDF0F4"
         for c in range(ncol):
             _style_cell(tbl.cell(ri, c), str(row[c]) if c < len(row) else "", size=12, fill=fill, align=al(c))
-    if note:
-        _txt(slide, (0.7, top + h + 0.2, 11.95, 1.4), [note], sizes=[13.5], colors=[INK_C], line_sp=1.22)
 
 
 def _chart(slide, s):
@@ -777,19 +839,35 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
     prs.slide_width = Inches(SLIDE_W); prs.slide_height = Inches(SLIDE_H)
     blank = (min(prs.slide_layouts, key=lambda L: len(L.placeholders)) if template
              else prs.slide_layouts[6])
-    _clean_master(prs, blank)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
+    # 含分节页时，额外保留一张干净版式做【分节版式（母版）】：分隔页设计一处可改、新章自动复用。
+    # 必须在 _clean_master 删除未用版式之前选定（否则会被删掉）；无第二张可用版式则回退到自带面板。
+    has_section = any(s.get("kind") == "section" for s in specs)
+    sec_lay = next((L for L in prs.slide_layouts if L._element is not blank._element),
+                   None) if has_section else None
+    _clean_master(prs, blank, sec_lay)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
+    try:
+        blank.name = "内容版式 Content"          # 母版视图里可辨识（名字仅为提示，无功能依赖）
+    except Exception as e:
+        _log.debug("重命名内容版式失败: %s", e)
     _layout_chrome(prs, blank, page_label)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
+    if sec_lay is not None:
+        try:
+            sec_lay.name = "分节 Section Divider"   # 分节版式：分隔页设计的单一可改处
+        except Exception as e:
+            _log.debug("重命名分节版式失败: %s", e)
+        _section_layout_chrome(prs, sec_lay)  # 分节静态件（主色面板 + 眉标）下放到分节版式
     fig_no = 0
     cur_ch = None
     for i, s in enumerate(specs, 1):
-        sl = prs.slides.add_slide(blank)
         k = s["kind"]
+        sl = prs.slides.add_slide(sec_lay if (k == "section" and sec_lay is not None) else blank)
         if k in ("cover", "title"):
             _cover(sl, s); continue
         if k == "close":
             _close(sl, s); continue
         if k == "section":
-            _section(sl, s); cur_ch = f"第{s['num']}章 · {s['title']}"; continue
+            _section(sl, s, panel=(sec_lay is None))  # 有分节版式则面板已继承，只填动态件
+            cur_ch = f"第{s['num']}章 · {s['title']}"; continue
         if k == "agenda":
             _agenda(sl, s); _page(sl); continue
         _title_block(sl, s["title"], s.get("sub"), chapter=cur_ch)
@@ -1004,7 +1082,12 @@ def _ptable(ax, s):
     aligns = t.get("col_align"); widths = t.get("col_w")
     note = s.get("note")
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, (4.0 if note else 5.05)
+    note_top, note_h, top, h = _note_layout(note)   # 说明在上、表在下（与 pptx 端 _table 一致）
+    if note:                                         # 先画说明（最上、左上角起；_mtext 默认 va=top）
+        yy = note_top
+        for ln in _wrap(note, _maxu(_TBL_W, _NOTE_FS)):
+            _mtext(ax, _TBL_X, yy, ln, fs=_NOTE_FS, color="#" + INK_C); yy += _NOTE_LH
+    x, w = _TBL_X, _TBL_W
     cw = [w * v / float(sum(widths)) for v in widths] if widths else [w / ncol] * ncol
     xstops = [x]
     for c in range(ncol):
@@ -1026,10 +1109,6 @@ def _ptable(ax, s):
         fill = "#FFFFFF" if ri % 2 else "#EDF0F4"
         for c in range(ncol):
             cell(ri, c, str(row[c]) if c < len(row) else "", fill, "#" + INK_C, False)
-    if note:
-        yy = top + h + 0.44
-        for ln in _wrap(note, _maxu(11.95, 13.5)):
-            _mtext(ax, 0.7, yy, ln, fs=13.5, color="#" + INK_C); yy += 0.33
 
 
 def _pchart(ax, s):
