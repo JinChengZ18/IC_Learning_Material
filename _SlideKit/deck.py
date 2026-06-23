@@ -110,9 +110,16 @@ def _txt(slide, box, lines, sizes=None, colors=None, bolds=None, monos=None,
         p.space_after = Pt(space)
         if line_sp:
             p.line_spacing = line_sp
-        r = p.add_run(); r.text = ln
-        _set_font(r, size=sizes[i], color=colors[i], bold=bolds[i], mono=monos[i])
+        for seg, em in _emph_segs(ln):             # 内联强调 **重点** → 加粗 + 强调色
+            r = p.add_run(); r.text = seg
+            _set_font(r, size=sizes[i], color=(ACCENT if em else colors[i]), bold=(em or bolds[i]), mono=monos[i])
     return tb
+
+
+def _emph_segs(line):
+    """把 '**重点**' 解析成 [(文本, 是否强调)] 多段；无标记则单段。供 _txt 生成加粗 + 强调色 run。"""
+    segs = [(p, i % 2 == 1) for i, p in enumerate(str(line).split("**"))]
+    return [s for s in segs if s[0]] or [("", False)]
 
 
 def _bar(slide, x, t, w, h, color):
@@ -385,9 +392,9 @@ def _table(slide, s):
     spec: {kind:'table', table:{headers:[...], rows:[[...],...], col_align?:[l/r/c], col_w?:[..]}}"""
     t = s["table"]; headers = t["headers"]; rows = t["rows"]
     aligns = t.get("col_align"); widths = t.get("col_w")
-    note = s.get("note")                       # 表下说明文字（取自笔记的引言/定义/结论）
+    note = s.get("note")                       # 表下说明文字（取自笔记的引言/定义/结论）—— 用正文字号，不是小脚注
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, (4.25 if note else 5.05)
+    x, top, w, h = 0.7, 1.78, 11.95, (4.0 if note else 5.05)
     gtbl = slide.shapes.add_table(nrow, ncol, Inches(x), Inches(top), Inches(w), Inches(h))
     tbl = gtbl.table
     tbl.first_row = False; tbl.horz_banding = False   # 关掉内置样式条纹，改用我们显式的斑马纹
@@ -405,7 +412,7 @@ def _table(slide, s):
         for c in range(ncol):
             _style_cell(tbl.cell(ri, c), str(row[c]) if c < len(row) else "", size=12, fill=fill, align=al(c))
     if note:
-        _txt(slide, (0.7, top + h + 0.14, 11.95, 1.05), [note], sizes=[11], colors=[MUTED_C], line_sp=1.16)
+        _txt(slide, (0.7, top + h + 0.2, 11.95, 1.4), [note], sizes=[13.5], colors=[INK_C], line_sp=1.22)
 
 
 def _chart(slide, s):
@@ -793,16 +800,16 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
                 fig_no = _split_figs(sl, s["figs"], asset_dir, fig_no, s.get("figs_v", False))
             else:
                 cap = s.get("caption")
-                box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)
-                if s.get("diagram"):                   # 原生框图（可编辑形状），否则插图片
-                    _dia_native(sl, DIAGRAMS[s["diagram"]](), box)
-                else:
-                    _pic(sl, os.path.join(asset_dir, s["figure"]), box)
+                if s.get("diagram"):                   # 原生框图（可编辑形状）：占满右栏
+                    _dia_native(sl, DIAGRAMS[s["diagram"]](), (6.0, 1.7, 6.85, 5.25))
+                else:                                  # 单张插图：略缩小、不占满右栏（避免方形图过大，如 4.1）
+                    fh = 3.9 if cap else 4.6
+                    _pic(sl, os.path.join(asset_dir, s["figure"]), (6.15, 1.85, 6.55, fh))
                 if cap:
                     fig_no += 1
-                    _txt(sl, (6.0, 6.34, 6.85, 0.5), [f"图 {fig_no} · {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+                    _txt(sl, (6.0, 6.05, 6.85, 0.5), [f"图 {fig_no} · {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
                 if s.get("credit"):          # 文献插图来源标注（恰当处）
-                    _txt(sl, (6.0, 6.86, 6.85, 0.3), ["来源：" + s["credit"]], sizes=[9], colors=[MUTED_C], align=PP_ALIGN.RIGHT)
+                    _txt(sl, (6.0, 6.56, 6.85, 0.3), ["来源：" + s["credit"]], sizes=[9], colors=[MUTED_C], align=PP_ALIGN.RIGHT)
         elif k == "table":
             _table(sl, s)
         elif k == "chart":
@@ -879,6 +886,7 @@ def _mmissing(ax, path, box):
 def _wrap(s, maxu):
     """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。
     连续 ASCII 字母/数字成"词"整体折行，不拆词（与 PowerPoint 的按词换行一致）。"""
+    s = str(s).replace("**", "")               # 内联强调标记仅 pptx 渲染；预览去掉标记（以 PowerPoint 为准）
     toks, i, n = [], 0, len(s)
     while i < n:
         if s[i].isascii() and s[i].isalnum():
@@ -996,7 +1004,7 @@ def _ptable(ax, s):
     aligns = t.get("col_align"); widths = t.get("col_w")
     note = s.get("note")
     ncol = len(headers); nrow = len(rows) + 1
-    x, top, w, h = 0.7, 1.78, 11.95, (4.25 if note else 5.05)
+    x, top, w, h = 0.7, 1.78, 11.95, (4.0 if note else 5.05)
     cw = [w * v / float(sum(widths)) for v in widths] if widths else [w / ncol] * ncol
     xstops = [x]
     for c in range(ncol):
@@ -1019,9 +1027,9 @@ def _ptable(ax, s):
         for c in range(ncol):
             cell(ri, c, str(row[c]) if c < len(row) else "", fill, "#" + INK_C, False)
     if note:
-        yy = top + h + 0.32
-        for ln in _wrap(note, _maxu(11.95, 11)):
-            _mtext(ax, 0.7, yy, ln, fs=11, color="#" + MUTED_C); yy += 0.265
+        yy = top + h + 0.44
+        for ln in _wrap(note, _maxu(11.95, 13.5)):
+            _mtext(ax, 0.7, yy, ln, fs=13.5, color="#" + INK_C); yy += 0.33
 
 
 def _pchart(ax, s):
@@ -1170,10 +1178,11 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 fig_no = _psplit_figs(ax, s["figs"], asset_dir, fig_no, s.get("figs_v", False))
             else:
                 cap = s.get("caption")
-                box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)
                 if s.get("diagram"):
-                    _dia_prev(ax, DIAGRAMS[s["diagram"]](), box)
+                    _dia_prev(ax, DIAGRAMS[s["diagram"]](), (6.0, 1.7, 6.85, 5.25))
                 else:
+                    fh0 = 3.9 if cap else 4.6
+                    box = (6.15, 1.85, 6.55, fh0)
                     p = os.path.join(asset_dir, s["figure"])
                     if not os.path.isfile(p):
                         _mmissing(ax, p, box)
@@ -1181,12 +1190,11 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                         iw, ih = Image.open(p).size
                         fx, ft, fw, fh = fit(box, iw, ih)
                         ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
-                        ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
                 if cap:
                     fig_no += 1
-                    _mtext(ax, 6.0 + 6.85 / 2.0, 6.46, f"图 {fig_no} · {cap}", fs=11, color="#" + MUTED_C, ha="center")
+                    _mtext(ax, 6.0 + 6.85 / 2.0, 6.18, f"图 {fig_no} · {cap}", fs=11, color="#" + MUTED_C, ha="center")
                 if s.get("credit"):
-                    _mtext(ax, 12.85, 6.92, "来源：" + s["credit"], fs=9, color="#" + MUTED_C, ha="right")
+                    _mtext(ax, 12.85, 6.66, "来源：" + s["credit"], fs=9, color="#" + MUTED_C, ha="right")
         elif k == "table":
             _ptable(ax, s)
         elif k == "chart":

@@ -28,7 +28,8 @@ python notes/<NN_topic>/figures.py               # ① 出图（PNG+SVG）
 python notes/<NN_topic>/slides.py                # ② 出片：可编辑 .pptx + 逐页预览 PNG
 python -m pytest tests/                          # 冒烟测试（折行/spec/母版/页码/auto-fit/报告页型）
 ```
-**本机无 LibreOffice/Node → `slides/_preview/prev_*.png` 是唯一的版面校对**。质检：逐张看预览（注意红字 ⚠ OVERFLOW）；**分发前务必用 PowerPoint 真打开最终 `.pptx`**（预览≠成稿，折行/字体可能差一两字）；跨机缺 YaHei/Consolas 时 `build_pptx(..., font=, mono_font=)`。
+**校对两条路**：① `slides/_preview/prev_*.png`（matplotlib 近似预览，快但字体/换行/自动缩字号会差）；② **`python tools/pptx_qa.py`** —— 用 **LibreOffice**（soffice）把 `.pptx` 渲成 PDF 再用 PyMuPDF 渲成 `slides/_qa/qa_*.png`，是**真实 PowerPoint 成稿**（装好 LibreOffice 后用这个做最终校对，比预览准）。质检：逐张看（注意红字 ⚠ OVERFLOW）；跨机缺 YaHei/Consolas 时 `build_pptx(..., font=, mono_font=)`。
+**内联强调**：正文 / 表下说明里用 `**重点**` → 渲成**加粗 + 强调色（橙）**（`deck._emph_segs`，仅 pptx；预览去标记）。善用它突出关键句。
 
 ## 新建一份 deck（一个笔记一个桶）
 1. 复制 `notes/05_floorplan/` → `notes/<NN_topic>/`。
