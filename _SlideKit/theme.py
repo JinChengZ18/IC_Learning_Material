@@ -28,11 +28,11 @@ import matplotlib.patheffects as pe
 # --------------------------------------------------------------------------- #
 # 靛蓝学术配色 (IEEE 风) · 近双色 + 灰阶 + 暖橙点缀；白底、细线、低饱和、克制
 # 主色靛蓝主导结构，暖橙仅作强调，其余语义色降饱和到学术色调（不再有糖果紫/品红）。
-BLUE   = "#1D4ED8"; BLUE_L   = "#DBEAFE"; BLUE_D   = "#1E3A8A"   # 主色 蓝：逻辑/信号/结构/标题
+BLUE   = "#5B2C86"; BLUE_L   = "#ECE5F3"; BLUE_D   = "#3C1C5A"   # 主色 深清华紫：逻辑/信号/结构/标题
 TEAL   = "#0D9488"; TEAL_L   = "#CCFBF1"; TEAL_D   = "#115E59"   # 存储/Macro（青绿）
 AMBER  = "#EA580C"; AMBER_L  = "#FFEDD5"; AMBER_D  = "#9A3412"   # 电源/PG/强调（橙）
 ROSE   = "#DC2626"; ROSE_L   = "#FEE2E2"; ROSE_D   = "#991B1B"   # IO/高亮/关键网（红，非粉）
-VIOLET = "#6D28D9"; VIOLET_L = "#EDE9FE"; VIOLET_D = "#5B21B6"   # 时钟/特殊（深紫）
+VIOLET = "#2563EB"; VIOLET_L = "#DBEAFE"; VIOLET_D = "#1E3A8A"   # 时钟/特殊（蓝；主色让位给清华紫后腾出）
 
 INK    = "#1A1F2B"   # 主文字
 INK2   = "#3A4252"   # 次文字
