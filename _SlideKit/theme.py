@@ -261,20 +261,61 @@ SOFT = {  # 各角色的浅卡片底色（学术低饱和）
 CARD_EDGE = "#CDD3DC"
 
 
+def _wrap_w(s, width_in, fs):
+    """按卡片可用宽度(英寸)折行：CJK≈1em、ASCII≈0.6em（em = fs/72 英寸）。防横向溢出。
+    连续 ASCII 字母/数字聚成"词"整体折行，不拆词（避免 mesh→m/esh 这类断裂）。"""
+    em = fs / 72.0
+    toks, i, n = [], 0, len(s)
+    while i < n:                       # 分词：ASCII 字母数字成块，其余逐字符
+        if s[i].isascii() and s[i].isalnum():
+            j = i + 1
+            while j < n and s[j].isascii() and s[j].isalnum():
+                j += 1
+            toks.append(s[i:j]); i = j
+        else:
+            toks.append(s[i]); i += 1
+    out, line, used = [], "", 0.0
+    for t in toks:
+        tw = sum(em * (0.6 if ord(c) < 128 else 1.0) for c in t)
+        if used + tw > width_in and line:
+            out.append(line.rstrip()); line, used = t.lstrip(), tw
+        else:
+            line += t; used += tw
+    if line.strip():
+        out.append(line.rstrip())
+    return out or [""]
+
+
 def infocard(ax, x, y, w, h, title, detail=None, role="neutral", highlight=False,
-             title_fs=17, detail_fs=14, z=2):
-    """参考图的核心卡片：浅色底 + 粗体深色标题 + 该色系的细节行。highlight=粗色描边。"""
+             title_fs=17, detail_fs=14, z=2, pad_x=0.3):
+    """参考图的核心卡片：浅色底 + 粗体深色标题 + 该色系细节行。
+    标题/细节按卡宽**折行**（防横向溢出），作为一组在卡内**垂直居中、行间留足行距**
+    （≈1.32 倍行高，杜绝 0 行距重叠）；整组超高时**等比缩字号**塞下（防纵向溢出）。"""
     ec = MAIN[role] if highlight else CARD_EDGE
     ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0,rounding_size=0.1",
                  fc=SOFT[role], ec=ec, lw=2.6 if highlight else 1.4, zorder=z))
+    inner = w - 2 * pad_x
+    tlines = _wrap_w(title, inner, title_fs)
+    dlines = _wrap_w(detail, inner, detail_fs) if detail else []
+    th = title_fs / 72.0 * 1.32          # 标题单行行高（含行距）
+    dh = detail_fs / 72.0 * 1.32         # 细节单行行高
+    gap = 0.16 if detail else 0.0        # 标题与细节之间额外间距
+    block = th * len(tlines) + gap + dh * len(dlines)
+    avail = h - 0.16
+    if block > avail and block > 0:       # 竖向放不下 → 等比缩字号
+        sc = avail / block
+        th *= sc; dh *= sc; gap *= sc; title_fs *= sc; detail_fs *= sc; block = avail
+    yy = y + h / 2.0 + block / 2.0        # 组顶（va=top，逐行下移）
+    for ln in tlines:
+        ax.text(x + pad_x, yy, ln, ha="left", va="top", color=INK,
+                fontsize=title_fs, fontweight="bold", zorder=z + 1)
+        yy -= th
     if detail:
-        ax.text(x + 0.3, y + h - 0.32, title, ha="left", va="top", color=INK,
-                fontsize=title_fs, fontweight="bold", zorder=z + 1)
-        ax.text(x + 0.3, y + 0.28, detail, ha="left", va="bottom", color=ROLE[role][2],
-                fontsize=detail_fs, zorder=z + 1)
-    else:  # 单行卡：标题垂直居中
-        ax.text(x + 0.3, y + h / 2, title, ha="left", va="center", color=INK,
-                fontsize=title_fs, fontweight="bold", zorder=z + 1)
+        yy -= gap
+        for ln in dlines:
+            ax.text(x + pad_x, yy, ln, ha="left", va="top", color=ROLE[role][2],
+                    fontsize=detail_fs, zorder=z + 1)
+            yy -= dh
     return dict(x=x, y=y, w=w, h=h, cx=x + w / 2, cy=y + h / 2,
                 right=(x + w, y + h / 2), left=(x, y + h / 2), top=(x + w / 2, y + h), bottom=(x + w / 2, y))
 

@@ -85,15 +85,7 @@ flowchart LR
 
 ---
 
-## 六、来源与版权 / Source & Attribution
-
-- 本笔记内容系学习整理，知识体系与讲解脉络源自 **Prof. Adam Teman** 的公开课程 *Digital VLSI Design (DVD)*（Bar-Ilan University, Course 83-612），课程主页 <https://enicslabs.com/academic-courses/dvd-english/> ，以及其中文搬运版《芯片设计从RTL到GDS》。
-- **引用格式**：Adam Teman, *Digital VLSI Design (DVD) — English*, Bar-Ilan University (Course 83-612). Retrieved from https://enicslabs.com/academic-courses/dvd-english/
-- 课程版权归原作者与院校所有；本目录仅作个人学习笔记之用。具体 EDA 命令/选项请以对应工具官方手册为准。
-
----
-
-## 七、待补充
+## 六、待补充
 
 - 课程视频的**转写字幕尚未生成**（`_BiliKit` 仍在处理 `6918961`）；待字幕产出后可回填课程原话与例子。
 - 已覆盖、本批次未含、可作为下一批的主题：**逻辑综合细节**（DVD Lec 3–4）、**STA 深入**（Lec 5）、**CTS 时钟树**（Lec 8）、**Routing 布线**（Lec 9）、**封装与 IO**（Lec 10）、**Signoff 签核**（Lec 11）、**Tcl 脚本**。

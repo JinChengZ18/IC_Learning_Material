@@ -299,7 +299,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
         _title_block(sl, s["title"], s.get("sub"))
         if k == "split":
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
-                 sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.1)
+                 sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16)
             _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 5.25))
         elif k == "cards2":
             for j, (hdr, code, a) in enumerate(s["cards"]):
@@ -307,7 +307,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
                 _txt(sl, (x + 0.35, 2.6, 5.3, 4.0), code, sizes=[11.5] * len(code), monos=[True] * len(code),
-                     colors=[INK_C] * len(code), space=7)
+                     colors=[INK_C] * len(code), space=7, line_sp=1.12)
         elif k == "grid6":
             for j, (t1, t2, c) in enumerate(s["items"]):
                 x = 0.7 + (j % 3) * 4.05
@@ -321,7 +321,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
                 _txt(sl, (x + 0.35, 2.55, 5.3, 4.2), _bullets_lines(items),
-                     sizes=[12.5] * len(items), colors=[INK_C] * len(items), space=6, line_sp=1.08)
+                     sizes=[12.5] * len(items), colors=[INK_C] * len(items), space=6, line_sp=1.16)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
@@ -358,16 +358,26 @@ def _mcard(ax, x, ytop, w, h, fc="#FFFFFF", ec=T.LINE, accent=None):
 
 
 def _wrap(s, maxu):
-    """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。"""
-    out, line, u = [], "", 0.0
-    for ch in s:
-        w = 0.55 if ord(ch) < 128 else 1.0
-        if u + w > maxu and line:
-            out.append(line); line, u = ch, w
+    """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。
+    连续 ASCII 字母/数字成"词"整体折行，不拆词（与 PowerPoint 的按词换行一致）。"""
+    toks, i, n = [], 0, len(s)
+    while i < n:
+        if s[i].isascii() and s[i].isalnum():
+            j = i + 1
+            while j < n and s[j].isascii() and s[j].isalnum():
+                j += 1
+            toks.append(s[i:j]); i = j
         else:
-            line += ch; u += w
-    if line:
-        out.append(line)
+            toks.append(s[i]); i += 1
+    out, line, u = [], "", 0.0
+    for t in toks:
+        w = sum(0.55 if ord(c) < 128 else 1.0 for c in t)
+        if u + w > maxu and line:
+            out.append(line.rstrip()); line, u = t.lstrip(), w
+        else:
+            line += t; u += w
+    if line.strip():
+        out.append(line.rstrip())
     return out or [""]
 
 
