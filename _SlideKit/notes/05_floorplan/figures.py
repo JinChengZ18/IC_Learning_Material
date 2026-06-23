@@ -62,7 +62,7 @@ def f02_why():
     T.annotate(ax, (xs[4], ys[4]), (xs[4] - 1.9, ys[4] + 0.3), "改在此\n≈ 重来", color=T.ROSE_D, rad=0.25, fs=CAP)
     # 右：PPA 三角（上）+ 三类代价卡（下）
     cx, cy, r = 7.1, 5.2, 1.25
-    ax.fill([cx, cx - r, cx + r], [cy + r, cy - r * 0.85, cy - r * 0.85], color=T.BLUE_L, ec=T.BLUE, lw=1.8, zorder=2, alpha=0.65)
+    ax.fill([cx, cx - r, cx + r], [cy + r, cy - r * 0.85, cy - r * 0.85], color=T.BLUE_L, ec=T.BLUE, lw=1.8, zorder=2)
     T.tag(ax, cx, cy + r + 0.28, "Performance", role="logic", fs=CAP - 0.5)
     T.tag(ax, cx - r + 0.1, cy - r * 0.85 - 0.28, "Power", role="power", fs=CAP - 0.5)
     T.tag(ax, cx + r - 0.1, cy - r * 0.85 - 0.28, "Area", role="memory", fs=CAP - 0.5)
@@ -171,7 +171,7 @@ def f06_macro():
     fig, ax = T.canvas(9.4, 6.8)
     cx, cy, cw, ch = 0.4, 0.5, 4.7, 5.8
     T.rect(ax, cx, cy, cw, ch, fc=T.WHITE, ec=T.INK2, lw=1.8, z=1)
-    T.rect(ax, cx + 0.2, cy + 0.2, cw - 0.4, ch - 0.4, fc=T.BLUE_L, ec="none", z=1, alpha=0.4)
+    T.rect(ax, cx + 0.2, cy + 0.2, cw - 0.4, ch - 0.4, fc=T.BLUE_L, ec="none", z=1)
     ax.text(cx + cw * 0.5, cy + ch * 0.42, "Std-Cell\nRegion", ha="center", va="center", color=T.BLUE_D, fontsize=BODY, fontweight="bold", zorder=2)
     m1 = T.node(ax, cx + 0.3, cy + ch - 1.9, 1.85, 1.6, "SRAM", role="memory", z=4, fs=BODY)
     m2 = T.node(ax, cx + cw - 2.15, cy + ch - 1.9, 1.85, 1.6, "SRAM", role="memory", z=4, fs=BODY)
@@ -272,8 +272,8 @@ def f09_irem():
 # F10 多电压域（4:3）------------------------------------------------------ #
 def f10_mv():
     fig, ax = T.canvas(9.4, 6.6)
-    T.rect(ax, 0.4, 1.2, 3.7, 4.0, fc=T.BLUE_L, ec=T.BLUE, lw=1.6, z=1, rounding=0.12, alpha=0.5)
-    T.rect(ax, 5.3, 1.2, 3.7, 4.0, fc=T.VIOLET_L, ec=T.VIOLET, lw=1.6, z=1, rounding=0.12, alpha=0.5)
+    T.rect(ax, 0.4, 1.2, 3.7, 4.0, fc=T.BLUE_L, ec=T.BLUE, lw=1.6, z=1, rounding=0.12)
+    T.rect(ax, 5.3, 1.2, 3.7, 4.0, fc=T.VIOLET_L, ec=T.VIOLET, lw=1.6, z=1, rounding=0.12)
     ax.text(2.25, 4.9, "Domain A · always-on", ha="center", color=T.BLUE_D, fontsize=BODY, fontweight="bold")
     ax.text(7.15, 4.9, "Domain B · switchable", ha="center", color=T.VIOLET_D, fontsize=BODY, fontweight="bold")
     la = T.node(ax, 0.8, 2.7, 1.9, 1.4, "Logic A", role="logic", z=4, fs=BODY)

@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-_SlideKit · theme.py  (v2 · Vibrant Semantic)
+_SlideKit · theme.py  (v3 · 鲜明 IC 学术配色)
 =============================================
-论文/图书级 IC 插图主题。配色**重置**为现代多色「语义」方案——
-不同功能用不同色相，最大化元素辨识度（电蓝=逻辑/信号，青绿=存储/Macro，
-琥珀=电源/PG，品红=IO/高亮，紫=时钟，石板灰=衬底/中性）。
+论文/图书级 IC 插图主题。配色为**鲜明的 IC 学术多色「语义」方案**——
+不同功能用不同色相、足够饱和以最大化元素辨识度（蓝=逻辑/信号，青绿=存储/Macro，
+橙=电源/PG，红=IO/高亮，紫=时钟，石板灰=衬底/中性）。**用纯色不滥用透明度**（卡片底用 _L 浅调实色）。
 
 一次导出 PNG(给 PPT) + SVG(给 md)。在 diagrams/decks 里 `import theme as T`。
 
@@ -28,11 +28,11 @@ import matplotlib.patheffects as pe
 # --------------------------------------------------------------------------- #
 # 靛蓝学术配色 (IEEE 风) · 近双色 + 灰阶 + 暖橙点缀；白底、细线、低饱和、克制
 # 主色靛蓝主导结构，暖橙仅作强调，其余语义色降饱和到学术色调（不再有糖果紫/品红）。
-BLUE   = "#1F3A8A"; BLUE_L   = "#E5E9F5"; BLUE_D   = "#15275E"   # 主色 靛蓝：逻辑/信号/结构/标题
-TEAL   = "#3F7C8C"; TEAL_L   = "#E1EDF0"; TEAL_D   = "#27545F"   # 存储/Macro（低饱和钢青）
-AMBER  = "#C2772E"; AMBER_L  = "#F6E8D5"; AMBER_D  = "#8A5212"   # 电源/PG/强调（暖橙点缀）
-ROSE   = "#A6473C"; ROSE_L   = "#F1DCD8"; ROSE_D   = "#762F27"   # IO/高亮/关键网（低饱和砖红）
-VIOLET = "#4C4A78"; VIOLET_L = "#E5E3EF"; VIOLET_D = "#322F52"   # 时钟/特殊（暗板岩，非粉）
+BLUE   = "#1D4ED8"; BLUE_L   = "#DBEAFE"; BLUE_D   = "#1E3A8A"   # 主色 蓝：逻辑/信号/结构/标题
+TEAL   = "#0D9488"; TEAL_L   = "#CCFBF1"; TEAL_D   = "#115E59"   # 存储/Macro（青绿）
+AMBER  = "#EA580C"; AMBER_L  = "#FFEDD5"; AMBER_D  = "#9A3412"   # 电源/PG/强调（橙）
+ROSE   = "#DC2626"; ROSE_L   = "#FEE2E2"; ROSE_D   = "#991B1B"   # IO/高亮/关键网（红，非粉）
+VIOLET = "#6D28D9"; VIOLET_L = "#EDE9FE"; VIOLET_D = "#5B21B6"   # 时钟/特殊（深紫）
 
 INK    = "#1A1F2B"   # 主文字
 INK2   = "#3A4252"   # 次文字
@@ -132,7 +132,7 @@ def node(ax, x, y, w, h, title, sub=None, role="logic", variant="soft",
         ax.text(cx, cy + h * 0.15, title, ha="center", va="center", color=tc,
                 fontsize=fs, fontweight=weight, zorder=z + 2)
         ax.text(cx, cy - h * 0.22, sub, ha="center", va="center", color=tc,
-                fontsize=sub_fs, zorder=z + 2, alpha=0.92)
+                fontsize=sub_fs, zorder=z + 2)
     else:
         ax.text(cx, cy, title, ha="center", va="center", color=tc,
                 fontsize=fs, fontweight=weight, zorder=z + 2)
@@ -256,11 +256,11 @@ def flow(ax, items, y, x0, x1, h=1.7, gap=0.32, fs=13.5, sub_fs=9.5, z=2,
 # --------------------------------------------------------------------------- #
 # 参考信息图风格图元（卡片 / chevron 流程 / 分节标题）—— 柔和、留白克制、层级分明
 # --------------------------------------------------------------------------- #
-SOFT = {  # 各角色的浅卡片底色（学术低饱和）
-    "logic": "#E5E9F5", "memory": "#E1EDF0", "power": "#F6E8D5",
-    "io": "#F1DCD8", "clock": "#E5E3EF", "neutral": "#EDF0F4",
+SOFT = {  # 各角色的浅卡片底色（取各色 _L 浅调，纯色不透明，不靠 alpha）
+    "logic": "#DBEAFE", "memory": "#CCFBF1", "power": "#FFEDD5",
+    "io": "#FEE2E2", "clock": "#EDE9FE", "neutral": "#EEF1F5",
 }
-CARD_EDGE = "#CDD3DC"
+CARD_EDGE = "#CBD2DC"
 
 
 def _wrap_w(s, width_in, fs):
