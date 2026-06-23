@@ -25,7 +25,7 @@ SPECS = [
      "src": SRC},
 
     {"kind": "split", "title": "研究背景与方法", "sub": "为何在 floorplan 阶段定利用率",
-     "figure": "f02_why.png", "caption": "修改成本随实现阶段急剧上升，floorplan 阶段改动近乎免费",
+     "figure": "f01_position.png", "caption": "Floorplan 在 PnR 流程中的位置：后端第一道决策定 PPA 上限",
      "style": "num", "bullets": [
         "Floorplan 决定芯片 PPA 上限，且此阶段改动成本最低。",
         "利用率定得过高会拥塞、绕不出线，过低则浪费面积。",
@@ -59,7 +59,7 @@ SPECS = [
                "y_title": "峰值 IR (mV)"}},
 
     {"kind": "split", "title": "电源网络规划：Ring → Stripe → Mesh → Rail", "sub": "均衡方案采用的 PG 骨架",
-     "figure": "f08_power.png", "caption": "自上而下由粗到细连成 PG 网络，靠加密 mesh 与 via 控住 IR/EM",
+     "figure": "f09_irem.png", "caption": "IR 压降与 EM：靠加密 mesh / via 与多路径控住",
      "bullets": [
         "Power Ring 绕 core 闭合，承担总电流入口。",
         "Power Stripe 横跨 core 分担电流，纵横交织成 Mesh。",
