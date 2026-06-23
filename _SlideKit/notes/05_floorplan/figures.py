@@ -383,10 +383,95 @@ def f15_loop():
     return T.save(fig, OUT, "f15_loop")
 
 
+# F16 网表唯一化（4:3）--------------------------------------------------- #
+def f16_uniquify():
+    fig, ax = T.canvas(9.4, 6.2)
+    T.sechead(ax, 0.4, 5.85, "①", "唯一化：每个子模块只被引用一次")
+
+    def tree(x0, shared, title, role_t):
+        ax.text(x0 + 1.75, 5.05, title, ha="center", color=role_t, fontsize=BODY, fontweight="bold")
+        top = T.node(ax, x0 + 0.95, 3.95, 1.6, 0.72, "top", role="neutral", fs=BODY)
+        m1 = T.node(ax, x0 - 0.05, 2.75, 1.5, 0.72, "m1", role="logic", fs=BODY)
+        m2 = T.node(ax, x0 + 2.05, 2.75, 1.5, 0.72, "m2", role="logic", fs=BODY)
+        T.arrow(ax, top["bottom"], m1["top"], color=T.INK2, lw=1.8, scale=11)
+        T.arrow(ax, top["bottom"], m2["top"], color=T.INK2, lw=1.8, scale=11)
+        if shared:
+            am = T.node(ax, x0 + 0.95, 1.55, 1.6, 0.72, "amod", role="memory", fs=BODY)
+            u = T.node(ax, x0 + 0.95, 0.45, 1.6, 0.72, "u1·BUFFD1", role="io", fs=CAP)
+            T.arrow(ax, m1["bottom"], am["top"], color=T.ROSE, lw=1.8, scale=11)
+            T.arrow(ax, m2["bottom"], am["top"], color=T.ROSE, lw=1.8, scale=11)
+            T.arrow(ax, am["bottom"], u["top"], color=T.INK2, lw=1.8, scale=11)
+        else:
+            a1 = T.node(ax, x0 - 0.05, 1.55, 1.5, 0.72, "amod1", role="memory", fs=CAP)
+            a2 = T.node(ax, x0 + 2.05, 1.55, 1.5, 0.72, "amod2", role="memory", fs=CAP)
+            u1 = T.node(ax, x0 - 0.05, 0.45, 1.5, 0.72, "u1", role="io", fs=CAP)
+            u2 = T.node(ax, x0 + 2.05, 0.45, 1.5, 0.72, "u1", role="io", fs=CAP)
+            T.arrow(ax, m1["bottom"], a1["top"], color=T.INK2, lw=1.8, scale=11)
+            T.arrow(ax, m2["bottom"], a2["top"], color=T.INK2, lw=1.8, scale=11)
+            T.arrow(ax, a1["bottom"], u1["top"], color=T.INK2, lw=1.8, scale=11)
+            T.arrow(ax, a2["bottom"], u2["top"], color=T.INK2, lw=1.8, scale=11)
+
+    tree(0.4, True, "非唯一：m1/m2 共享 amod", T.ROSE_D)
+    tree(5.3, False, "唯一化：各自独立副本", T.TEAL_D)
+    T.line(ax, 4.85, 0.3, 4.85, 5.0, color=T.LINE, lw=1.2, ls=(0, (3, 3)))
+    ax.text(2.15, 0.02, "改 m1/u1 会牵连 m2/u1（不可独立优化）", ha="center", color=T.ROSE_D, fontsize=CAP - 0.5)
+    ax.text(7.05, 0.02, "各实例可独立优化、移动", ha="center", color=T.TEAL_D, fontsize=CAP - 0.5)
+    return T.save(fig, OUT, "f16_uniquify")
+
+
+# F17 扁平 vs 层次化（4:3）------------------------------------------------ #
+def f17_hier():
+    fig, ax = T.canvas(9.4, 6.0)
+    ax.text(2.35, 5.55, "扁平 Flat", ha="center", color=T.BLUE_D, fontsize=H2, fontweight="bold")
+    T.rect(ax, 0.5, 1.4, 3.7, 3.7, fc=T.WHITE, ec=T.INK2, lw=1.8, z=1)
+    T.node(ax, 1.15, 2.55, 2.4, 1.4, "整颗芯片\n一次 P&R", role="logic", fs=BODY, z=3)
+    ax.text(2.35, 1.75, "运行慢 / 内存大", ha="center", color=T.MUTED, fontsize=CAP)
+    ax.text(7.0, 5.55, "层次化 Hierarchical", ha="center", color=T.TEAL_D, fontsize=H2, fontweight="bold")
+    T.rect(ax, 5.0, 1.4, 4.0, 3.7, fc=T.WHITE, ec=T.INK2, lw=1.8, z=1)
+    top = T.node(ax, 6.35, 4.15, 1.5, 0.7, "Top 集成", role="neutral", fs=CAP, z=4)
+    blks = []
+    for i in range(3):
+        b = T.node(ax, 5.2 + i * 1.28, 2.75, 1.12, 0.95, f"Blk{i+1}", role="memory", fs=CAP, z=3)
+        blks.append(b)
+        T.arrow(ax, b["top"], top["bottom"], color=T.INK2, lw=1.4, scale=9)
+        ax.text(b["cx"], b["y"] - 0.28, "P&R", ha="center", color=T.MUTED, fontsize=CAP - 2)
+    ax.text(7.0, 1.75, "并行 / 复用，但需 ILM、引脚、预算", ha="center", color=T.MUTED, fontsize=CAP)
+    T.infocard(ax, 0.5, 0.25, 8.5, 0.9, "取舍",
+               "层次化省运行时间与内存、利于复用，但全芯片时序收敛更难，依赖引脚分配 / feedthrough / 时序预算 / ILM",
+               role="neutral", title_fs=BODY, detail_fs=CAP - 0.5)
+    return T.save(fig, OUT, "f17_hier")
+
+
+# F18 电源网格与宏摆放（4:3）---------------------------------------------- #
+def f18_pgmacro():
+    fig, ax = T.canvas(9.0, 6.4)
+    dx, dy, s = 0.5, 0.7, 5.2
+    T.rect(ax, dx, dy, s, s, fc=T.WHITE, ec=T.INK2, lw=2.0, z=1)
+    n = 9
+    pl = (s - 0.12 * (n + 1)) / n
+    for i in range(n):
+        p = dx + 0.12 + i * (pl + 0.12)
+        for yy in (dy, dy + s - 0.3):
+            T.rect(ax, p, yy, pl, 0.3, fc=T.AMBER_L, ec=T.AMBER, lw=0.9, z=3)
+    ax.text(dx + s / 2, dy + s + 0.12, "电源 pad 环（VDD/VSS）", ha="center", va="bottom", color=T.AMBER_D, fontsize=CAP, fontweight="bold")
+    # 高功耗宏：靠近边界 pad、彼此拉开
+    T.node(ax, dx + 0.55, dy + 0.6, 1.5, 1.5, "高功耗\nMacro", role="memory", fs=CAP, z=4)
+    T.node(ax, dx + s - 2.05, dy + s - 2.1, 1.5, 1.5, "高功耗\nMacro", role="memory", fs=CAP, z=4)
+    ax.text(dx + s / 2, dy + s / 2, "Std-Cell", ha="center", va="center", color=T.MUTED, fontsize=CAP)
+    # IR 热点示意（远离 pad 的中心）
+    ax.add_patch(__import__("matplotlib").patches.Circle((dx + s * 0.5, dy + s * 0.5), 0.55, fc=T.ROSE_L, ec=T.ROSE, lw=1.4, ls=(0, (3, 2)), zorder=2))
+    bx = dx + s + 0.4
+    cards = [("靠近边界电源 pad", "io"), ("高功耗宏彼此拉开", "power"),
+             ("宏通道留给 PG/via/时钟", "neutral"), ("pad·宏·网格一起迭代", "logic")]
+    for i, (t, role) in enumerate(cards):
+        T.infocard(ax, bx, 5.1 - i * 1.18, 9.0 - bx - 0.3, 1.0, t, role=role, title_fs=BODY)
+    return T.save(fig, OUT, "f18_pgmacro")
+
+
 def main():
     figs = [f01_position, f02_why, f03_geometry, f04_util, f05_rows, f06_macro,
             f07_halo, f08_power, f09_irem, f10_mv, f11_budget, f12_io,
-            f13_iopad, f14_gating, f15_loop]
+            f13_iopad, f14_gating, f15_loop, f16_uniquify, f17_hier, f18_pgmacro]
     print("Output:", OUT)
     for fn in figs:
         print("  saved:", os.path.basename(fn()))
