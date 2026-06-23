@@ -432,9 +432,21 @@ def _refs(slide, s):
         _txt(slide, (0.7, 1.78, 12.0, 5.2), lines, sizes=[12.5] * len(lines), colors=[INK_C] * len(lines), space=9, line_sp=1.2, auto_fit=True)
 
 
-def _split_figs(sl, figs, asset_dir, fig_no):
-    """split 右栏并排渲染多张图（1–3），每张带图注「图 N · …」+ 可选来源。返回更新后的 fig_no。"""
+def _split_figs(sl, figs, asset_dir, fig_no, vertical=False):
+    """split 右栏多图（1–3）+ 图注「图 N · …」+ 来源。vertical=True 上下堆叠（适合宽图），否则左右并排。"""
     n = len(figs)
+    if vertical:
+        x, w, y0 = 6.0, 6.85, 1.72
+        bh = 5.2 / n
+        img_h = bh - 0.62
+        for i, fgd in enumerate(figs):
+            yb = y0 + i * bh
+            _pic(sl, os.path.join(asset_dir, fgd["f"]), (x, yb, w, img_h))
+            fig_no += 1
+            _txt(sl, (x, yb + img_h + 0.03, w, 0.32), [f"图 {fig_no} · {fgd['cap']}"], sizes=[11], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+            if fgd.get("credit"):
+                _txt(sl, (x, yb + img_h + 0.33, w, 0.26), ["来源：" + fgd["credit"]], sizes=[8], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+        return fig_no
     x0, wtot, y0, gap = 6.0, 6.85, 1.7, 0.22
     cw = (wtot - gap * (n - 1)) / n
     img_h = 4.55 if n == 1 else (3.7 if n == 2 else 3.0)
@@ -444,8 +456,7 @@ def _split_figs(sl, figs, asset_dir, fig_no):
         _pic(sl, os.path.join(asset_dir, fgd["f"]), (x, y0, cw, img_h))
         fig_no += 1
         yy = y0 + img_h + 0.08
-        if fgd.get("cap"):
-            _txt(sl, (x, yy, cw, 0.62), [f"图 {fig_no} · {fgd['cap']}"], sizes=[cap_fs], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+        _txt(sl, (x, yy, cw, 0.62), [f"图 {fig_no} · {fgd['cap']}"], sizes=[cap_fs], colors=[MUTED_C], align=PP_ALIGN.CENTER)
         if fgd.get("credit"):
             _txt(sl, (x, yy + 0.6, cw, 0.3), ["来源：" + fgd["credit"]], sizes=[8], colors=[MUTED_C], align=PP_ALIGN.CENTER)
     return fig_no
@@ -751,7 +762,7 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
                  sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16, auto_fit=True)
             if s.get("figs"):                          # 多图（每图带图注 + 来源）
-                fig_no = _split_figs(sl, s["figs"], asset_dir, fig_no)
+                fig_no = _split_figs(sl, s["figs"], asset_dir, fig_no, s.get("figs_v", False))
             else:
                 cap = s.get("caption")
                 box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)
@@ -1032,23 +1043,38 @@ def _prefs(ax, s):
     return mx
 
 
-def _psplit_figs(ax, figs, asset_dir, fig_no):
-    """预览端：split 右栏并排多图 + 图注（与 _split_figs 镜像）。"""
+def _psplit_figs(ax, figs, asset_dir, fig_no, vertical=False):
+    """预览端：split 右栏多图 + 图注（与 _split_figs 镜像）；vertical=True 上下堆叠。"""
     n = len(figs)
+
+    def _img(p, box):
+        if not os.path.isfile(p):
+            _mmissing(ax, p, box); return
+        iw, ih = Image.open(p).size
+        fx, ft, fw, fh = fit(box, iw, ih)
+        ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
+        ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
+
+    if vertical:
+        x, w, y0 = 6.0, 6.85, 1.72
+        bh = 5.2 / n; img_h = bh - 0.62
+        for i, fgd in enumerate(figs):
+            yb = y0 + i * bh
+            _img(os.path.join(asset_dir, fgd["f"]), (x, yb, w, img_h))
+            fig_no += 1
+            yy = yb + img_h + 0.20
+            for ln in _wrap(f"图 {fig_no} · {fgd['cap']}", _maxu(w, 11)):
+                _mtext(ax, x + w / 2, yy, ln, fs=11, color="#" + MUTED_C, ha="center"); yy += 0.23
+            if fgd.get("credit"):
+                _mtext(ax, x + w / 2, yy + 0.01, "来源：" + fgd["credit"], fs=8, color="#" + MUTED_C, ha="center")
+        return fig_no
     x0, wtot, y0, gap = 6.0, 6.85, 1.7, 0.22
     cw = (wtot - gap * (n - 1)) / n
     img_h = 4.55 if n == 1 else (3.7 if n == 2 else 3.0)
     cap_fs = 11 if n == 1 else (9 if n == 2 else 8)
     for i, fgd in enumerate(figs):
         x = x0 + i * (cw + gap)
-        p = os.path.join(asset_dir, fgd["f"])
-        if not os.path.isfile(p):
-            _mmissing(ax, p, (x, y0, cw, img_h))
-        else:
-            iw, ih = Image.open(p).size
-            fx, ft, fw, fh = fit((x, y0, cw, img_h), iw, ih)
-            ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
-            ax.add_patch(Rectangle((x, SLIDE_H - y0 - img_h), cw, img_h, fc="none", ec="#E2E8F0", lw=1, zorder=1))
+        _img(os.path.join(asset_dir, fgd["f"]), (x, y0, cw, img_h))
         fig_no += 1
         yy = y0 + img_h + 0.24
         for ln in _wrap(f"图 {fig_no} · {fgd['cap']}", _maxu(cw, cap_fs)):
@@ -1103,7 +1129,7 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
             if yy > 7.05:                                   # 缩到底仍溢出才告警
                 _oflow_mark(ax)
             if s.get("figs"):
-                fig_no = _psplit_figs(ax, s["figs"], asset_dir, fig_no)
+                fig_no = _psplit_figs(ax, s["figs"], asset_dir, fig_no, s.get("figs_v", False))
             else:
                 cap = s.get("caption")
                 box = (6.0, 1.7, 6.85, 4.55 if cap else 5.25)

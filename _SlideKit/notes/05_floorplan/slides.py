@@ -25,7 +25,7 @@ PRIMARY = D.PRIMARY
 ACCENT = D.ACCENT
 
 
-def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None, caption=None, figs=None):
+def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None, caption=None, figs=None, figs_v=False):
     d = {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": PRIMARY, "style": style}
     if diagram:                 # 右栏改用 PPT 原生框图（可编辑形状）；fig 仍保留供笔记 md 与预览回退
         d["diagram"] = diagram
@@ -33,8 +33,10 @@ def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None, capti
         d["credit"] = credit
     if caption:                 # 单图图注（图下「图 N · …」）
         d["caption"] = caption
-    if figs:                    # 多图：[{"f":路径,"cap":图注,"credit":来源}]，右栏并排渲染、各带图注
+    if figs:                    # 多图：[fg(路径,图注,来源)]，右栏渲染、各带图注
         d["figs"] = figs
+    if figs_v:                  # 多图上下堆叠（宽图用），默认左右并排
+        d["figs_v"] = True
     return d
 
 
@@ -88,7 +90,10 @@ SPECS = [
         "硬宏的位置、朝向与固定状态，以及标准单元可放置区",
         "电源环 / 条带 / 网格 / 供电轨，阻挡 / 留边 / 区域约束等物理约束",
         "下游布局 / CTS / 布线 / 签核都沿此骨架细化；此阶段改成本低，签核再改则牵一发而动全身",
-    ], credit="Intel 80486DX2 die（功能块标注）· Smial · CC BY 3.0 · Wikimedia"),
+    ], figs=[
+        fg("ext_die_486_ccby.jpg", "真实 486 裸片：7 个功能块构成物理骨架", "Smial · CC BY 3.0 · Wikimedia"),
+        fg("ext_wafer_6inch_ccbysa.jpg", "晶圆上成片裸片：一颗 die 即一份 floorplan", "A. Kübelbeck · CC BY-SA 3.0 · Wikimedia"),
+    ]),
     tbl("1.2 沿主线反查：现象 → 优先方向", "遇到问题沿同一条路径排查", ["现象", "优先反查"], [
         ["布线拥塞", "利用率、宏通道、引脚可达性、布线阻挡"],
         ["时序变差", "宏单元 / 引脚位置、层次化时序预算、长绕线"],
@@ -133,8 +138,10 @@ SPECS = [
         "Floorplan 阶段的利用率通常指标准单元占核心区面积的比例，常见初值约 70%。",
         "利用率太高会带来布线拥塞、合法化与优化自由度不足、引脚密集处局部拥塞，以及电源网格与信号抢资源；太低则浪费面积、拉长平均互连。",
         "工程上要区分总利用率（含宏）与有效利用率（扣除阻挡、宏留边、禁布区）；但不能只凭利用率定尺寸——完成初始估算后还要跑试布线或全局布线估拥塞，再决定是否放大核心、调综合、移宏或改引脚。",
-    ], style="prose", caption="拥塞如何形成：逻辑块 → 布线竞争 → 拥塞热力图",
-        credit="VeriHGN, Hu et al. · arXiv:2603.11075 · CC BY 4.0"),
+    ], style="prose", figs_v=True, figs=[
+        fg("ext_congest_verihgn_ccby.png", "拥塞如何形成：逻辑块→布线竞争→热力图", "VeriHGN, Hu et al. · arXiv:2603.11075 · CC BY 4.0"),
+        fg("ext_congest_heatmap_ccby.jpg", "真实版图上的拥塞预测热力图（jet 配色）", "Tsai et al. · arXiv:2510.15872 · CC BY 4.0"),
+    ]),
     split("2.3 网表唯一化", "物理实现前每个子模块只引用一次", "f16_uniquify.png", [
         "进入物理域前，网表必须唯一化——每个子模块只被引用一次。这是因为物理优化要按实例独立移动、插缓冲器、做优化。",
         "如果两个实例共享同一个模块定义，工具想优化 m1/u1 时就可能同时改变 m2/u1，物理优化边界不清晰。",
@@ -152,6 +159,8 @@ SPECS = [
            "UltraSPARC T1 · ZyMOS / Fritzchens Fritz · CC BY-SA 3.0"),
         fg("ext_floorplan_compare_ccbysa.png", "宏摆放对比：人工分区 vs 规则 AI",
            "Copparihollmann · CC BY-SA 4.0 · Wikimedia"),
+        fg("ext_sram_hitachi_ccbysa.jpg", "存储宏内部：规则的 SRAM 位单元阵列",
+           "Seanriddle · CC BY-SA 4.0 · Wikimedia"),
     ]),
     tbl("2.5 布局区域：表达放置意图", "越硬越易局部拥塞，仅用于必要结构性意图", ["类型", "含义", "强度"], [
         ["软引导 soft guide", "希望这些单元聚在一起，但无固定区域", "最软"],
@@ -159,14 +168,15 @@ SPECS = [
         ["区域约束 region", "指定单元必须放该区域，其他单元也可进入", "较硬"],
         ["围栏约束 fence", "指定单元必须放该区域，其他单元不可进入", "最硬"],
     ], col_align=["l", "l", "c"]),
-    split("2.6 阻挡与留边", "限制放置 + 给布线留活路", "f07_halo.png", [
+    split("2.6 阻挡与留边", "限制放置 + 给布线留活路", "ext_blockage_floorset_ccby.png", [
         "布局阻挡限制标准单元摆放，分三种：",
         "hard 完全禁放；soft 初始禁、优化阶段可放 buffer / inverter",
         "partial 限制区域最大密度（例如最多 40%）",
         "留边 halo（padding / keepout）：宏外围一圈空白，改善引脚可达性",
         "留边还为缓冲器 / 反相器插入、电源与信号布线留近宏通道",
         "关键区别：halo 跟随宏移动，blockage 多为固定坐标",
-    ]),
+    ], caption="在版图上逐步叠加约束：边界 = keepout / 留边，预置 = 固定 / 硬阻挡",
+        credit="FloorSet, Mallappa et al. · arXiv:2405.05480 · CC BY 4.0"),
     bl("2.7 布线阻挡与好 Floorplan", "限制走线 + 图上可见的好特征", [
         "布线阻挡限制走线（非摆放），可指定层或层范围（如禁 M1–M3 在某区域走线）",
         "用途：保护宏单元上方特殊区域，给电源结构预留资源",
@@ -192,13 +202,18 @@ SPECS = [
         "芯片级约束必须映射成模块级约束。例如顶层某输入到模块的路径预算为 1.5 ns，模块实现时就要在模块边界建立对应的输入 / 输出延迟、时钟不确定性、负载与驱动单元约束。",
         "预算合理时，各模块独立收敛后全芯片才容易收敛；预算不合理时，单个模块看似通过，全芯片仍可能失败。",
         "接口逻辑模型（ILM）保留模块边界附近与接口相关的逻辑、隐藏内部细节；抽取时序模型（ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析更快、更可控。",
-    ], style="prose", caption="层次化分块布图：紧凑块边界 b1–b11 + B*-tree 表示",
-        credit="PARSAC, Mostafa et al. · arXiv:2405.05495 · CC BY-SA 4.0"),
+    ], style="prose", figs_v=True, figs=[
+        fg("ext_pdflow_parsac_ccbysa.png", "物理设计流程：分区 → 层次化布图 → … → 时序收敛", "PARSAC · arXiv:2405.05495 · CC BY-SA 4.0"),
+        fg("ext_block_floorplan_parsac_ccbysa.png", "层次化分块布图：块边界 b1–b11 + B*-tree", "PARSAC · arXiv:2405.05495 · CC BY-SA 4.0"),
+    ]),
     split("3.3 引脚分配与穿通", "顶层 IO 与模块 pin 影响点不同", "ext_wirebond_ccbysa.jpg", [
         "顶层 IO 摆放决定芯片对外接口位置，影响封装、ESD、电源焊盘与芯片边界；模块级引脚分配则决定层次化模块之间如何连接，影响模块间布线、时序预算、feedthrough 与全芯片收敛。",
         "模块级引脚的约束常包括布线层、引脚间距与尺寸、重叠规则、网络分组、引脚引导区域、数据流方向，以及试布线的边界穿越情况。",
         "在无通道或通道资源紧张的设计中 feedthrough 很关键：若信号从分区 A 经分区 B 到分区 C，而 B 没有 feedthrough，信号可能被迫绕过整个模块。解法是在 B 上生成 feedthrough 引脚 / 网络，把跨越 B 的连接拆成几段。",
-    ], style="prose", credit="Wire-bond 实拍 · Mister rf · CC BY-SA 4.0 · Wikimedia"),
+    ], style="prose", figs=[
+        fg("ext_wirebond_ccbysa.jpg", "引线键合特写：金线焊到封装", "Mister rf · CC BY-SA 4.0 · Wikimedia"),
+        fg("ext_wirebond_pkg_ccbysa.jpg", "开盖芯片：裸片经键合线接到封装引脚", "Mister rf · CC BY-SA 4.0 · Wikimedia"),
+    ]),
 
     # ===== 第 4 章 电源规划与完整性 =====
     section("4", "电源规划与完整性", "PDN、IR / EM、电源网格与宏摆放",
@@ -214,14 +229,17 @@ SPECS = [
         "若实际电压低于容差下限，单元延迟会增加、时序可能失败，严重时功能错误。",
         "一个典型估算：1 mm 长、100 nm 宽的 M1 电源轨，方块电阻 0.1 Ω/□ 时线阻约 1000 Ω，承载约 0.1 mA 时 IR 压降可达约 100 mV——细而长的低层电源线无法单独供电，必须用更宽、更厚、更高层、多路径、多过孔的结构。",
     ], style="prose", credit="IR drop map · WACA-UNet, Seo et al. · arXiv:2507.19197 · CC BY 4.0"),
-    bl("4.3 电迁移 EM", "长期电流密度能不能扛住", [
+    split("4.3 电迁移 EM", "长期电流密度能不能扛住", "f09_irem.png", [
         "EM：电流长期流过导体，电子动量推动金属原子迁移",
         "开路：单根线上形成空洞（void）",
         "短路：相邻线之间桥接（bridging）",
         "RC 改变：即使不开 / 不短路，也可能造成性能退化",
         "IR 偏“瞬时电压够不够”，EM 偏“长期电流密度扛不扛”",
         "二者都与 floorplan 有关：焊盘、高功耗宏位置、网格宽度 / 间距 / 过孔早期就定",
-    ], two=True),
+    ], figs=[
+        fg("ext_em_void_ccbysa.jpg", "铜互连电迁移失效 SEM：断裂 / 空洞", "P.-E. Zörner · CC BY-SA 3.0 · Wikimedia"),
+        fg("ext_em_alcu_ccby.jpg", "AlCu M2 连续性空洞 SEM（加速 EM 测试）", "Liu et al. · doi:10.3390/mi16040458 · CC BY 4.0"),
+    ]),
     tbl("4.4 PDN 的基本取舍", "电源越强越可靠，但越抢信号资源", ["选择", "好处", "代价"], [
         ["更宽电源线", "降低电阻与 IR 压降", "占用布线轨道"],
         ["更多电源条带", "提供更多电流路径", "增加信号拥塞"],
@@ -244,14 +262,15 @@ SPECS = [
         "决定：要不要电源环、层次化模块是否需要屏蔽",
         "命令骨架：globalNetConnect → addRing → addStripe → sroute，先做初始电源网络分析",
     ]),
-    split("4.7 电源网格与宏摆放", "高功耗宏要看供电路径", "f18_pgmacro.png", [
+    split("4.7 电源网格与宏摆放", "高功耗宏要看供电路径", "ext_irlayout_cfirstnet_ccby.png", [
         "高功耗模块摆放不能只看数据流，还要看供电路径",
         "高功耗模块靠近边界电源焊盘",
         "高功耗模块之间不要过度集中",
         "宏通道不只给信号，也给电源条带、过孔、时钟预留",
         "电源焊盘、宏位置与网格密度必须一起迭代",
         "IR 用颜色图找热点；修复常是热点加线 / 加过孔 / 加宽条带 / 移宏",
-    ]),
+    ], caption="版图上的 IR 压降热点图（红 = 高压降，预测 vs 金标）",
+        credit="CFIRSTNET, Liu et al. · arXiv:2502.12168 · CC BY 4.0"),
 
     # ===== 第 5 章 工具流程与收束 =====
     section("5", "工具流程与调试收束", "Innovus 流程、判断一个好 Floorplan",
@@ -300,16 +319,18 @@ SPECS = [
         "IDESA / EPFL — Digital IC design tutorials.",
         "Cadence Innovus / Synopsys ICC2 / Fusion Compiler User Guides（命令与流程参考）.",
     ]},
-    {"kind": "refs", "title": "图片来源 Image Credits", "sub": "全部为开放许可（CC0 / CC BY / CC BY-SA / 公有领域），均经来源页核验、按许可署名", "accent": PRIMARY, "refs": [
-        "图 1.1 Intel 80486DX2 die（功能块标注）— Smial, CC BY 3.0, Wikimedia Commons.",
-        "图 2.1 Intel Core i9-13900K die shot — Fritzchens Fritz / JmsDoug, CC0, Wikimedia Commons.",
-        "图 2.2 布线拥塞形成（VeriHGN）— R. Hu et al., arXiv:2603.11075, doi:10.48550/arXiv.2603.11075, CC BY 4.0.",
-        "图 2.4 UltraSPARC T1 die（核 + L2 存储宏）— ZyMOS / Fritzchens Fritz, CC BY-SA 3.0, Wikimedia Commons.",
-        "图 2.4 宏摆放对比（人工 vs 规则 AI）— Copparihollmann, CC BY-SA 4.0, Wikimedia Commons.",
-        "图 3.2 层次化分块布图（PARSAC）— H. Mostafa et al., arXiv:2405.05495, doi:10.48550/arXiv.2405.05495, CC BY-SA 4.0.",
-        "图 3.3 Wire-bonding close-up — Mister rf, CC BY-SA 4.0, Wikimedia Commons.",
-        "图 4.1 Bitfury 芯片顶层金属供电网 — ZeptoBars, CC BY 3.0, Wikimedia Commons.",
-        "图 4.2 Static IR-drop map（WACA-UNet）— Y. Seo et al., arXiv:2507.19197, doi:10.48550/arXiv.2507.19197, CC BY 4.0.",
+    {"kind": "refs", "title": "图片来源 Image Credits", "sub": "全部开放许可（CC0/CC BY/CC BY-SA/PD），经来源页核验署名；arXiv 图 DOI = 10.48550/arXiv.<编号>，期刊图另附 DOI", "accent": PRIMARY, "refs": [
+        "图 1.1 486 die — Smial, CC BY 3.0；晶圆 — A. Kübelbeck, CC BY-SA 3.0.",
+        "图 2.1 i9-13900K die — Fritzchens Fritz / JmsDoug, CC0.",
+        "图 2.2 拥塞形成 — Hu et al., arXiv:2603.11075；热力图 — Tsai et al., arXiv:2510.15872（CC BY 4.0）.",
+        "图 2.4 UltraSPARC die — ZyMOS, CC BY-SA 3.0；摆放对比 — Copparihollmann；SRAM — Seanriddle（CC BY-SA 4.0）.",
+        "图 2.6 放置约束 — Mallappa et al., FloorSet, arXiv:2405.05480, CC BY 4.0.",
+        "图 3.2 层次化布图/流程 — Mostafa et al., PARSAC, arXiv:2405.05495, CC BY-SA 4.0.",
+        "图 3.3 引线键合 — Mister rf, CC BY-SA 4.0.",
+        "图 4.1 Bitfury 顶层供电网 — ZeptoBars, CC BY 3.0.",
+        "图 4.2 IR 压降图 — Seo et al., WACA-UNet, arXiv:2507.19197, CC BY 4.0.",
+        "图 4.3 EM SEM — P.-E. Zörner, CC BY-SA 3.0；AlCu 空洞 — Liu et al., doi:10.3390/mi16040458, CC BY 4.0.",
+        "图 4.7 IR-on-layout — Liu et al., CFIRSTNET, arXiv:2502.12168, doi:10.1145/3676536.3676756, CC BY 4.0.",
     ]},
     {"kind": "close", "title": "谢谢 · Thanks",
      "sub": "下一讲：Placement 标准单元布局",
