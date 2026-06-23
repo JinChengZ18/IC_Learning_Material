@@ -215,7 +215,16 @@ SPECS = [
 def main():
     D.build_previews(SPECS, PREV, TOTAL, asset_dir=ASSETS)
     print("previews ->", PREV, "(", len(SPECS), "pages )")
-    print("pptx ->", D.build_pptx(SPECS, PPTX, TOTAL, asset_dir=ASSETS))
+    tmpl = os.path.abspath(os.path.join(_SK, "..", "local-doc", "PPT-template.pptx"))
+    if os.path.exists(tmpl):  # 基于模板母版的对比版本
+        try:
+            print("pptx(tmpl) ->", D.build_pptx(SPECS, PPTX.replace(".pptx", "_tmpl.pptx"), TOTAL, asset_dir=ASSETS, template=tmpl))
+        except Exception as e:
+            print("tmpl build failed:", e)
+    try:  # 主版本（干净白底，可被 PowerPoint 锁住）
+        print("pptx ->", D.build_pptx(SPECS, PPTX, TOTAL, asset_dir=ASSETS))
+    except Exception as e:
+        print("main pptx skipped (locked?):", e)
 
 
 if __name__ == "__main__":

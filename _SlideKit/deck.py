@@ -134,10 +134,16 @@ def _bullets_lines(bullets):
     return ["▪  " + b for b in bullets]
 
 
-def build_pptx(specs, out_pptx, total, author="J.C", asset_dir=""):
-    prs = Presentation()
+def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None):
+    """template=<.pptx 路径> 时，基于该模板（继承其母版/主题/字体），并清掉模板自带的示例幻灯片。"""
+    prs = Presentation(template) if template else Presentation()
+    if template:
+        sld = prs.slides._sldIdLst
+        for s in list(sld):
+            sld.remove(s)
     prs.slide_width = Inches(SLIDE_W); prs.slide_height = Inches(SLIDE_H)
-    blank = prs.slide_layouts[6]
+    blank = (min(prs.slide_layouts, key=lambda L: len(L.placeholders)) if template
+             else prs.slide_layouts[6])
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
         k = s["kind"]; acc = s.get("accent", "2563EB")
