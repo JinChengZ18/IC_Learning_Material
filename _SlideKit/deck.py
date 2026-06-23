@@ -132,11 +132,13 @@ def _card(slide, x, t, w, h, fill="FFFFFF", line="CBD5E1", accent=None):
     return sp
 
 
-def _title_block(slide, title, sub, accent=PRIMARY):
+def _title_block(slide, title, sub, accent=PRIMARY, chapter=None):
     # 左侧主色竖条 + 全宽细分隔线已下放到版式（母版）上，这里只填每页不同的标题文本
-    _txt(slide, (0.85, 0.42, 11.8, 0.8), [title], sizes=[28], bolds=[True], colors=[INK_C])
+    _txt(slide, (0.85, 0.42, 9.2, 0.8), [title], sizes=[28], bolds=[True], colors=[INK_C])
     if sub:
-        _txt(slide, (0.87, 1.18, 11.8, 0.5), [sub], sizes=[14], colors=[SUB_C])
+        _txt(slide, (0.87, 1.18, 9.2, 0.5), [sub], sizes=[14], colors=[SUB_C])
+    if chapter:                              # 右上角章节面包屑（现代结构感）
+        _txt(slide, (9.35, 0.55, 3.35, 0.4), [chapter], sizes=[12], bolds=[True], colors=[PRIMARY], align=PP_ALIGN.RIGHT)
 
 
 def _page(slide):
@@ -291,6 +293,28 @@ def _close(slide, s):
     _txt(slide, (1.15, 6.85, 11.6, 0.4), [s.get("src", "")], sizes=[11], colors=[MUTED_C])
 
 
+def _section(slide, s):
+    """分节标题页（现代分隔）：左侧主色面板 + 大号章节数字，右侧章节标题 + 小节清单。"""
+    _bg(slide, BG_C)
+    _mask(slide)
+    pw = 4.5
+    _bar(slide, 0.0, 0.0, pw, SLIDE_H, PRIMARY)
+    _txt(slide, (0.0, 1.55, pw, 0.5), [s.get("eyebrow", "CHAPTER")], sizes=[16], bolds=[True],
+         colors=["C5D6F7"], align=PP_ALIGN.CENTER)
+    _txt(slide, (0.0, 2.2, pw, 2.5), [str(s["num"])], sizes=[150], bolds=[True], colors=["FFFFFF"],
+         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+    _txt(slide, (5.1, 1.95, 7.7, 1.2), [s["title"]], sizes=[36], bolds=[True], colors=[INK_C])
+    if s.get("sub"):
+        _txt(slide, (5.15, 3.2, 7.6, 0.6), [s["sub"]], sizes=[16], colors=[SUB_C])
+    _bar(slide, 5.15, 3.95, 2.4, 0.05, ACCENT)
+    items = s.get("items", [])
+    dy = min(0.52, 2.9 / max(1, len(items)))
+    for i, it in enumerate(items):
+        y = 4.35 + i * dy
+        _bar(slide, 5.15, y + 0.06, 0.13, 0.13, ACCENT)
+        _txt(slide, (5.45, y - 0.04, 7.3, 0.4), [it], sizes=[13.5], colors=[INK_C])
+
+
 def _clean_master(prs, keep):
     """清掉默认模板自带的占位符（日期/页脚/页码/标题/正文）并删掉未使用的版式：
     否则默认占位符会与自定义母版件重叠（日期框压住页脚标签），且默认模板是 4:3、占位符按
@@ -412,6 +436,7 @@ _REQUIRED = {
     "bullets": ["title", "bullets"],
     "cols2": ["title", "cols"], "cards2": ["title", "cards"], "grid6": ["title", "items"],
     "table": ["title", "table"], "chart": ["title", "chart"], "refs": ["title", "refs"],
+    "section": ["title", "num"],
 }
 
 
@@ -472,6 +497,7 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
     _clean_master(prs, blank)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
     _layout_chrome(prs, blank, page_label)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
     fig_no = 0
+    cur_ch = None
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
         k = s["kind"]
@@ -479,9 +505,11 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
             _cover(sl, s); continue
         if k == "close":
             _close(sl, s); continue
+        if k == "section":
+            _section(sl, s); cur_ch = f"第{s['num']}章 · {s['title']}"; continue
         if k == "agenda":
             _agenda(sl, s); _page(sl); continue
-        _title_block(sl, s["title"], s.get("sub"))
+        _title_block(sl, s["title"], s.get("sub"), chapter=cur_ch)
         if k == "split":
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
                  sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16, auto_fit=True)
@@ -627,6 +655,23 @@ def _pclose(ax, s):
     _mtext(ax, 1.15, 6.9, s.get("src", ""), fs=10, color="#" + MUTED_C)
 
 
+def _psection(ax, s):
+    ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
+    pw = 4.5
+    ax.add_patch(Rectangle((0, 0), pw, SLIDE_H, fc="#" + PRIMARY, ec="none", zorder=1))
+    _mtext(ax, pw / 2, 1.65, s.get("eyebrow", "CHAPTER"), fs=15, bold=True, color="#C5D6F7", ha="center")
+    _mtext(ax, pw / 2, 3.6, str(s["num"]), fs=135, bold=True, color="white", ha="center", va="center")
+    _mtext(ax, 5.1, 1.95, s["title"], fs=32, bold=True, color="#" + INK_C)
+    if s.get("sub"):
+        _mtext(ax, 5.15, 3.2, s["sub"], fs=15, color="#" + SUB_C)
+    ax.add_patch(Rectangle((5.15, SLIDE_H - 3.95 - 0.05), 2.4, 0.05, fc="#" + ACCENT, ec="none", zorder=2))
+    items = s.get("items", []); dy = min(0.52, 2.9 / max(1, len(items)))
+    for i, it in enumerate(items):
+        y = 4.35 + i * dy
+        ax.add_patch(Rectangle((5.15, SLIDE_H - y - 0.19), 0.13, 0.13, fc="#" + ACCENT, ec="none", zorder=2))
+        _mtext(ax, 5.45, y, it, fs=13, color="#" + INK_C)
+
+
 def _pagenda(ax, s, i, page_label):
     ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
     ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc="#" + PRIMARY, ec="none", zorder=2))
@@ -734,6 +779,7 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
     paths = []
     T.setup_fonts()
     fig_no = 0
+    cur_ch = None
     for i, s in enumerate(specs, 1):
         fig, ax = plt.subplots(figsize=(SLIDE_W, SLIDE_H), dpi=110)
         ax.set_xlim(0, SLIDE_W); ax.set_ylim(0, SLIDE_H); ax.axis("off"); ax.set_autoscale_on(False)
@@ -744,6 +790,8 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
             _pcover(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
         if k == "close":
             _pclose(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
+        if k == "section":
+            _psection(ax, s); cur_ch = f"第{s['num']}章 · {s['title']}"; paths.append(_save_prev(fig, outdir, i)); continue
         if k == "agenda":
             _pagenda(ax, s, i, page_label); paths.append(_save_prev(fig, outdir, i)); continue
         ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
@@ -751,6 +799,8 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
         _mtext(ax, 0.85, 0.5, s["title"], fs=24, bold=True)
         if s.get("sub"):
             _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
+        if cur_ch:
+            _mtext(ax, 12.7, 0.62, cur_ch, fs=11, bold=True, color="#" + PRIMARY, ha="right")
         ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
         _mtext(ax, 0.6, 7.1, page_label, fs=10, color="#" + PAGE_C)
         if k == "split":
