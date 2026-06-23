@@ -1,3 +1,4 @@
-matplotlib>=3.7
-# 仅需 matplotlib（含其依赖 numpy）。绘制架构/原理图并导出 PNG+SVG。
-# 安装：  python -m pip install -r requirements.txt
+# _SlideKit 运行依赖。安装：python -m pip install -r requirements.txt
+matplotlib>=3.7      # 绘制架构/原理图、逐页版面预览，并导出 PNG+SVG（含其依赖 numpy）
+python-pptx>=1.0     # 生成可编辑 .pptx（原生标题/要点文本 + 母版/版式 XML）
+Pillow>=10           # 读图尺寸以等比放入幻灯片（deck._pic）、生成缩略图（tools/thumbs.py）

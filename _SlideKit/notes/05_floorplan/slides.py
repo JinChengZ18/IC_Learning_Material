@@ -22,9 +22,9 @@ TOTAL = 24
 SRC = "整理 J.C  ·  源自 Digital VLSI Design (DVD), Prof. Adam Teman, Bar-Ilan University (83-612)"
 FOOTER = "Floorplan · 布图规划"   # 左下页脚标签（随笔记而变）；页码用母版 slidenum 字段自动生成
 
-# 统一配色：主色靛蓝，暖橙仅强调（全篇一致）
-PRIMARY = "1F3A8A"
-ACCENT = "C2772E"
+# 统一配色：主色靛蓝，暖橙仅强调（全篇一致）。复用引擎调色板，避免第三处硬编码（单一真源 theme.py）
+PRIMARY = D.PRIMARY
+ACCENT = D.ACCENT
 BLUE = TEAL = AMBER = ROSE = VIOLET = PRIMARY  # 内容页一律靛蓝；橙色只出现在封面/导览/收尾
 
 
@@ -268,10 +268,10 @@ SPECS = [
 def main():
     D.build_previews(SPECS, PREV, TOTAL, asset_dir=ASSETS, page_label=FOOTER)
     print("previews ->", PREV, "(", len(SPECS), "pages )")
-    try:  # 主版本（干净浅母版，可被 PowerPoint 锁住）
+    try:  # 主版本（干净浅母版）；仅当文件被 PowerPoint 锁住时跳过保存，其余错误照常抛出
         print("pptx ->", D.build_pptx(SPECS, PPTX, TOTAL, asset_dir=ASSETS, page_label=FOOTER))
-    except Exception as e:
-        print("main pptx skipped (locked?):", e)
+    except PermissionError as e:
+        print("main pptx skipped (file locked by PowerPoint?):", e)
 
 
 if __name__ == "__main__":

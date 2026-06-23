@@ -48,7 +48,7 @@ Q 86.36 25.36 86.36 34
 L 86.36 74.32 
 Q 86.36 82.96 95 82.96 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #1a1f2b; opacity: 0.16"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #111827; opacity: 0.16"/>
     <path d="M 93.6 81.36 
 L 277.92 81.36 
 Q 286.56 81.36 286.56 72.72 
@@ -59,7 +59,7 @@ Q 84.96 23.76 84.96 32.4
 L 84.96 72.72 
 Q 84.96 81.36 93.6 81.36 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #f6e8d5; stroke: #c2772e; stroke-width: 1.8; stroke-linejoin: miter"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #F8E0C2; stroke: #C46A18; stroke-width: 1.8; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 95 169.36 
@@ -72,7 +72,7 @@ Q 86.36 111.76 86.36 120.4
 L 86.36 160.72 
 Q 86.36 169.36 95 169.36 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #1a1f2b; opacity: 0.16"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #111827; opacity: 0.16"/>
     <path d="M 93.6 167.76 
 L 277.92 167.76 
 Q 286.56 167.76 286.56 159.12 
@@ -83,7 +83,7 @@ Q 84.96 110.16 84.96 118.8
 L 84.96 159.12 
 Q 84.96 167.76 93.6 167.76 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #f6e8d5; stroke: #c2772e; stroke-width: 1.8; stroke-linejoin: miter"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #F8E0C2; stroke: #C46A18; stroke-width: 1.8; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 80.6 309.76 
@@ -96,7 +96,7 @@ Q 71.96 201.76 71.96 210.4
 L 71.96 301.12 
 Q 71.96 309.76 80.6 309.76 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #1a1f2b; opacity: 0.16"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #111827; opacity: 0.16"/>
     <path d="M 79.2 308.16 
 L 292.32 308.16 
 Q 300.96 308.16 300.96 299.52 
@@ -107,7 +107,7 @@ Q 70.56 200.16 70.56 208.8
 L 70.56 299.52 
 Q 70.56 308.16 79.2 308.16 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #e5e3ef; stroke: #4c4a78; stroke-width: 1.8; stroke-linejoin: miter"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #DCE7FF; stroke: #163A70; stroke-width: 1.8; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 95 399.76 
@@ -120,7 +120,7 @@ Q 86.36 342.16 86.36 350.8
 L 86.36 391.12 
 Q 86.36 399.76 95 399.76 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #1a1f2b; opacity: 0.16"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #111827; opacity: 0.16"/>
     <path d="M 93.6 398.16 
 L 277.92 398.16 
 Q 286.56 398.16 286.56 389.52 
@@ -131,7 +131,7 @@ Q 84.96 340.56 84.96 349.2
 L 84.96 389.52 
 Q 84.96 398.16 93.6 398.16 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #e1edf0; stroke: #3f7c8c; stroke-width: 1.8; stroke-linejoin: miter"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #D9F0F2; stroke: #087C89; stroke-width: 1.8; stroke-linejoin: miter"/>
    </g>
    <g id="patch_7">
     <path d="M 95 475.36 
@@ -144,7 +144,7 @@ Q 86.36 417.76 86.36 426.4
 L 86.36 466.72 
 Q 86.36 475.36 95 475.36 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #1a1f2b; opacity: 0.16"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #111827; opacity: 0.16"/>
     <path d="M 93.6 473.76 
 L 277.92 473.76 
 Q 286.56 473.76 286.56 465.12 
@@ -155,73 +155,73 @@ Q 84.96 416.16 84.96 424.8
 L 84.96 465.12 
 Q 84.96 473.76 93.6 473.76 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #edf0f4; stroke: #94a3b8; stroke-width: 1.8; stroke-linejoin: miter"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #E7EEF7; stroke: #708399; stroke-width: 1.8; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #8a5212" x="297.36" y="138.96" transform="rotate(-0 297.36 138.96)">→ VVDD</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #8C4A0E" x="297.36" y="138.96" transform="rotate(-0 297.36 138.96)">→ VVDD</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #27545f" x="297.36" y="369.36" transform="rotate(-0 297.36 369.36)">→ VVSS</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #0B5F6A" x="297.36" y="369.36" transform="rotate(-0 297.36 369.36)">→ VVSS</text>
    </g>
    <g id="patch_8">
     <path d="M 185.76 84.358828 
 Q 185.76 95.75865 185.76 105.146011 
-" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
     <path d="M 188.16 100.346011 
 L 185.76 105.146011 
 L 183.36 100.346011 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #6b7280; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #526174; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
    </g>
    <g id="patch_9">
     <path d="M 185.76 170.761904 
 Q 185.76 183.962697 185.76 195.151029 
-" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
     <path d="M 188.16 190.351029 
 L 185.76 195.151029 
 L 183.36 190.351029 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #6b7280; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #526174; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
    </g>
    <g id="patch_10">
     <path d="M 185.76 311.161904 
 Q 185.76 324.362697 185.76 335.551029 
-" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
     <path d="M 188.16 330.751029 
 L 185.76 335.551029 
 L 183.36 330.751029 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #6b7280; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #526174; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
    </g>
    <g id="patch_11">
     <path d="M 185.76 401.161465 
 Q 185.76 407.161245 185.76 411.148564 
-" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: none; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
     <path d="M 188.16 406.348564 
 L 185.76 411.148564 
 L 183.36 406.348564 
 z
-" clip-path="url(#p12b27ee28a)" style="fill: #6b7280; stroke: #6b7280; stroke-width: 1.8; stroke-linecap: round"/>
+" clip-path="url(#p12b27ee28a)" style="fill: #526174; stroke: #526174; stroke-width: 1.8; stroke-linecap: round"/>
    </g>
    <g id="text_3">
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #6b7280" transform="translate(340.823672 240.173203)">header</text>
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #6b7280" transform="translate(343.26 258.290859)">更常用</text>
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #6b7280" transform="translate(338.249062 276.408516)">(漏电好)</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #526174" transform="translate(340.823672 240.173203)">头开关</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #526174" transform="translate(343.26 258.290859)">更常用</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #526174" transform="translate(338.249062 276.408516)">(漏电好)</text>
    </g>
    <g id="text_4">
-    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8a5212" x="185.76" y="57.241641" transform="rotate(-0 185.76 57.241641)">VDD 真实电源</text>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8C4A0E" x="185.76" y="57.241641" transform="rotate(-0 185.76 57.241641)">VDD 真实电源</text>
    </g>
    <g id="text_5">
-    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8a5212" x="185.76" y="143.641641" transform="rotate(-0 185.76 143.641641)">Header（PMOS）</text>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #8C4A0E" x="185.76" y="143.641641" transform="rotate(-0 185.76 143.641641)">头开关（PMOS）</text>
    </g>
    <g id="text_6">
-    <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #322f52" x="185.76" y="259.392422" transform="rotate(-0 185.76 259.392422)">可关断逻辑</text>
+    <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0F2A57" x="185.76" y="259.392422" transform="rotate(-0 185.76 259.392422)">可关断逻辑</text>
    </g>
    <g id="text_7">
-    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #27545f" x="185.76" y="374.041641" transform="rotate(-0 185.76 374.041641)">Footer（NMOS）</text>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0B5F6A" x="185.76" y="374.041641" transform="rotate(-0 185.76 374.041641)">脚开关（NMOS）</text>
    </g>
    <g id="text_8">
-    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #1a1f2b" x="185.76" y="449.641641" transform="rotate(-0 185.76 449.641641)">VSS 真实地</text>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #111827" x="185.76" y="449.641641" transform="rotate(-0 185.76 449.641641)">VSS 真实地</text>
    </g>
   </g>
  </g>

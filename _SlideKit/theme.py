@@ -61,11 +61,13 @@ BYLINE = "整理 J.C · 源自 Digital VLSI Design (DVD), A. Teman, Bar-Ilan Uni
 
 # 字号层级（hierarchy）：主标签 > 次级 > 正文 > 脚注
 FS_H1, FS_H2, FS_BODY, FS_CAP = 24, 19, 17, 15  # 调大：图被缩到 ~0.78 插入幻灯片，字号要够大才看得清
+ASCII_RATIO = 0.6   # ASCII 字符相对 CJK 的近似宽度比；折行的单一真源（theme._wrap_w 与 deck._wrap 同用）
 
 
 def setup_fonts():
     plt.rcParams["font.sans-serif"] = [
         "Microsoft YaHei", "Microsoft YaHei UI", "SimHei", "Segoe UI", "DejaVu Sans"]
+    plt.rcParams["font.monospace"] = ["Consolas", "Cascadia Mono", "Courier New", "DejaVu Sans Mono"]
     plt.rcParams["font.family"] = "sans-serif"
     plt.rcParams["axes.unicode_minus"] = False
     plt.rcParams["svg.fonttype"] = "none"
@@ -276,7 +278,7 @@ def _wrap_w(s, width_in, fs):
             toks.append(s[i]); i += 1
     out, line, used = [], "", 0.0
     for t in toks:
-        tw = sum(em * (0.6 if ord(c) < 128 else 1.0) for c in t)
+        tw = sum(em * (ASCII_RATIO if ord(c) < 128 else 1.0) for c in t)
         if used + tw > width_in and line:
             out.append(line.rstrip()); line, used = t.lstrip(), tw
         else:

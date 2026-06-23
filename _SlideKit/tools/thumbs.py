@@ -5,6 +5,9 @@ import os
 import sys
 from PIL import Image
 
+if len(sys.argv) < 2:
+    print(__doc__.strip())
+    sys.exit(1)
 src = sys.argv[1]
 maxw = int(sys.argv[2]) if len(sys.argv) > 2 else 1280
 out = os.path.join(src, "_qa")

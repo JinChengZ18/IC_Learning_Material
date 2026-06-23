@@ -5,6 +5,9 @@ import zipfile
 import re
 from pptx import Presentation
 
+if len(sys.argv) < 2:
+    print(__doc__.strip())
+    sys.exit(1)
 f = sys.argv[1]
 p = Presentation(f)
 print("slide size:", round(p.slide_width / 914400, 3), "x", round(p.slide_height / 914400, 3), "in")
@@ -16,7 +19,6 @@ for i, lay in enumerate(p.slide_layouts):
 z = zipfile.ZipFile(f)
 theme = [n for n in z.namelist() if re.match(r"ppt/theme/theme\d+\.xml", n)]
 xml = z.read(theme[0]).decode("utf-8", "ignore")
-clr = z.read(theme[0]).decode("utf-8", "ignore")
 scheme = re.search(r"<a:clrScheme.*?</a:clrScheme>", xml, re.S)
 if scheme:
     pairs = re.findall(r'<a:(\w+)>\s*<a:(?:srgbClr val="([0-9A-Fa-f]{6})"|sysClr[^>]*lastClr="([0-9A-Fa-f]{6})")', scheme.group(0))

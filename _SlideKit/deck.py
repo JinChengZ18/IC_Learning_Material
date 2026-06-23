@@ -13,6 +13,8 @@ kind ∈ title | split | cards2 | grid6 | cols2 | close
 import os
 import sys
 import copy
+import uuid
+import logging
 
 import matplotlib
 matplotlib.use("Agg")
@@ -24,8 +26,10 @@ from PIL import Image
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.oxml.ns import qn
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import theme as T  # noqa: E402
@@ -34,17 +38,23 @@ SLIDE_W, SLIDE_H = 13.333, 7.5
 YAHEI = "Microsoft YaHei"
 MONO = "Consolas"
 
-# 统一配色（IEEE 靛蓝学术）——全篇一致，不每页换色；白底浅母版
-PRIMARY   = "1F3A8A"   # 主色 靛蓝：标题条/页码/主卡片/封面竖条
-PRIMARY_D = "15275E"
-ACCENT    = "C2772E"   # 暖橙：仅作次列/强调
-INK_C     = "1A1F2B"   # 主文字
-SUB_C     = "3A4252"   # 次文字
-MUTED_C   = "6B7280"   # 弱化
-PAGE_C    = "9AA3B0"   # 页码/页脚
-HAIR_C    = "C7CDD6"   # 细分隔线
-BG_C      = "FFFFFF"   # 母版底色（浅）
+# 统一配色（IEEE 靛蓝学术）——单一真源在 theme.py，这里只 lstrip('#') 复用，杜绝三处各写一份 hex。
+# 改配色只动 theme.py 即全局生效（含图、deck、消费侧 slides.py）。
+PRIMARY   = T.BLUE.lstrip("#")    # 主色 靛蓝：标题条/页码/主卡片/封面竖条
+PRIMARY_D = T.BLUE_D.lstrip("#")
+ACCENT    = T.AMBER.lstrip("#")   # 暖橙：仅作次列/强调
+INK_C     = T.INK.lstrip("#")     # 主文字
+SUB_C     = T.INK2.lstrip("#")    # 次文字
+MUTED_C   = T.MUTED.lstrip("#")   # 弱化
+PAGE_C    = "9AA3B0"              # 页码/页脚（deck 专用浅灰，theme 无对应）
+HAIR_C    = T.LINE.lstrip("#")    # 细分隔线
+BG_C      = T.WHITE.lstrip("#")   # 母版底色（浅）
 PAGE_LABEL = "Floorplan · 布图规划"
+
+# 数据系列配色（图表/对比用）——同样派生自 theme，靛蓝起头
+SERIES_COLORS = [c.lstrip("#") for c in (T.BLUE, T.AMBER, T.TEAL, T.ROSE, T.VIOLET)]
+
+_log = logging.getLogger("slidekit")
 
 
 def _rgb(hexc):
@@ -63,11 +73,11 @@ def fit(box, iw, ih):
 
 
 # ============================ pptx 端 ===================================== #
-def _set_font(run, name=YAHEI, size=14, bold=False, color=INK_C, mono=False):
+def _set_font(run, name=None, size=14, bold=False, color=INK_C, mono=False):
     run.font.size = Pt(size)
     run.font.bold = bold
     run.font.color.rgb = _rgb(color)
-    fn = MONO if mono else name
+    fn = MONO if mono else (name or YAHEI)   # 运行时读取，可被 build_pptx 的 font/mono_font 覆盖
     run.font.name = fn
     rPr = run._r.get_or_add_rPr()
     for tag in ("a:latin", "a:ea", "a:cs"):
@@ -78,11 +88,13 @@ def _set_font(run, name=YAHEI, size=14, bold=False, color=INK_C, mono=False):
 
 
 def _txt(slide, box, lines, sizes=None, colors=None, bolds=None, monos=None,
-         align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, space=6, wrap=True, line_sp=None):
+         align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, space=6, wrap=True, line_sp=None, auto_fit=False):
     x, t, w, h = box
     tb = slide.shapes.add_textbox(Inches(x), Inches(t), Inches(w), Inches(h))
     tf = tb.text_frame
     tf.word_wrap = wrap
+    if auto_fit:                      # 正文框：内容过满时让 PowerPoint 自动缩字号塞下（shrink-to-fit）
+        tf.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
     tf.vertical_anchor = anchor
     tf.margin_left = tf.margin_right = Pt(2)
     tf.margin_top = tf.margin_bottom = Pt(2)
@@ -134,7 +146,7 @@ def _page(slide):
     tf = tb.text_frame; tf.word_wrap = False
     tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = Pt(0)
     p = tf.paragraphs[0]; p.alignment = PP_ALIGN.RIGHT
-    fld = p._p.makeelement(qn("a:fld"), {"id": "{8B7AE7E1-4F6F-4B3A-9E2D-1A2B3C4D5E6F}", "type": "slidenum"})
+    fld = p._p.makeelement(qn("a:fld"), {"id": "{%s}" % str(uuid.uuid4()).upper(), "type": "slidenum"})
     rPr = fld.makeelement(qn("a:rPr"), {"lang": "en-US", "sz": "1000"})
     sf = rPr.makeelement(qn("a:solidFill"), {}); cl = sf.makeelement(qn("a:srgbClr"), {"val": PAGE_C})
     sf.append(cl); rPr.append(sf)
@@ -164,8 +176,8 @@ def _layout_chrome(prs, lay, page_label):
     sldIdLst.remove(sid)
     try:
         prs.part.drop_rel(rId)
-    except Exception:
-        pass
+    except Exception as e:                  # 草稿页关系已不存在等——不致命，但记录便于排查
+        _log.debug("drop_rel(%s) 跳过: %s", rId, e)
 
 
 def _mask(slide):
@@ -178,7 +190,24 @@ def _bg(slide, color):
     slide.background.fill.fore_color.rgb = _rgb(color)
 
 
+def _missing_pic(slide, path, box):
+    """缺图占位：画一只灰色虚线框 + 居中红字 'missing: fXX.png'，并打印告警。
+    避免某张图未生成 / 改名 / 新桶引用未画图时，整份 deck 直接 FileNotFoundError 崩掉。"""
+    x, t, w, h = box
+    sp = slide.shapes.add_shape(5, Inches(x), Inches(t), Inches(w), Inches(h))  # 5=rounded rect
+    sp.fill.solid(); sp.fill.fore_color.rgb = _rgb("EDF0F4")
+    sp.line.color.rgb = _rgb("C7CDD6"); sp.line.width = Pt(1.2)
+    sp.shadow.inherit = False
+    _txt(slide, (x, t + h / 2 - 0.35, w, 0.7), ["缺图 missing:", os.path.basename(path)],
+         sizes=[14, 13], bolds=[True, False], colors=["A6473C", "6B7280"],
+         align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE, space=2)
+    print("[warn] 缺图（已用占位框）:", path)
+
+
 def _pic(slide, path, box):
+    if not os.path.isfile(path):
+        _missing_pic(slide, path, box)
+        return
     iw, ih = Image.open(path).size
     x, t, w, h = fit(box, iw, ih)
     slide.shapes.add_picture(path, Inches(x), Inches(t), Inches(w), Inches(h))
@@ -191,10 +220,16 @@ def _bullets_lines(bullets):
 CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭"
 
 
+def _circ(i):
+    """第 i 个圈号（i 从 0 起）。①–⑩ 用圈号字形；超过 10 退化为 (n) 文本——
+    既避免 IndexError，也绕开 YaHei 缺 ⑪–⑭ 字形导致的预览/pptx 豆腐块。"""
+    return CIRC[i] if i < 10 else f"({i + 1})"
+
+
 def _marks(items, style="bullet"):
     """并列内容用 ▪；递进/有序内容用 ①②③（style='num'）。"""
     if style == "num":
-        return [f"{CIRC[i]}  {b}" for i, b in enumerate(items)]
+        return [f"{_circ(i)}  {b}" for i, b in enumerate(items)]
     return ["▪  " + b for b in items]
 
 
@@ -230,7 +265,8 @@ def _agenda(slide, s):
     _bg(slide, BG_C)
     _title_block(slide, s["title"], s.get("sub"))
     secs = s["sections"]; colx = [0.95, 7.0]; w = 5.45
-    top0, rowh, per = 2.05, 1.16, 4
+    n = len(secs); per = max(1, (n + 1) // 2)   # 两列均分；行数随小节数自适应，避免列索引越界
+    top0 = 2.05; rowh = min(1.16, 4.15 / per)   # 小节多时压缩行距，防纵向溢出
     for j, (num, ttl, det) in enumerate(secs):
         x = colx[j // per]; y = top0 + (j % per) * rowh
         _circ_num(slide, x, y, num)
@@ -274,7 +310,156 @@ def _clean_master(prs, keep):
                         ph._element.getparent().remove(ph._element)
 
 
-def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None, page_label=PAGE_LABEL):
+# ---------- 面向技术报告的页型：table / chart / refs（原生可编辑） ---------- #
+def _align(a):
+    return {"left": PP_ALIGN.LEFT, "right": PP_ALIGN.RIGHT, "center": PP_ALIGN.CENTER}.get(a, PP_ALIGN.LEFT)
+
+
+def _cell_border(cell, color=HAIR_C, width_pt=0.75):
+    """给表格单元四边描细线（python-pptx 不直接支持，需写 a:tcPr/a:lnL..lnB）。
+    四个 ln 元素须排在 fill 之前，故统一 insert(0,…) 插到 tcPr 最前。"""
+    tcPr = cell._tc.get_or_add_tcPr()
+    for tag in ("a:lnB", "a:lnT", "a:lnR", "a:lnL"):   # 逆序插到最前 → 最终顺序 L,R,T,B
+        old = tcPr.find(qn(tag))
+        if old is not None:
+            tcPr.remove(old)
+        ln = tcPr.makeelement(qn(tag), {"w": str(int(width_pt * 12700)), "cap": "flat", "cmpd": "sng", "algn": "ctr"})
+        sf = ln.makeelement(qn("a:solidFill"), {})
+        clr = sf.makeelement(qn("a:srgbClr"), {"val": color})
+        sf.append(clr); ln.append(sf)
+        tcPr.insert(0, ln)
+
+
+def _style_cell(cell, text, size=12, color=INK_C, bold=False, fill="FFFFFF", align="left", font=None):
+    cell.vertical_anchor = MSO_ANCHOR.MIDDLE
+    cell.margin_left = cell.margin_right = Pt(7)
+    cell.margin_top = cell.margin_bottom = Pt(3)
+    cell.fill.solid(); cell.fill.fore_color.rgb = _rgb(fill)
+    tf = cell.text_frame; tf.word_wrap = True
+    p = tf.paragraphs[0]; p.alignment = _align(align)
+    r = p.add_run(); r.text = text
+    _set_font(r, name=font, size=size, bold=bold, color=color)
+    _cell_border(cell)
+
+
+def _table(slide, s):
+    """原生可编辑表格：主色表头(白字粗体) + 斑马纹正文 + 细线边框 + 数值列右对齐。
+    spec: {kind:'table', table:{headers:[...], rows:[[...],...], col_align?:[l/r/c], col_w?:[..]}}"""
+    t = s["table"]; headers = t["headers"]; rows = t["rows"]
+    aligns = t.get("col_align"); widths = t.get("col_w")
+    ncol = len(headers); nrow = len(rows) + 1
+    x, top, w, h = 0.7, 1.78, 11.95, 5.05
+    gtbl = slide.shapes.add_table(nrow, ncol, Inches(x), Inches(top), Inches(w), Inches(h))
+    tbl = gtbl.table
+    tbl.first_row = False; tbl.horz_banding = False   # 关掉内置样式条纹，改用我们显式的斑马纹
+    if widths:
+        tot = float(sum(widths))
+        for c, cw in enumerate(widths):
+            tbl.columns[c].width = Inches(w * cw / tot)
+    for r in range(nrow):
+        tbl.rows[r].height = Inches(h / nrow)
+    al = lambda c: (aligns[c] if aligns and c < len(aligns) else "left")
+    for c, htext in enumerate(headers):
+        _style_cell(tbl.cell(0, c), str(htext), size=12.5, color="FFFFFF", bold=True, fill=PRIMARY, align=al(c))
+    for ri, row in enumerate(rows, 1):
+        fill = "FFFFFF" if ri % 2 else "EDF0F4"
+        for c in range(ncol):
+            _style_cell(tbl.cell(ri, c), str(row[c]) if c < len(row) else "", size=12, fill=fill, align=al(c))
+
+
+def _chart(slide, s):
+    """原生可编辑图表（line / bar）。spec: {kind:'chart', chart:{type:'line'|'bar',
+    categories:[...], series:[(name,[v,...]),...], x_title?, y_title?}}"""
+    c = s["chart"]; ctype = c.get("type", "line")
+    cd = CategoryChartData(); cd.categories = c["categories"]
+    for name, vals in c["series"]:
+        cd.add_series(name, vals)
+    xlc = XL_CHART_TYPE.LINE_MARKERS if ctype == "line" else XL_CHART_TYPE.COLUMN_CLUSTERED
+    x, top, w, h = 0.7, 1.78, 11.95, 5.05
+    ch = slide.shapes.add_chart(xlc, Inches(x), Inches(top), Inches(w), Inches(h), cd).chart
+    ch.has_legend = len(c["series"]) > 1
+    if ch.has_legend:
+        ch.legend.position = XL_LEGEND_POSITION.BOTTOM; ch.legend.include_in_layout = False
+    ch.font.size = Pt(11); ch.font.name = YAHEI
+    for i, ser in enumerate(ch.series):
+        col = _rgb(SERIES_COLORS[i % len(SERIES_COLORS)])
+        if ctype == "line":
+            ser.format.line.color.rgb = col; ser.format.line.width = Pt(2.0)
+        else:
+            ser.format.fill.solid(); ser.format.fill.fore_color.rgb = col
+    for axis, key in ((ch.category_axis, "x_title"), (ch.value_axis, "y_title")):
+        if c.get(key):
+            axis.has_title = True; axis.axis_title.text_frame.text = c[key]
+
+
+def _refs(slide, s):
+    """编号参考文献页。spec: {kind:'refs', refs:['Author, Title, Venue, Year.', ...]}"""
+    items = s["refs"]
+    lines = [f"[{i + 1}]  {r}" for i, r in enumerate(items)]
+    if len(items) > 8:
+        mid = (len(items) + 1) // 2
+        _txt(slide, (0.7, 1.78, 6.0, 5.2), lines[:mid], sizes=[12] * mid, colors=[INK_C] * mid, space=8, line_sp=1.18, auto_fit=True)
+        _txt(slide, (6.9, 1.78, 6.0, 5.2), lines[mid:], sizes=[12] * (len(lines) - mid),
+             colors=[INK_C] * (len(lines) - mid), space=8, line_sp=1.18, auto_fit=True)
+    else:
+        _txt(slide, (0.7, 1.78, 12.0, 5.2), lines, sizes=[12.5] * len(lines), colors=[INK_C] * len(lines), space=9, line_sp=1.2, auto_fit=True)
+
+
+_REQUIRED = {
+    "cover": ["title"], "title": ["title"], "close": ["title"],
+    "agenda": ["title", "sections"],
+    "split": ["title", "figure", "bullets"],
+    "bullets": ["title", "bullets"],
+    "cols2": ["title", "cols"], "cards2": ["title", "cards"], "grid6": ["title", "items"],
+    "table": ["title", "table"], "chart": ["title", "chart"], "refs": ["title", "refs"],
+}
+
+
+def validate_specs(specs, asset_dir=None):
+    """逐页校验：kind 合法、必需字段齐全、table/chart 子结构完整。有硬错误一次列全并抛 ValueError，
+    避免到深处才以晦涩的 KeyError 崩溃。asset_dir 给定时顺带检查 split 缺图（只告警，构建用占位框）。"""
+    problems, warns = [], []
+    for i, s in enumerate(specs, 1):
+        k = s.get("kind")
+        if k not in _REQUIRED:
+            problems.append(f"第{i}页：未知 kind={k!r}（合法：{sorted(_REQUIRED)}）"); continue
+        for key in _REQUIRED[k]:
+            if key not in s:
+                problems.append(f"第{i}页 kind={k}：缺字段 {key!r}")
+        if k == "table" and isinstance(s.get("table"), dict):
+            if "headers" not in s["table"] or "rows" not in s["table"]:
+                problems.append(f"第{i}页 table：table 需含 headers 与 rows")
+        if k == "chart" and isinstance(s.get("chart"), dict):
+            if "categories" not in s["chart"] or "series" not in s["chart"]:
+                problems.append(f"第{i}页 chart：chart 需含 categories 与 series")
+        if k == "split" and asset_dir and "figure" in s:
+            if not os.path.isfile(os.path.join(asset_dir, s["figure"])):
+                warns.append(f"第{i}页：缺图 {s['figure']}（将用占位框）")
+    for w in warns:
+        print("[warn]", w)
+    if problems:
+        raise ValueError("spec 校验失败：\n  - " + "\n  - ".join(problems))
+    return True
+
+
+def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None, page_label=PAGE_LABEL,
+               font=None, mono_font=None):
+    """从规格构建可编辑 .pptx。
+    font / mono_font：覆盖正文/等宽字体（默认 Microsoft YaHei / Consolas）。换机器若缺这两款字体，
+    传本机可用字体名即可，避免 PowerPoint 字体替换打乱已校对的折行。构建后自动还原全局字体，
+    便于同一进程内连续构建多份不同字体的 deck。"""
+    validate_specs(specs)        # 缺图软检查留给 build_previews / 渲染期占位告警，避免重复刷屏
+    global YAHEI, MONO
+    _saved_fonts = (YAHEI, MONO)
+    YAHEI = font or YAHEI
+    MONO = mono_font or MONO
+    try:
+        return _build_pptx_impl(specs, out_pptx, total, author, asset_dir, template, page_label)
+    finally:
+        YAHEI, MONO = _saved_fonts
+
+
+def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", template=None, page_label=PAGE_LABEL):
     """template=<.pptx 路径> 时，基于该模板（继承其母版/主题/字体），并清掉模板自带的示例幻灯片。"""
     prs = Presentation(template) if template else Presentation()
     if template:
@@ -286,6 +471,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
              else prs.slide_layouts[6])
     _clean_master(prs, blank)   # 删默认 4:3 占位符/未用版式，避免页脚重叠、母版按 16:9
     _layout_chrome(prs, blank, page_label)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
+    fig_no = 0
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
         k = s["kind"]
@@ -295,19 +481,28 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
             _close(sl, s); continue
         if k == "agenda":
             _agenda(sl, s); _page(sl); continue
-        acc = (s.get("accent", PRIMARY) or PRIMARY).lstrip("#")
         _title_block(sl, s["title"], s.get("sub"))
         if k == "split":
             _txt(sl, (0.7, 1.72, 5.2, 5.4), _marks(s["bullets"], s.get("style", "bullet")),
-                 sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16)
-            _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 5.25))
+                 sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.16, auto_fit=True)
+            cap = s.get("caption")
+            _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 4.7 if cap else 5.25))
+            if cap:
+                fig_no += 1
+                _txt(sl, (6.0, 6.48, 6.85, 0.5), [f"图 {fig_no}. {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+        elif k == "table":
+            _table(sl, s)
+        elif k == "chart":
+            _chart(sl, s)
+        elif k == "refs":
+            _refs(sl, s)
         elif k == "cards2":
             for j, (hdr, code, a) in enumerate(s["cards"]):
                 x = 0.7 + j * 6.1
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
                 _txt(sl, (x + 0.35, 2.6, 5.3, 4.0), code, sizes=[11.5] * len(code), monos=[True] * len(code),
-                     colors=[INK_C] * len(code), space=7, line_sp=1.12)
+                     colors=[INK_C] * len(code), space=7, line_sp=1.12, auto_fit=True)
         elif k == "grid6":
             for j, (t1, t2, c) in enumerate(s["items"]):
                 x = 0.7 + (j % 3) * 4.05
@@ -321,24 +516,26 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
                 _txt(sl, (x + 0.35, 2.55, 5.3, 4.2), _bullets_lines(items),
-                     sizes=[12.5] * len(items), colors=[INK_C] * len(items), space=6, line_sp=1.16)
+                     sizes=[12.5] * len(items), colors=[INK_C] * len(items), space=6, line_sp=1.16, auto_fit=True)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
                 mid = (len(items) + 1) // 2
                 _txt(sl, (0.7, 1.75, 6.0, 5.3), _bullets_lines(items[:mid]),
-                     sizes=[14.5] * mid, colors=[INK_C] * mid, space=9, line_sp=1.2)
+                     sizes=[14.5] * mid, colors=[INK_C] * mid, space=9, line_sp=1.2, auto_fit=True)
                 _txt(sl, (6.9, 1.75, 6.0, 5.3), _bullets_lines(items[mid:]),
-                     sizes=[14.5] * (len(items) - mid), colors=[INK_C] * (len(items) - mid), space=9, line_sp=1.2)
+                     sizes=[14.5] * (len(items) - mid), colors=[INK_C] * (len(items) - mid), space=9, line_sp=1.2, auto_fit=True)
             else:
                 _txt(sl, (0.7, 1.75, 12.0, 5.3), _bullets_lines(items),
-                     sizes=[15] * len(items), colors=[INK_C] * len(items), space=10, line_sp=1.25)
+                     sizes=[15] * len(items), colors=[INK_C] * len(items), space=10, line_sp=1.25, auto_fit=True)
         _page(sl)
     try:
         prs.core_properties.author = author
-    except Exception:
-        pass
-    os.makedirs(os.path.dirname(out_pptx), exist_ok=True)
+    except Exception as e:
+        _log.debug("设置 author 失败: %s", e)
+    out_dir = os.path.dirname(out_pptx)
+    if out_dir:                                  # 裸文件名时 dirname 为 ''，makedirs('') 会报错
+        os.makedirs(out_dir, exist_ok=True)
     prs.save(out_pptx)
     return out_pptx
 
@@ -357,6 +554,15 @@ def _mcard(ax, x, ytop, w, h, fc="#FFFFFF", ec=T.LINE, accent=None):
         ax.add_patch(Rectangle((x, SLIDE_H - ytop - h + 0.12), 0.09, h - 0.24, fc=accent, ec="none", zorder=3))
 
 
+def _mmissing(ax, path, box):
+    """预览端缺图占位：灰色虚线框 + 居中红字，与 pptx 端 _missing_pic 一致。"""
+    x, t, w, h = box
+    ax.add_patch(FancyBboxPatch((x, SLIDE_H - t - h), w, h, boxstyle="round,pad=0,rounding_size=0.08",
+                 fc="#EDF0F4", ec="#C7CDD6", lw=1.3, ls="--", zorder=4))
+    ax.text(x + w / 2, SLIDE_H - t - h / 2, "缺图 missing:\n" + os.path.basename(path),
+            ha="center", va="center", color="#A6473C", fontsize=13, fontweight="bold", zorder=5)
+
+
 def _wrap(s, maxu):
     """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。
     连续 ASCII 字母/数字成"词"整体折行，不拆词（与 PowerPoint 的按词换行一致）。"""
@@ -371,7 +577,7 @@ def _wrap(s, maxu):
             toks.append(s[i]); i += 1
     out, line, u = [], "", 0.0
     for t in toks:
-        w = sum(0.55 if ord(c) < 128 else 1.0 for c in t)
+        w = sum(T.ASCII_RATIO if ord(c) < 128 else 1.0 for c in t)
         if u + w > maxu and line:
             out.append(line.rstrip()); line, u = t.lstrip(), w
         else:
@@ -379,6 +585,12 @@ def _wrap(s, maxu):
     if line.strip():
         out.append(line.rstrip())
     return out or [""]
+
+
+def _maxu(width_in, fs):
+    """正文框可用宽度(英寸) → _wrap 的 maxu（≈可容纳的 CJK 字数）。
+    供新页型按真实框宽推折行阈值，取代经验魔数；现有页型沿用其手调常量。"""
+    return width_in / (fs / 72.0)
 
 
 def _pbul(ax, xb, xt, yy, text, fs, color, maxu, lh=0.40, gap=0.16, mark="▪"):
@@ -422,7 +634,8 @@ def _pagenda(ax, s, i, page_label):
     if s.get("sub"):
         _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
     ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
-    secs = s["sections"]; colx = [0.95, 7.0]; top0, rowh, per = 2.05, 1.16, 4
+    secs = s["sections"]; colx = [0.95, 7.0]
+    n = len(secs); per = max(1, (n + 1) // 2); top0 = 2.05; rowh = min(1.16, 4.15 / per)
     for j, (num, ttl, det) in enumerate(secs):
         x = colx[j // per]; y = top0 + (j % per) * rowh
         ax.add_patch(Circle((x + 0.23, SLIDE_H - y - 0.23), 0.23, fc="#" + PRIMARY, ec="none", zorder=3))
@@ -437,16 +650,96 @@ def _pagenda(ax, s, i, page_label):
     _mtext(ax, 12.9, 7.1, str(i), fs=10, color="#" + PAGE_C, ha="right")
 
 
+def _ptable(ax, s):
+    t = s["table"]; headers = t["headers"]; rows = t["rows"]
+    aligns = t.get("col_align"); widths = t.get("col_w")
+    ncol = len(headers); nrow = len(rows) + 1
+    x, top, w, h = 0.7, 1.78, 11.95, 5.05
+    cw = [w * v / float(sum(widths)) for v in widths] if widths else [w / ncol] * ncol
+    xstops = [x]
+    for c in range(ncol):
+        xstops.append(xstops[-1] + cw[c])
+    rh = h / nrow
+    al = lambda c: (aligns[c] if aligns and c < len(aligns) else "left")
+
+    def cell(rr, cc, text, fill, color, bold):
+        cx0 = xstops[cc]; cyt = top + rr * rh
+        ax.add_patch(Rectangle((cx0, SLIDE_H - cyt - rh), cw[cc], rh, fc=fill, ec="#C7CDD6", lw=0.8, zorder=2))
+        ha = al(cc); tx = cx0 + 0.12 if ha == "left" else (cx0 + cw[cc] - 0.12 if ha == "right" else cx0 + cw[cc] / 2)
+        ha2 = {"left": "left", "right": "right", "center": "center"}.get(ha, "left")
+        ax.text(tx, SLIDE_H - cyt - rh / 2, text, ha=ha2, va="center", color=color,
+                fontsize=10.5 if bold else 10, fontweight=("bold" if bold else "normal"), zorder=3)
+
+    for c, htext in enumerate(headers):
+        cell(0, c, str(htext), "#" + PRIMARY, "white", True)
+    for ri, row in enumerate(rows, 1):
+        fill = "#FFFFFF" if ri % 2 else "#EDF0F4"
+        for c in range(ncol):
+            cell(ri, c, str(row[c]) if c < len(row) else "", fill, "#" + INK_C, False)
+
+
+def _pchart(ax, s):
+    c = s["chart"]; ctype = c.get("type", "line")
+    x, top, w, h = 0.7, 1.85, 11.95, 4.85
+    iax = ax.inset_axes([x, SLIDE_H - top - h, w, h], transform=ax.transData)
+    cats = c["categories"]; xs = list(range(len(cats)))
+    pal = ["#" + c for c in SERIES_COLORS]
+    if ctype == "line":
+        for i, (name, vals) in enumerate(c["series"]):
+            iax.plot(xs, vals, marker="o", ms=4, lw=2, color=pal[i % len(pal)], label=name)
+    else:
+        n = len(c["series"]); bw = 0.8 / max(n, 1)
+        for i, (name, vals) in enumerate(c["series"]):
+            iax.bar([xx + (i - (n - 1) / 2.0) * bw for xx in xs], vals, width=bw, color=pal[i % len(pal)], label=name)
+    iax.set_xticks(xs); iax.set_xticklabels(cats, fontsize=9)
+    iax.tick_params(labelsize=8)
+    if len(c["series"]) > 1:
+        iax.legend(fontsize=8, loc="best")
+    if c.get("x_title"):
+        iax.set_xlabel(c["x_title"], fontsize=9)
+    if c.get("y_title"):
+        iax.set_ylabel(c["y_title"], fontsize=9)
+
+
+def _oflow_mark(ax):
+    """预览端唯一能本地算出的版面警告：正文超出可用高度时，在底部中央打红字告警。
+    pptx 端 PowerPoint 会 shrink-to-fit 自救，但预览是唯一校对通道，必须把溢出显式标出来。"""
+    _mtext(ax, SLIDE_W / 2.0, 7.30, "⚠ OVERFLOW 正文超出版面（请精简内容或缩小字号）",
+           fs=11, color="#C0152F", bold=True, ha="center")
+
+
+def _prefs(ax, s):
+    items = s["refs"]
+    mx = 1.95
+    if len(items) > 8:
+        mid = (len(items) + 1) // 2
+        yy = 1.95
+        for i, r in enumerate(items[:mid]):
+            yy = _pbul(ax, 0.7, 1.15, yy, r, 12, "#" + INK_C, 26, mark=f"[{i + 1}]")
+        mx = yy; yy = 1.95
+        for i, r in enumerate(items[mid:]):
+            yy = _pbul(ax, 6.9, 7.35, yy, r, 12, "#" + INK_C, 26, mark=f"[{mid + i + 1}]")
+        mx = max(mx, yy)
+    else:
+        yy = 1.95
+        for i, r in enumerate(items):
+            yy = _pbul(ax, 0.7, 1.15, yy, r, 12.5, "#" + INK_C, 52, mark=f"[{i + 1}]")
+        mx = yy
+    return mx
+
+
 def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
     os.makedirs(outdir, exist_ok=True)
+    validate_specs(specs, asset_dir)
     paths = []
     T.setup_fonts()
+    fig_no = 0
     for i, s in enumerate(specs, 1):
         fig, ax = plt.subplots(figsize=(SLIDE_W, SLIDE_H), dpi=110)
         ax.set_xlim(0, SLIDE_W); ax.set_ylim(0, SLIDE_H); ax.axis("off"); ax.set_autoscale_on(False)
         fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
-        k = s["kind"]; acc = s.get("accent", T.BLUE)
-        accx = acc if acc.startswith("#") else "#" + acc
+        k = s["kind"]
+        mark_c = "#" + INK_C    # 要点标记色：与 pptx 一致（pptx 整行 INK），不用 accent，避免预览与 pptx 不符
         if k in ("cover", "title"):
             _pcover(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
         if k == "close":
@@ -464,15 +757,32 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
             style = s.get("style", "bullet")
             yy = 1.95
             for bi, b in enumerate(s["bullets"]):
-                mk = CIRC[bi] if style == "num" else "▪"
-                yy = _pbul(ax, 0.7, 1.05, yy, b, 14, accx, 24, mark=mk)
-            box = (6.0, 1.7, 6.85, 5.25)
+                mk = _circ(bi) if style == "num" else "▪"
+                yy = _pbul(ax, 0.7, 1.05, yy, b, 14, mark_c, 24, mark=mk)
+            if yy > 6.98:
+                _oflow_mark(ax)
+            cap = s.get("caption")
+            box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
             p = os.path.join(asset_dir, s["figure"])
-            iw, ih = Image.open(p).size
-            fx, ft, fw, fh = fit(box, iw, ih)
-            ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
-            ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
+            if not os.path.isfile(p):
+                _mmissing(ax, p, box)
+            else:
+                iw, ih = Image.open(p).size
+                fx, ft, fw, fh = fit(box, iw, ih)
+                ax.imshow(mpimg.imread(p), extent=[fx, fx + fw, SLIDE_H - ft - fh, SLIDE_H - ft], aspect="auto", zorder=4)
+                ax.add_patch(Rectangle((box[0], SLIDE_H - box[1] - box[3]), box[2], box[3], fc="none", ec="#E2E8F0", lw=1, zorder=1))
+            if cap:
+                fig_no += 1
+                _mtext(ax, 6.0 + 6.85 / 2.0, 6.62, f"图 {fig_no}. {cap}", fs=11, color="#" + MUTED_C, ha="center")
+        elif k == "table":
+            _ptable(ax, s)
+        elif k == "chart":
+            _pchart(ax, s)
+        elif k == "refs":
+            if _prefs(ax, s) > 6.98:
+                _oflow_mark(ax)
         elif k == "cards2":
+            mx = 0
             for j, (hdr, code, a) in enumerate(s["cards"]):
                 x = 0.7 + j * 6.1
                 _mcard(ax, x, 1.7, 5.8, 5.1, accent="#" + a if not a.startswith("#") else a)
@@ -480,6 +790,9 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 yy = 2.6
                 for ln in code:
                     _mtext(ax, x + 0.35, yy, ln, fs=11, mono=True); yy += 0.42
+                mx = max(mx, yy)
+            if mx > 6.85:
+                _oflow_mark(ax)
         elif k == "grid6":
             for j, (t1, t2, c) in enumerate(s["items"]):
                 x = 0.7 + (j % 3) * 4.05; y = 1.75 + (j // 3) * 2.45
@@ -487,6 +800,7 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 _mtext(ax, x + 0.3, y + 0.28, t1, fs=14, bold=True)
                 _mtext(ax, x + 0.3, y + 1.05, "→ " + t2, fs=12, color=T.MUTED)
         elif k == "cols2":
+            mx = 0
             for j, (hdr, items, a) in enumerate(s["cols"]):
                 x = 0.7 + j * 6.1
                 ac = a if a.startswith("#") else "#" + a
@@ -494,21 +808,28 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 _mtext(ax, x + 0.35, 1.95, hdr, fs=14, bold=True, color=ac)
                 yy = 2.55
                 for it in items:
-                    yy = _pbul(ax, x + 0.32, x + 0.6, yy, it, 12.5, ac, 28, lh=0.36, gap=0.12)
+                    yy = _pbul(ax, x + 0.32, x + 0.6, yy, it, 12.5, mark_c, 28, lh=0.36, gap=0.12)
+                mx = max(mx, yy)
+            if mx > 6.75:
+                _oflow_mark(ax)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
                 mid = (len(items) + 1) // 2
                 yy = 1.95
                 for b in items[:mid]:
-                    yy = _pbul(ax, 0.7, 1.0, yy, b, 14, accx, 30)
-                yy = 1.95
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 14, mark_c, 30)
+                ya = yy; yy = 1.95
                 for b in items[mid:]:
-                    yy = _pbul(ax, 6.9, 7.2, yy, b, 14, accx, 30)
+                    yy = _pbul(ax, 6.9, 7.2, yy, b, 14, mark_c, 30)
+                if max(ya, yy) > 6.98:
+                    _oflow_mark(ax)
             else:
                 yy = 1.95
                 for b in items:
-                    yy = _pbul(ax, 0.7, 1.0, yy, b, 15, accx, 52)
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 15, mark_c, 52)
+                if yy > 6.98:
+                    _oflow_mark(ax)
         _mtext(ax, 12.9, 7.1, str(i), fs=10, color="#" + PAGE_C, ha="right")
         paths.append(_save_prev(fig, outdir, i))
     return paths
