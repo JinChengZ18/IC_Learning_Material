@@ -12,6 +12,7 @@ kind ∈ title | split | cards2 | grid6 | cols2 | close
 """
 import os
 import sys
+import copy
 
 import matplotlib
 matplotlib.use("Agg")
@@ -120,16 +121,42 @@ def _card(slide, x, t, w, h, fill="FFFFFF", line="CBD5E1", accent=None):
 
 
 def _title_block(slide, title, sub, accent=PRIMARY):
-    _bar(slide, 0.6, 0.5, 0.16, 0.62, PRIMARY)            # 左侧主色竖条（统一）
+    # 左侧主色竖条 + 全宽细分隔线已下放到版式（母版）上，这里只填每页不同的标题文本
     _txt(slide, (0.85, 0.42, 11.8, 0.8), [title], sizes=[28], bolds=[True], colors=[INK_C])
     if sub:
         _txt(slide, (0.87, 1.18, 11.8, 0.5), [sub], sizes=[14], colors=[SUB_C])
-    _bar(slide, 0.85, 1.6, 11.85, 0.022, HAIR_C)          # 全宽细分隔线（母版感）
 
 
-def _page(slide, n, total, label=PAGE_LABEL):
+def _page(slide, n, total):
+    # 页脚标签也在版式（母版）上，这里只填每页不同的页码
     _txt(slide, (10.8, 7.06, 2.2, 0.4), [f"{n:02d} / {total:02d}"], sizes=[10], colors=[PAGE_C], align=PP_ALIGN.RIGHT)
-    _txt(slide, (0.6, 7.06, 7, 0.4), [label], sizes=[10], colors=[PAGE_C])
+
+
+def _layout_chrome(prs, lay):
+    """把每页重复出现的"母版件"放到【版式】上——内容/导览页自动继承，新增页自动带样式；
+    要全局改样式（条色/分隔线/页脚）只改这一处，或直接在 PowerPoint 的版式视图里改。
+    python-pptx 不支持直接给版式加形状，故先在草稿页上画好，再把形状 XML 复制进版式、删草稿页。"""
+    scratch = prs.slides.add_slide(lay)
+    before = len(scratch.shapes._spTree)
+    _bar(scratch, 0.6, 0.5, 0.16, 0.62, PRIMARY)        # 左侧主色竖条
+    _bar(scratch, 0.85, 1.6, 11.85, 0.022, HAIR_C)      # 全宽细分隔线
+    _txt(scratch, (0.6, 7.06, 7, 0.4), [PAGE_LABEL], sizes=[10], colors=[PAGE_C])  # 左下页脚标签
+    lay_spTree = lay.shapes._spTree
+    for el in list(scratch.shapes._spTree)[before:]:
+        lay_spTree.append(copy.deepcopy(el))
+    sldIdLst = prs.slides._sldIdLst                      # 删掉这张临时草稿页
+    sid = sldIdLst[-1]
+    rId = sid.get(qn("r:id"))
+    sldIdLst.remove(sid)
+    try:
+        prs.part.drop_rel(rId)
+    except Exception:
+        pass
+
+
+def _mask(slide):
+    """封面/收尾页：盖一层满版白底，遮住版式继承来的内容页母版件，再画自己的整版设计。"""
+    _bar(slide, 0, 0, SLIDE_W, SLIDE_H, BG_C)
 
 
 def _bg(slide, color):
@@ -171,6 +198,7 @@ def _circ_num(slide, x, y, num, d=0.46, fill=PRIMARY, fg="FFFFFF", fs=15):
 def _cover(slide, s):
     """封面：浅底 + 左侧主色厚竖条 + 大标题，独立于内容页版式。"""
     _bg(slide, BG_C)
+    _mask(slide)
     _bar(slide, 0.0, 0.0, 0.30, SLIDE_H, PRIMARY)
     _txt(slide, (1.15, 1.45, 11, 0.4), [s.get("tag", "数字 IC 后端 · DVD Lecture 6")],
          sizes=[14], bolds=[True], colors=[PRIMARY])
@@ -202,6 +230,7 @@ def _agenda(slide, s):
 def _close(slide, s):
     """收尾：浅底 + 左侧主色厚竖条，与封面呼应。"""
     _bg(slide, BG_C)
+    _mask(slide)
     _bar(slide, 0.0, 0.0, 0.30, SLIDE_H, PRIMARY)
     _txt(slide, (1.1, 2.75, 11.6, 1.2), [s["title"]], sizes=[44], bolds=[True], colors=[INK_C])
     if s.get("sub"):
@@ -222,6 +251,7 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
     prs.slide_width = Inches(SLIDE_W); prs.slide_height = Inches(SLIDE_H)
     blank = (min(prs.slide_layouts, key=lambda L: len(L.placeholders)) if template
              else prs.slide_layouts[6])
+    _layout_chrome(prs, blank)  # 母版件下放到版式：所有内容页继承，新增页自动带样式
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
         k = s["kind"]

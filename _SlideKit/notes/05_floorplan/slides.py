@@ -148,13 +148,6 @@ SPECS = [
         "PG 网络与高翻转信号线的 EM 机理不同，需分别评估",
         "签核常用 Voltus、RedHawk、PrimeRail 等工具",
     ]),
-    split("电源门控：power switch / header / footer", "对可关断模块做 Power Gating", "f14_gating.png", [
-        "对可关断模块插入 Power Switch，实现 Power Gating 门控",
-        "Header 是 PMOS 开关，置于 VDD 与虚拟 VVDD 之间，更常用",
-        "Footer 是 NMOS 开关，置于虚拟 VVSS 与 VSS 之间，较少单用",
-        "floorplan 阶段要规划 switch 阵列布局与 enable 菊花链",
-        "菊花链分时开启可抑制唤醒冲击电流 inrush",
-    ]),
     split("多电压域与 UPF", "多电压域与 UPF 功耗意图", "f10_mv.png", [
         "让不同区域采用不同电压或可关断，从而降低整体功耗",
         "Level Shifter 转换跨电压域信号电平，如 0.8V 与 1.0V 互转",
@@ -162,6 +155,13 @@ SPECS = [
         "Retention FF 在模块关断期间保持寄存器状态",
         "Always-on Buffer 在关断域内却接常开电源以维持通路",
         "UPF（IEEE 1801）或 CPF 描述功耗意图，floorplan 据此落地",
+    ]),
+    split("电源门控：power switch / header / footer", "多电压域里可关断模块的实现手段", "f14_gating.png", [
+        "对可关断模块插入 Power Switch，实现 Power Gating 门控",
+        "Header 是 PMOS 开关，置于 VDD 与虚拟 VVDD 之间，更常用",
+        "Footer 是 NMOS 开关，置于虚拟 VVSS 与 VSS 之间，较少单用",
+        "floorplan 阶段要规划 switch 阵列布局与 enable 菊花链",
+        "菊花链分时开启可抑制唤醒冲击电流 inrush",
     ]),
     split("时序预算与模块划分", "层次化划分与时序预算分配", "f11_budget.png", [
         "层次化设计把芯片按层级切成若干 Block 或 partition",

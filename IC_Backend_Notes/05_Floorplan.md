@@ -274,23 +274,7 @@ globalNetConnect VDD -type pgpin -pin VDD -all
 
 ---
 
-## Slide 15 · 电源门控：power switch / header / footer
-
-![电源门控 header / footer](assets/floorplan/f14_gating.png)
-
-**知识点**
-
-- 对可关断模块插 **Power Switch** 实现 **Power Gating（功率门控）**
-- **Header（头开关）**：**PMOS**，置于真实 VDD 与模块虚拟电源 **VVDD** 之间；关断时切断正轨；**工程更常用**（漏电控制好）
-- **Footer（脚开关）**：**NMOS**，置于模块虚拟地 **VVSS** 与真实 VSS 之间；关断时切断接地回路；**较少单独使用**
-- header + footer 同时使用更罕见
-- floorplan 阶段要规划：switch **阵列布局**（ring-style 或 grid/column-style）、**enable 信号菊花链（daisy-chain）**走向（控**冲击电流 inrush** 与唤醒时间），以及 **secondary / always-on PG** 连接
-
-> 备注：唤醒冲击电流大 → enable 菊花链**分时**开启。
-
----
-
-## Slide 16 · 多电压域与 UPF
+## Slide 15 · 多电压域与 UPF
 
 ![多电压域与 UPF](assets/floorplan/f10_mv.png)
 
@@ -305,7 +289,7 @@ globalNetConnect VDD -type pgpin -pin VDD -all
 | Isolation Cell | 某域关断时把其输出**钳位**到已知值(0/1)，防下游浮空 | 信号从可关断域进常开域 |
 | Retention FF | 域断电时低漏电“影子锁存”保状态，上电恢复 | 需状态保持的可关断域 |
 | Always-on Buffer | 关断域内但接**常开电源**，保证 enable/retention 控制信号有效 | 控制信号穿过关断域 |
-| Power Switch | 门控供电（见上页） | 可关断域 |
+| Power Switch | 门控供电（见下页） | 可关断域 |
 
 - 顺序：常**先 isolation 后 level shift**（先钳位再转电平），但**非绝对**（取决信号方向与隔离单元供电域；ELS 合并二者则无先后）
 - **UPF**（IEEE 1801，Synopsys 主推）/ **CPF**（Cadence 主推）描述功耗意图；floorplan 据此 `create_voltage_area`、规划独立 PG 与 secondary/always-on 网、放 switch、预留 LS/ISO 位置
@@ -322,6 +306,22 @@ create_voltage_area -power_domain PD_CPU -region {{100 100} {400 400}} VA_CPU
 ```
 
 > 备注：LS 管“电压不同”，ISO 管“关断后输出乱”——常考区别。
+
+---
+
+## Slide 16 · 电源门控：power switch / header / footer
+
+![电源门控 header / footer](assets/floorplan/f14_gating.png)
+
+**知识点**
+
+- 对可关断模块插 **Power Switch** 实现 **Power Gating（功率门控）**；它是上页多电压域里“可关断模块”的具体实现手段
+- **Header（头开关）**：**PMOS**，置于真实 VDD 与模块虚拟电源 **VVDD** 之间；关断时切断正轨；**工程更常用**（漏电控制好）
+- **Footer（脚开关）**：**NMOS**，置于模块虚拟地 **VVSS** 与真实 VSS 之间；关断时切断接地回路；**较少单独使用**
+- header + footer 同时使用更罕见
+- floorplan 阶段要规划：switch **阵列布局**（ring-style 或 grid/column-style）、**enable 信号菊花链（daisy-chain）**走向（控**冲击电流 inrush** 与唤醒时间），以及 **secondary / always-on PG** 连接
+
+> 备注：唤醒冲击电流大 → enable 菊花链**分时**开启。
 
 ---
 

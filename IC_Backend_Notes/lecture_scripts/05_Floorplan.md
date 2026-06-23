@@ -89,21 +89,21 @@ Core 内部的骨架基本成型，现在把视线移到芯片边界——信号
 
 ---
 
-## Slide 15 · 电源门控：power switch / header / footer
+## Slide 15 · 多电压域与 UPF
 
-控住了 IR 和 EM，下一个功耗维度是漏电——对不工作的模块直接断电，这就是电源门控，而它的开关阵列同样要在 floorplan 阶段就排进去。对可关断模块插 Power Switch 实现 Power Gating（功率门控）。Header（头开关）是 PMOS，置于真实 VDD 与模块虚拟电源 VVDD 之间，关断时切断正轨，工程上更常用，因为漏电控制好。Footer（脚开关）是 NMOS，置于模块虚拟地 VVSS 与真实 VSS 之间，关断时切断接地回路，较少单独使用；header 加 footer 同时用就更罕见。floorplan 阶段要规划三件事：switch 的阵列布局（ring-style 或 grid/column-style）、enable 信号菊花链（daisy-chain）的走向（用来控制冲击电流 inrush 与唤醒时间），以及 secondary/always-on PG 的连接。一个要点：唤醒时冲击电流很大，所以 enable 菊花链要分时错开开启。
+控住了 IR 和 EM，我们再往功耗维度上走一层：与其让全芯片跑同一个电压，不如让不同模块用不同电压、甚至干脆可关断——这就是多电压域设计，它需要一整套专用单元来处理跨域的电平和断电问题，并且全程由 UPF/CPF 来描述意图。每个独立的电压/电源状态区域就是一个电压岛/电源域。关键专用单元有五类：Level Shifter 负责跨电压域信号的电平转换，比如 0.8V 和 1.0V 之间；Isolation Cell 在某域关断时把它的输出钳位到已知值 0 或 1，防止下游浮空，用于信号从可关断域进入常开域；Retention FF 在域断电时用低漏电的「影子锁存」保住状态，上电后恢复；Always-on Buffer 身在关断域内却接常开电源，保证 enable/retention 这类控制信号始终有效；Power Switch 则是下一页要专门讲的门控开关。一个顺序问题：通常先 isolation 后 level shift（先钳位再转电平），但这不绝对，取决于信号方向与隔离单元的供电域，如果用 ELS 把两者合并就没有先后。整套意图由 UPF（IEEE 1801，Synopsys 主推）或 CPF（Cadence 主推）描述，floorplan 据此 `create_voltage_area`、规划独立 PG 与 secondary/always-on 网、放 switch、预留 LS 和 ISO 的位置。记住区别：LS 管「电压不同」，ISO 管「关断后输出乱」。
 
 ---
 
-## Slide 16 · 多电压域与 UPF
+## Slide 16 · 电源门控：power switch / header / footer
 
-电源门控是「整块断电」，再进一步，不同模块本身就跑在不同电压上——这就是多电压域，它需要一整套专用单元来处理跨域的电平和断电问题，并且全程由 UPF/CPF 来描述意图。不同模块工作在不同电压，或者干脆可关断，以此省功耗，每个独立的电压/电源状态区域就是一个电压岛/电源域。关键专用单元有五类：Level Shifter 负责跨电压域信号的电平转换，比如 0.8V 和 1.0V 之间；Isolation Cell 在某域关断时把它的输出钳位到已知值 0 或 1，防止下游浮空，用于信号从可关断域进入常开域；Retention FF 在域断电时用低漏电的「影子锁存」保住状态，上电后恢复；Always-on Buffer 身在关断域内却接常开电源，保证 enable/retention 这类控制信号始终有效；Power Switch 就是上一页讲的门控。一个顺序问题：通常先 isolation 后 level shift（先钳位再转电平），但这不绝对，取决于信号方向与隔离单元的供电域，如果用 ELS 把两者合并就没有先后。整套意图由 UPF（IEEE 1801，Synopsys 主推）或 CPF（Cadence 主推）描述，floorplan 据此 `create_voltage_area`、规划独立 PG 与 secondary/always-on 网、放 switch、预留 LS 和 ISO 的位置。记住区别：LS 管「电压不同」，ISO 管「关断后输出乱」。
+多电压域里最激进的一招，是把暂时不工作的模块整块断电——这就是电源门控（power gating）；和上面那几个专用单元一样，它的开关阵列也必须在 floorplan 阶段就排进去。对可关断模块插 Power Switch 实现 Power Gating（功率门控）。Header（头开关）是 PMOS，置于真实 VDD 与模块虚拟电源 VVDD 之间，关断时切断正轨，工程上更常用，因为漏电控制好。Footer（脚开关）是 NMOS，置于模块虚拟地 VVSS 与真实 VSS 之间，关断时切断接地回路，较少单独使用；header 加 footer 同时用就更罕见。floorplan 阶段要规划三件事：switch 的阵列布局（ring-style 或 grid/column-style）、enable 信号菊花链（daisy-chain）的走向（用来控制冲击电流 inrush 与唤醒时间），以及 secondary/always-on PG 的连接。一个要点：唤醒时冲击电流很大，所以 enable 菊花链要分时错开开启。
 
 ---
 
 ## Slide 17 · 时序预算与模块划分
 
-电压域把芯片切成了若干电源域，而层次化设计还要按时序把顶层切成块来分别实现——这就回到了 Slide 12 埋的伏笔：每个块要拿到自己的时序预算才能独立收敛。层次化设计中顶层切成 Partition/Block 分别实现，每个 block 对外端口都需要一份 Timing Budget——把顶层路径约束拆到各 block 边界，生成每个 block 各自的 SDC。预算合理，各 block 独立收敛后顶层就能收敛；不合理，就得反复迭代。这里 pin 位置与 budget 强耦合：pin 离驱动或接收逻辑越远，块内走线越长、可用 budget 越少。自动预算工具：ICC2 用 `allocate_budgets` / `estimate_timing`，Innovus 用 `deriveTimingBudget`，或者用 `create_block_abstraction` 加 ETM（Extracted Timing Model）。还有 ILM（Interface Logic Model），只保留接口逻辑、抽掉块内部，用来简化并加速顶层时序收敛，是层次化设计常用的手段。注意 block 的 SDC budget 不只是 input/output delay，还包含时钟不确定度、时钟延迟、驱动单元/输入转换、负载。一句话：预算就是把一条总约束像切蛋糕一样分给各层级。
+电源和电压域都规划完了，接下来换一个维度切分芯片——层次化设计要按时序把顶层切成块来分别实现，这就回到了 Slide 12 埋的伏笔：每个块要拿到自己的时序预算才能独立收敛。层次化设计中顶层切成 Partition/Block 分别实现，每个 block 对外端口都需要一份 Timing Budget——把顶层路径约束拆到各 block 边界，生成每个 block 各自的 SDC。预算合理，各 block 独立收敛后顶层就能收敛；不合理，就得反复迭代。这里 pin 位置与 budget 强耦合：pin 离驱动或接收逻辑越远，块内走线越长、可用 budget 越少。自动预算工具：ICC2 用 `allocate_budgets` / `estimate_timing`，Innovus 用 `deriveTimingBudget`，或者用 `create_block_abstraction` 加 ETM（Extracted Timing Model）。还有 ILM（Interface Logic Model），只保留接口逻辑、抽掉块内部，用来简化并加速顶层时序收敛，是层次化设计常用的手段。注意 block 的 SDC budget 不只是 input/output delay，还包含时钟不确定度、时钟延迟、驱动单元/输入转换、负载。一句话：预算就是把一条总约束像切蛋糕一样分给各层级。
 
 ---
 
