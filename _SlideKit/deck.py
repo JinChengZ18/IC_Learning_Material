@@ -615,7 +615,7 @@ def _dia_hier():
     BD, TD, MU, I2 = T.BLUE_D, T.TEAL_D, T.MUTED, T.INK2
     boxes = [
         (0.15, 1.35, 2.85, 3.1, "", "neutral", "outline"),
-        (0.5, 2.5, 2.15, 1.35, "整颗芯片\n一次 P&R", "logic", "soft"),
+        (0.5, 2.5, 2.15, 1.35, "整颗芯片\n一次 P&R", "logic", "solid"),
         (3.55, 1.35, 3.15, 3.1, "", "neutral", "outline"),
         (4.55, 3.5, 1.55, 0.65, "Top 集成", "neutral", "soft"),
         (3.75, 2.35, 0.85, 0.8, "Blk1", "memory", "soft"), (4.7, 2.35, 0.85, 0.8, "Blk2", "memory", "soft"),
@@ -634,7 +634,7 @@ def _dia_hier():
 
 
 def _dia_pnr():
-    flow = [("逻辑综合\nSynth", "neutral", "outline"), ("布图规划\nFloorplan", "clock", "soft"),
+    flow = [("逻辑综合\nSynth", "neutral", "outline"), ("布图规划\nFloorplan", "clock", "solid"),
             ("布局\nPlace", "neutral", "outline"), ("时钟树\nCTS", "neutral", "outline"),
             ("布线\nRoute", "neutral", "outline")]
     boxes, arrows = [], []
@@ -647,7 +647,7 @@ def _dia_pnr():
     tasks = [("① die / core 几何", "logic"), ("② 宏摆放 & 朝向", "memory"),
              ("③ 电源规划 PG", "power"), ("④ 多电压 / blockage", "io")]
     for i, (t, role) in enumerate(tasks):
-        boxes.append((0.1 + (i % 2) * 3.45, 2.45 - (i // 2) * 1.15, 3.2, 0.95, t, role, "soft"))
+        boxes.append((0.1 + (i % 2) * 3.45, 2.45 - (i // 2) * 1.15, 3.2, 0.95, t, role, "solid"))
     labels = [(0.1, 5.18, "Floorplan 在 PnR 流程中的位置", T.INK, 12.5, "left", True),
               (0.1, 3.8, "Floorplan 主要任务", T.INK, 12.5, "left", True)]
     return {"fs": 12, "boxes": boxes, "arrows": arrows, "labels": labels}
@@ -670,10 +670,10 @@ def _dia_io():
 def _dia_loop():
     I2 = T.INK2
     boxes = [
-        (2.3, 4.0, 2.2, 0.9, "Floorplan\n定 die/macro/PG", "logic", "soft"),
-        (4.7, 2.1, 2.0, 0.9, "试布局 + GR", "memory", "soft"),
-        (2.3, 0.3, 2.2, 0.9, "评估\n拥塞 / 时序 / IR", "io", "soft"),
-        (0.1, 2.1, 2.0, 0.9, "回退调整", "power", "soft"),
+        (2.3, 4.0, 2.2, 0.9, "Floorplan\n定 die/macro/PG", "logic", "solid"),
+        (4.7, 2.1, 2.0, 0.9, "试布局 + GR", "memory", "solid"),
+        (2.3, 0.3, 2.2, 0.9, "评估\n拥塞 / 时序 / IR", "io", "solid"),
+        (0.1, 2.1, 2.0, 0.9, "回退调整", "power", "solid"),
     ]
     arrows = [(4.5, 4.05, 5.45, 3.05, I2), (5.55, 2.1, 4.5, 1.05, I2),
               (2.3, 1.05, 1.35, 2.05, I2), (1.35, 3.0, 2.3, 4.05, I2)]
@@ -854,6 +854,17 @@ def _pbul(ax, xb, xt, yy, text, fs, color, maxu, lh=0.40, gap=0.16, mark="▪"):
     return yy + gap
 
 
+def _fit_scale(items, maxu, top, bottom, lh, gap, floor=0.60):
+    """模拟 PowerPoint 的 shrink-to-fit：估算这组要点在 base 行高下的总高度，
+    超出可用高度则返回 <1 的缩放，使预览端按相同比例缩字号 → 预览≈导出 pptx。
+    （pptx 端 auto_fit=True 让 PowerPoint 自己缩；此处让预览跟着缩，校对才准。）"""
+    total = sum(len(_wrap(it, maxu)) * lh + gap for it in items)
+    avail = bottom - top
+    if total <= avail or total <= 0:
+        return 1.0
+    return max(floor, avail / total)
+
+
 def _pcover(ax, s):
     ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
     ax.add_patch(Rectangle((0, 0), 0.30, SLIDE_H, fc="#" + PRIMARY, ec="none", zorder=2))
@@ -1029,14 +1040,17 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
         _mtext(ax, 0.6, 7.1, page_label, fs=10, color="#" + PAGE_C)
         if k == "split":
             style = s.get("style", "bullet")
+            maxu = 26 if style == "prose" else 24
+            blh, bgap = (0.40, 0.22) if style == "prose" else (0.40, 0.16)
+            sc = _fit_scale(s["bullets"], maxu, 1.95, 6.98, blh, bgap)   # 模拟 pptx 自动缩字号
             yy = 1.95
             for bi, b in enumerate(s["bullets"]):
                 if style == "prose":                       # 叙述性内容：整段、无标记、段间留白
-                    yy = _pbul(ax, 0.7, 0.7, yy, b, 14, mark_c, 26, gap=0.22, mark="")
+                    yy = _pbul(ax, 0.7, 0.7, yy, b, 14 * sc, mark_c, maxu, lh=blh * sc, gap=bgap * sc, mark="")
                 else:
                     mk = _circ(bi) if style == "num" else "▪"
-                    yy = _pbul(ax, 0.7, 1.05, yy, b, 14, mark_c, 24, mark=mk)
-            if yy > 6.98:
+                    yy = _pbul(ax, 0.7, 1.05, yy, b, 14 * sc, mark_c, maxu, lh=blh * sc, gap=bgap * sc, mark=mk)
+            if yy > 7.05:                                   # 缩到底仍溢出才告警
                 _oflow_mark(ax)
             cap = s.get("caption")
             box = (6.0, 1.7, 6.85, 4.7 if cap else 5.25)
@@ -1088,29 +1102,33 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
                 ac = a if a.startswith("#") else "#" + a
                 _mcard(ax, x, 1.7, 5.8, 5.1, accent=ac)
                 _mtext(ax, x + 0.35, 1.95, hdr, fs=14, bold=True, color=ac)
+                sc = _fit_scale(items, 28, 2.55, 6.72, 0.36, 0.12)
                 yy = 2.55
                 for it in items:
-                    yy = _pbul(ax, x + 0.32, x + 0.6, yy, it, 12.5, mark_c, 28, lh=0.36, gap=0.12)
+                    yy = _pbul(ax, x + 0.32, x + 0.6, yy, it, 12.5 * sc, mark_c, 28, lh=0.36 * sc, gap=0.12 * sc)
                 mx = max(mx, yy)
-            if mx > 6.75:
+            if mx > 6.8:
                 _oflow_mark(ax)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
                 mid = (len(items) + 1) // 2
+                scL = _fit_scale(items[:mid], 30, 1.95, 6.98, 0.40, 0.16)
+                scR = _fit_scale(items[mid:], 30, 1.95, 6.98, 0.40, 0.16)
                 yy = 1.95
                 for b in items[:mid]:
-                    yy = _pbul(ax, 0.7, 1.0, yy, b, 14, mark_c, 30)
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 14 * scL, mark_c, 30, lh=0.40 * scL, gap=0.16 * scL)
                 ya = yy; yy = 1.95
                 for b in items[mid:]:
-                    yy = _pbul(ax, 6.9, 7.2, yy, b, 14, mark_c, 30)
-                if max(ya, yy) > 6.98:
+                    yy = _pbul(ax, 6.9, 7.2, yy, b, 14 * scR, mark_c, 30, lh=0.40 * scR, gap=0.16 * scR)
+                if max(ya, yy) > 7.05:
                     _oflow_mark(ax)
             else:
+                sc = _fit_scale(items, 52, 1.95, 6.98, 0.40, 0.16)
                 yy = 1.95
                 for b in items:
-                    yy = _pbul(ax, 0.7, 1.0, yy, b, 15, mark_c, 52)
-                if yy > 6.98:
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 15 * sc, mark_c, 52, lh=0.40 * sc, gap=0.16 * sc)
+                if yy > 7.05:
                     _oflow_mark(ax)
         _mtext(ax, 12.9, 7.1, str(i), fs=10, color="#" + PAGE_C, ha="right")
         paths.append(_save_prev(fig, outdir, i))

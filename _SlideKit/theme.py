@@ -28,11 +28,11 @@ import matplotlib.patheffects as pe
 # --------------------------------------------------------------------------- #
 # 靛蓝学术配色 (IEEE 风) · 近双色 + 灰阶 + 暖橙点缀；白底、细线、低饱和、克制
 # 主色靛蓝主导结构，暖橙仅作强调，其余语义色降饱和到学术色调（不再有糖果紫/品红）。
-BLUE   = "#5B2C86"; BLUE_L   = "#ECE5F3"; BLUE_D   = "#3C1C5A"   # 主色 深清华紫：逻辑/信号/结构/标题
-TEAL   = "#0D9488"; TEAL_L   = "#CCFBF1"; TEAL_D   = "#115E59"   # 存储/Macro（青绿）
-AMBER  = "#EA580C"; AMBER_L  = "#FFEDD5"; AMBER_D  = "#9A3412"   # 电源/PG/强调（橙）
-ROSE   = "#DC2626"; ROSE_L   = "#FEE2E2"; ROSE_D   = "#991B1B"   # IO/高亮/关键网（红，非粉）
-VIOLET = "#2563EB"; VIOLET_L = "#DBEAFE"; VIOLET_D = "#1E3A8A"   # 时钟/特殊（蓝；主色让位给清华紫后腾出）
+BLUE   = "#46196B"; BLUE_L   = "#D4C2E5"; BLUE_D   = "#2C0E48"   # 主色 深清华紫（更深、更有质感）：逻辑/信号/标题
+TEAL   = "#0B7D72"; TEAL_L   = "#9FE2D4"; TEAL_D   = "#084A43"   # 存储/Macro（深青绿，非浅）
+AMBER  = "#D14E0A"; AMBER_L  = "#F6CD9E"; AMBER_D  = "#7E2E07"   # 电源/PG/强调（深橙）
+ROSE   = "#BE1E1E"; ROSE_L   = "#E6ADAD"; ROSE_D   = "#7E1414"   # IO/高亮/关键网（深红，压住"粉"）
+VIOLET = "#1E50C8"; VIOLET_L = "#B6CCF2"; VIOLET_D = "#15307A"   # 时钟/特殊（蓝；主色让位给清华紫后腾出）
 
 INK    = "#1A1F2B"   # 主文字
 INK2   = "#3A4252"   # 次文字
@@ -256,11 +256,11 @@ def flow(ax, items, y, x0, x1, h=1.7, gap=0.32, fs=13.5, sub_fs=9.5, z=2,
 # --------------------------------------------------------------------------- #
 # 参考信息图风格图元（卡片 / chevron 流程 / 分节标题）—— 柔和、留白克制、层级分明
 # --------------------------------------------------------------------------- #
-SOFT = {  # 各角色的浅卡片底色（取各色 _L 浅调，纯色不透明，不靠 alpha）
-    "logic": "#DBEAFE", "memory": "#CCFBF1", "power": "#FFEDD5",
-    "io": "#FEE2E2", "clock": "#EDE9FE", "neutral": "#EEF1F5",
+SOFT = {  # 各角色卡片底色：直接取各色 _L 深调（单一真源、纯色不透明；已加深去"粉/浅"）
+    "logic": BLUE_L, "memory": TEAL_L, "power": AMBER_L,
+    "io": ROSE_L, "clock": VIOLET_L, "neutral": "#DCE1E9",
 }
-CARD_EDGE = "#CBD2DC"
+CARD_EDGE = "#B7BFCB"
 
 
 def _wrap_w(s, width_in, fs):
