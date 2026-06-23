@@ -30,7 +30,7 @@
 4. IO / Pad / Bump 与引脚分配
 5. 电源规划（ring/stripe/mesh/rail/sroute）；IR drop 与 EM；电源门控
 6. 多电压域与 UPF；时序预算与分块
-7. 拥塞/IR 早期预估与迭代闭环；指标、文件、命令、小结、面试考点
+7. 拥塞/IR 早期预估与迭代闭环；指标、文件、命令、小结、课后自测
 
 > 备注：先给地图，强调 Floorplan 是 floorplan→试布局/GR→评估→回退 的**迭代闭环**，不是一遍过。
 
@@ -456,7 +456,7 @@ set_load 0.05 [get_ports data_out]
 
 ---
 
-## Slide 23 · 易混淆点 / 面试高频考点
+## Slide 23 · 易混淆点 · 课后自测
 
 **知识点（16 题）**
 

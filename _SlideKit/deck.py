@@ -17,7 +17,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from matplotlib.patches import Rectangle, FancyBboxPatch
+from matplotlib.patches import Rectangle, FancyBboxPatch, Circle
 from PIL import Image
 
 from pptx import Presentation
@@ -32,6 +32,18 @@ import theme as T  # noqa: E402
 SLIDE_W, SLIDE_H = 13.333, 7.5
 YAHEI = "Microsoft YaHei"
 MONO = "Consolas"
+
+# 统一配色（IEEE 靛蓝学术）——全篇一致，不每页换色；白底浅母版
+PRIMARY   = "1F3A8A"   # 主色 靛蓝：标题条/页码/主卡片/封面竖条
+PRIMARY_D = "15275E"
+ACCENT    = "C2772E"   # 暖橙：仅作次列/强调
+INK_C     = "1A1F2B"   # 主文字
+SUB_C     = "3A4252"   # 次文字
+MUTED_C   = "6B7280"   # 弱化
+PAGE_C    = "9AA3B0"   # 页码/页脚
+HAIR_C    = "C7CDD6"   # 细分隔线
+BG_C      = "FFFFFF"   # 母版底色（浅）
+PAGE_LABEL = "Floorplan · 布图规划"
 
 
 def _rgb(hexc):
@@ -50,7 +62,7 @@ def fit(box, iw, ih):
 
 
 # ============================ pptx 端 ===================================== #
-def _set_font(run, name=YAHEI, size=14, bold=False, color="1E293B", mono=False):
+def _set_font(run, name=YAHEI, size=14, bold=False, color=INK_C, mono=False):
     run.font.size = Pt(size)
     run.font.bold = bold
     run.font.color.rgb = _rgb(color)
@@ -75,7 +87,7 @@ def _txt(slide, box, lines, sizes=None, colors=None, bolds=None, monos=None,
     tf.margin_top = tf.margin_bottom = Pt(2)
     n = len(lines)
     sizes = sizes or [14] * n
-    colors = colors or ["1E293B"] * n
+    colors = colors or [INK_C] * n
     bolds = bolds or [False] * n
     monos = monos or [False] * n
     for i, ln in enumerate(lines):
@@ -107,16 +119,17 @@ def _card(slide, x, t, w, h, fill="FFFFFF", line="CBD5E1", accent=None):
     return sp
 
 
-def _title_block(slide, title, sub, accent):
-    _bar(slide, 0.6, 0.5, 0.16, 0.62, accent)
-    _txt(slide, (0.85, 0.42, 11.8, 0.8), [title], sizes=[28], bolds=[True], colors=["1E293B"])
+def _title_block(slide, title, sub, accent=PRIMARY):
+    _bar(slide, 0.6, 0.5, 0.16, 0.62, PRIMARY)            # 左侧主色竖条（统一）
+    _txt(slide, (0.85, 0.42, 11.8, 0.8), [title], sizes=[28], bolds=[True], colors=[INK_C])
     if sub:
-        _txt(slide, (0.87, 1.18, 11.8, 0.5), [sub], sizes=[14], colors=["64748B"])
+        _txt(slide, (0.87, 1.18, 11.8, 0.5), [sub], sizes=[14], colors=[SUB_C])
+    _bar(slide, 0.85, 1.6, 11.85, 0.022, HAIR_C)          # 全宽细分隔线（母版感）
 
 
-def _page(slide, n, total, label="Floorplan"):
-    _txt(slide, (10.8, 7.06, 2.2, 0.4), [f"{n:02d} / {total:02d}"], sizes=[10], colors=["94A3B8"], align=PP_ALIGN.RIGHT)
-    _txt(slide, (0.6, 7.06, 4, 0.4), [label], sizes=[10], colors=["94A3B8"])
+def _page(slide, n, total, label=PAGE_LABEL):
+    _txt(slide, (10.8, 7.06, 2.2, 0.4), [f"{n:02d} / {total:02d}"], sizes=[10], colors=[PAGE_C], align=PP_ALIGN.RIGHT)
+    _txt(slide, (0.6, 7.06, 7, 0.4), [label], sizes=[10], colors=[PAGE_C])
 
 
 def _bg(slide, color):
@@ -134,6 +147,61 @@ def _bullets_lines(bullets):
     return ["▪  " + b for b in bullets]
 
 
+def _circ_num(slide, x, y, num, d=0.46, fill=PRIMARY, fg="FFFFFF", fs=15):
+    sp = slide.shapes.add_shape(9, Inches(x), Inches(y), Inches(d), Inches(d))  # 9=oval
+    sp.fill.solid(); sp.fill.fore_color.rgb = _rgb(fill)
+    sp.line.fill.background(); sp.shadow.inherit = False
+    tf = sp.text_frame; tf.word_wrap = False
+    tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
+    p = tf.paragraphs[0]; p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = str(num)
+    _set_font(r, size=fs, bold=True, color=fg)
+
+
+def _cover(slide, s):
+    """封面：浅底 + 左侧主色厚竖条 + 大标题，独立于内容页版式。"""
+    _bg(slide, BG_C)
+    _bar(slide, 0.0, 0.0, 0.30, SLIDE_H, PRIMARY)
+    _txt(slide, (1.15, 1.45, 11, 0.4), [s.get("tag", "数字 IC 后端 · DVD Lecture 6")],
+         sizes=[14], bolds=[True], colors=[PRIMARY])
+    _txt(slide, (1.1, 2.45, 11.6, 1.3), [s["title"]], sizes=[46], bolds=[True], colors=[INK_C])
+    if s.get("sub"):
+        _txt(slide, (1.15, 3.95, 11, 0.6), [s["sub"]], sizes=[19], colors=[SUB_C])
+    _bar(slide, 1.15, 4.80, 3.8, 0.045, PRIMARY)
+    if s.get("line"):
+        _txt(slide, (1.15, 5.08, 11.4, 0.6), [s["line"]], sizes=[14], bolds=[True], colors=[ACCENT])
+    _txt(slide, (1.15, 6.85, 11.6, 0.4), [s.get("src", "")], sizes=[11], colors=[MUTED_C])
+
+
+def _agenda(slide, s):
+    """导览：浅底 + 标题条 + 两列编号小节 + 底部主线高亮，独立于内容页版式。"""
+    _bg(slide, BG_C)
+    _title_block(slide, s["title"], s.get("sub"))
+    secs = s["sections"]; colx = [0.95, 7.0]; w = 5.45
+    top0, rowh, per = 2.05, 1.16, 4
+    for j, (num, ttl, det) in enumerate(secs):
+        x = colx[j // per]; y = top0 + (j % per) * rowh
+        _circ_num(slide, x, y, num)
+        _txt(slide, (x + 0.64, y - 0.06, w, 0.45), [ttl], sizes=[16], bolds=[True], colors=[INK_C])
+        _txt(slide, (x + 0.64, y + 0.40, w, 0.55), [det], sizes=[12.5], colors=[MUTED_C])
+    if s.get("line"):
+        _card(slide, 0.95, 6.62, 11.45, 0.62, fill="F6E8D5", line="E4C79A")
+        _txt(slide, (1.25, 6.75, 11, 0.4), [s["line"]], sizes=[13.5], bolds=[True], colors=["8A5212"])
+
+
+def _close(slide, s):
+    """收尾：浅底 + 左侧主色厚竖条，与封面呼应。"""
+    _bg(slide, BG_C)
+    _bar(slide, 0.0, 0.0, 0.30, SLIDE_H, PRIMARY)
+    _txt(slide, (1.1, 2.75, 11.6, 1.2), [s["title"]], sizes=[44], bolds=[True], colors=[INK_C])
+    if s.get("sub"):
+        _txt(slide, (1.15, 4.15, 11, 0.6), [s["sub"]], sizes=[18], colors=[SUB_C])
+    _bar(slide, 1.15, 4.95, 3.4, 0.045, ACCENT)
+    if s.get("line"):
+        _txt(slide, (1.15, 5.25, 11.4, 0.5), [s["line"]], sizes=[13], colors=[MUTED_C])
+    _txt(slide, (1.15, 6.85, 11.6, 0.4), [s.get("src", "")], sizes=[11], colors=[MUTED_C])
+
+
 def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None):
     """template=<.pptx 路径> 时，基于该模板（继承其母版/主题/字体），并清掉模板自带的示例幻灯片。"""
     prs = Presentation(template) if template else Presentation()
@@ -146,19 +214,18 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
              else prs.slide_layouts[6])
     for i, s in enumerate(specs, 1):
         sl = prs.slides.add_slide(blank)
-        k = s["kind"]; acc = s.get("accent", "2563EB")
-        if k in ("title", "close"):
-            _bg(sl, "1E293B")
-            _bar(sl, 0.9, 2.5 if k == "title" else 3.0, 0.16, 0.7, "F59E0B")
-            _txt(sl, (1.2, 2.3 if k == "title" else 2.85, 11, 1.2), [s["title"]], sizes=[44], bolds=[True], colors=["FFFFFF"])
-            if s.get("sub"):
-                _txt(sl, (1.2, 3.6 if k == "title" else 3.9, 11, 0.6), [s["sub"]], sizes=[18], colors=["CBD5E1"])
-            _txt(sl, (1.2, 6.6, 11, 0.5), [s.get("src", "")], sizes=[11], colors=["64748B"])
-            continue
-        _title_block(sl, s["title"], s.get("sub"), acc)
+        k = s["kind"]
+        if k in ("cover", "title"):
+            _cover(sl, s); continue
+        if k == "close":
+            _close(sl, s); continue
+        if k == "agenda":
+            _agenda(sl, s); _page(sl, i, total); continue
+        acc = (s.get("accent", PRIMARY) or PRIMARY).lstrip("#")
+        _title_block(sl, s["title"], s.get("sub"))
         if k == "split":
-            _txt(sl, (0.7, 1.75, 5.15, 5.3), _bullets_lines(s["bullets"]),
-                 sizes=[15] * len(s["bullets"]), colors=["1E293B"] * len(s["bullets"]), space=10, line_sp=1.15)
+            _txt(sl, (0.7, 1.72, 5.2, 5.4), _bullets_lines(s["bullets"]),
+                 sizes=[14] * len(s["bullets"]), colors=[INK_C] * len(s["bullets"]), space=8, line_sp=1.1)
             _pic(sl, os.path.join(asset_dir, s["figure"]), (6.0, 1.7, 6.85, 5.25))
         elif k == "cards2":
             for j, (hdr, code, a) in enumerate(s["cards"]):
@@ -166,32 +233,32 @@ def build_pptx(specs, out_pptx, total, author="J.C", asset_dir="", template=None
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
                 _txt(sl, (x + 0.35, 2.6, 5.3, 4.0), code, sizes=[11.5] * len(code), monos=[True] * len(code),
-                     colors=["1E293B"] * len(code), space=7)
+                     colors=[INK_C] * len(code), space=7)
         elif k == "grid6":
             for j, (t1, t2, c) in enumerate(s["items"]):
                 x = 0.7 + (j % 3) * 4.05
                 y = 1.75 + (j // 3) * 2.45
                 _card(sl, x, y, 3.75, 2.15, accent=c)
-                _txt(sl, (x + 0.3, y + 0.28, 3.3, 0.6), [t1], sizes=[15], bolds=[True], colors=["1E293B"])
-                _txt(sl, (x + 0.3, y + 1.05, 3.3, 0.9), ["→ " + t2], sizes=[12], colors=["64748B"])
+                _txt(sl, (x + 0.3, y + 0.28, 3.3, 0.6), [t1], sizes=[15], bolds=[True], colors=[INK_C])
+                _txt(sl, (x + 0.3, y + 1.05, 3.3, 0.9), ["→ " + t2], sizes=[12], colors=[MUTED_C])
         elif k == "cols2":
             for j, (hdr, items, a) in enumerate(s["cols"]):
                 x = 0.7 + j * 6.1
                 _card(sl, x, 1.7, 5.8, 5.1, accent=a)
                 _txt(sl, (x + 0.35, 1.95, 5.2, 0.5), [hdr], sizes=[15], bolds=[True], colors=[a])
-                _txt(sl, (x + 0.35, 2.6, 5.25, 4.1), _bullets_lines(items),
-                     sizes=[13] * len(items), colors=["1E293B"] * len(items), space=8, line_sp=1.1)
+                _txt(sl, (x + 0.35, 2.55, 5.3, 4.2), _bullets_lines(items),
+                     sizes=[12.5] * len(items), colors=[INK_C] * len(items), space=6, line_sp=1.08)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
                 mid = (len(items) + 1) // 2
                 _txt(sl, (0.7, 1.75, 6.0, 5.3), _bullets_lines(items[:mid]),
-                     sizes=[14.5] * mid, colors=["1E293B"] * mid, space=9, line_sp=1.2)
+                     sizes=[14.5] * mid, colors=[INK_C] * mid, space=9, line_sp=1.2)
                 _txt(sl, (6.9, 1.75, 6.0, 5.3), _bullets_lines(items[mid:]),
-                     sizes=[14.5] * (len(items) - mid), colors=["1E293B"] * (len(items) - mid), space=9, line_sp=1.2)
+                     sizes=[14.5] * (len(items) - mid), colors=[INK_C] * (len(items) - mid), space=9, line_sp=1.2)
             else:
                 _txt(sl, (0.7, 1.75, 12.0, 5.3), _bullets_lines(items),
-                     sizes=[15] * len(items), colors=["1E293B"] * len(items), space=10, line_sp=1.25)
+                     sizes=[15] * len(items), colors=[INK_C] * len(items), space=10, line_sp=1.25)
         _page(sl, i, total)
     try:
         prs.core_properties.author = author
@@ -216,6 +283,75 @@ def _mcard(ax, x, ytop, w, h, fc="#FFFFFF", ec=T.LINE, accent=None):
         ax.add_patch(Rectangle((x, SLIDE_H - ytop - h + 0.12), 0.09, h - 0.24, fc=accent, ec="none", zorder=3))
 
 
+def _wrap(s, maxu):
+    """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。"""
+    out, line, u = [], "", 0.0
+    for ch in s:
+        w = 0.55 if ord(ch) < 128 else 1.0
+        if u + w > maxu and line:
+            out.append(line); line, u = ch, w
+        else:
+            line += ch; u += w
+    if line:
+        out.append(line)
+    return out or [""]
+
+
+def _pbul(ax, xb, xt, yy, text, fs, color, maxu, lh=0.40, gap=0.16):
+    """预览端：画一条带 ▪ 的可折行要点，返回下一行 y。"""
+    _mtext(ax, xb, yy, "▪", fs=fs, color=color, bold=True)
+    for ln in _wrap(text, maxu):
+        _mtext(ax, xt, yy, ln, fs=fs)
+        yy += lh
+    return yy + gap
+
+
+def _pcover(ax, s):
+    ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
+    ax.add_patch(Rectangle((0, 0), 0.30, SLIDE_H, fc="#" + PRIMARY, ec="none", zorder=2))
+    _mtext(ax, 1.15, 1.45, s.get("tag", "数字 IC 后端 · DVD Lecture 6"), fs=13, bold=True, color="#" + PRIMARY)
+    _mtext(ax, 1.1, 2.45, s["title"], fs=40, bold=True, color="#" + INK_C)
+    if s.get("sub"):
+        _mtext(ax, 1.15, 3.95, s["sub"], fs=17, color="#" + SUB_C)
+    ax.add_patch(Rectangle((1.15, SLIDE_H - 4.80 - 0.05), 3.8, 0.05, fc="#" + PRIMARY, ec="none", zorder=2))
+    if s.get("line"):
+        _mtext(ax, 1.15, 5.18, s["line"], fs=13, bold=True, color="#" + ACCENT)
+    _mtext(ax, 1.15, 6.9, s.get("src", ""), fs=10, color="#" + MUTED_C)
+
+
+def _pclose(ax, s):
+    ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
+    ax.add_patch(Rectangle((0, 0), 0.30, SLIDE_H, fc="#" + PRIMARY, ec="none", zorder=2))
+    _mtext(ax, 1.1, 2.75, s["title"], fs=38, bold=True, color="#" + INK_C)
+    if s.get("sub"):
+        _mtext(ax, 1.15, 4.15, s["sub"], fs=16, color="#" + SUB_C)
+    ax.add_patch(Rectangle((1.15, SLIDE_H - 4.95 - 0.05), 3.4, 0.05, fc="#" + ACCENT, ec="none", zorder=2))
+    if s.get("line"):
+        _mtext(ax, 1.15, 5.40, s["line"], fs=12, color="#" + MUTED_C)
+    _mtext(ax, 1.15, 6.9, s.get("src", ""), fs=10, color="#" + MUTED_C)
+
+
+def _pagenda(ax, s, i, total):
+    ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
+    ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc="#" + PRIMARY, ec="none", zorder=2))
+    _mtext(ax, 0.85, 0.5, s["title"], fs=24, bold=True)
+    if s.get("sub"):
+        _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
+    ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
+    secs = s["sections"]; colx = [0.95, 7.0]; top0, rowh, per = 2.05, 1.16, 4
+    for j, (num, ttl, det) in enumerate(secs):
+        x = colx[j // per]; y = top0 + (j % per) * rowh
+        ax.add_patch(Circle((x + 0.23, SLIDE_H - y - 0.23), 0.23, fc="#" + PRIMARY, ec="none", zorder=3))
+        _mtext(ax, x + 0.23, y + 0.23, str(num), fs=14, bold=True, color="white", ha="center", va="center")
+        _mtext(ax, x + 0.64, y - 0.02, ttl, fs=15, bold=True, color="#" + INK_C)
+        _mtext(ax, x + 0.64, y + 0.42, det, fs=12, color="#" + MUTED_C)
+    if s.get("line"):
+        ax.add_patch(FancyBboxPatch((0.95, SLIDE_H - 6.62 - 0.62), 11.45, 0.62,
+                     boxstyle="round,pad=0,rounding_size=0.06", fc="#F6E8D5", ec="#E4C79A", lw=1.2, zorder=2))
+        _mtext(ax, 1.25, 6.82, s["line"], fs=13, bold=True, color="#8A5212")
+    _mtext(ax, 12.9, 7.1, f"{i:02d}/{total:02d}", fs=10, color=T.MUTED, ha="right")
+
+
 def build_previews(specs, outdir, total, asset_dir=""):
     os.makedirs(outdir, exist_ok=True)
     paths = []
@@ -226,25 +362,22 @@ def build_previews(specs, outdir, total, asset_dir=""):
         fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
         k = s["kind"]; acc = s.get("accent", T.BLUE)
         accx = acc if acc.startswith("#") else "#" + acc
-        if k in ("title", "close"):
-            ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc=T.INK, ec="none", zorder=0))
-            ax.add_patch(Rectangle((0.9, SLIDE_H - (2.5 if k == "title" else 3.0) - 0.7), 0.16, 0.7, fc=T.AMBER, ec="none", zorder=2))
-            _mtext(ax, 1.2, 2.3 if k == "title" else 2.85, s["title"], fs=40, color="white", bold=True)
-            if s.get("sub"):
-                _mtext(ax, 1.2, 3.7 if k == "title" else 4.0, s["sub"], fs=17, color="#CBD5E1")
-            _mtext(ax, 1.2, 6.7, s.get("src", ""), fs=10, color="#64748B")
-            paths.append(_save_prev(fig, outdir, i)); continue
+        if k in ("cover", "title"):
+            _pcover(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
+        if k == "close":
+            _pclose(ax, s); paths.append(_save_prev(fig, outdir, i)); continue
+        if k == "agenda":
+            _pagenda(ax, s, i, total); paths.append(_save_prev(fig, outdir, i)); continue
         ax.add_patch(Rectangle((0, 0), SLIDE_W, SLIDE_H, fc="white", ec="none", zorder=0))
-        ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc=accx, ec="none", zorder=2))
+        ax.add_patch(Rectangle((0.6, SLIDE_H - 0.5 - 0.62), 0.16, 0.62, fc="#" + PRIMARY, ec="none", zorder=2))
         _mtext(ax, 0.85, 0.5, s["title"], fs=24, bold=True)
         if s.get("sub"):
             _mtext(ax, 0.87, 1.2, s["sub"], fs=13, color=T.MUTED)
+        ax.add_patch(Rectangle((0.85, SLIDE_H - 1.6 - 0.02), 11.85, 0.02, fc="#" + HAIR_C, ec="none", zorder=1))
         if k == "split":
             yy = 1.95
             for b in s["bullets"]:
-                _mtext(ax, 0.7, yy, "▪", fs=15, color=accx, bold=True)
-                _mtext(ax, 1.02, yy, b, fs=14)
-                yy += 0.62
+                yy = _pbul(ax, 0.7, 1.02, yy, b, 14, accx, 24)
             box = (6.0, 1.7, 6.85, 5.25)
             p = os.path.join(asset_dir, s["figure"])
             iw, ih = Image.open(p).size
@@ -271,23 +404,23 @@ def build_previews(specs, outdir, total, asset_dir=""):
                 ac = a if a.startswith("#") else "#" + a
                 _mcard(ax, x, 1.7, 5.8, 5.1, accent=ac)
                 _mtext(ax, x + 0.35, 1.95, hdr, fs=14, bold=True, color=ac)
-                yy = 2.6
+                yy = 2.55
                 for it in items:
-                    _mtext(ax, x + 0.35, yy, "▪ " + it, fs=13); yy += 0.6
+                    yy = _pbul(ax, x + 0.32, x + 0.6, yy, it, 12.5, ac, 28, lh=0.36, gap=0.12)
         elif k == "bullets":
             items = s["bullets"]
             if s.get("two_col"):
                 mid = (len(items) + 1) // 2
                 yy = 1.95
                 for b in items[:mid]:
-                    _mtext(ax, 0.7, yy, "▪", fs=14, color=accx, bold=True); _mtext(ax, 1.0, yy, b, fs=14); yy += 0.62
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 14, accx, 30)
                 yy = 1.95
                 for b in items[mid:]:
-                    _mtext(ax, 6.9, yy, "▪", fs=14, color=accx, bold=True); _mtext(ax, 7.2, yy, b, fs=14); yy += 0.62
+                    yy = _pbul(ax, 6.9, 7.2, yy, b, 14, accx, 30)
             else:
                 yy = 1.95
                 for b in items:
-                    _mtext(ax, 0.7, yy, "▪", fs=15, color=accx, bold=True); _mtext(ax, 1.0, yy, b, fs=15); yy += 0.66
+                    yy = _pbul(ax, 0.7, 1.0, yy, b, 15, accx, 52)
         _mtext(ax, 12.9, 7.1, f"{i:02d}/{total:02d}", fs=10, color=T.MUTED, ha="right")
         paths.append(_save_prev(fig, outdir, i))
     return paths
