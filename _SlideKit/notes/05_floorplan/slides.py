@@ -25,10 +25,12 @@ PRIMARY = D.PRIMARY
 ACCENT = D.ACCENT
 
 
-def split(t, sub, fig, bullets, style="bullet", diagram=None):
+def split(t, sub, fig, bullets, style="bullet", diagram=None, credit=None):
     d = {"kind": "split", "title": t, "sub": sub, "figure": fig, "bullets": bullets, "accent": PRIMARY, "style": style}
     if diagram:                 # 右栏改用 PPT 原生框图（可编辑形状）；fig 仍保留供笔记 md 与预览回退
         d["diagram"] = diagram
+    if credit:                  # 引用文献插图时的来源标注（图下小字「来源：…」）；见 refs 页与 tools/extract_figs.py
+        d["credit"] = credit
     return d
 
 
@@ -276,6 +278,13 @@ SPECS = [
             "editPin / assignIoPins",
             "defIn != floorPlan  (read DEF vs create)",
         ], ACCENT),
+    ]},
+    {"kind": "refs", "title": "参考文献 References", "sub": "本讲内容与图示来源（引用文献插图时图下另标“来源：…”）", "accent": PRIMARY, "refs": [
+        "Adam Teman. Digital VLSI Design (DVD), Lecture 6 — Import Design and Floorplan. Bar-Ilan University, Course 83-612. https://enicslabs.com/academic-courses/dvd-english/",
+        "J. M. Rabaey, A. Chandrakasan, B. Nikolić. Digital Integrated Circuits: A Design Perspective. Prentice Hall.",
+        "N. H. E. Weste, D. M. Harris. CMOS VLSI Design: A Circuits and Systems Perspective. Addison-Wesley.",
+        "IDESA / EPFL — Digital IC design tutorials.",
+        "Cadence Innovus User Guide; Synopsys IC Compiler II / Fusion Compiler User Guide（命令与流程参考）.",
     ]},
     {"kind": "close", "title": "谢谢 · Thanks",
      "sub": "下一讲：Placement 标准单元布局（DVD Lecture 7）",

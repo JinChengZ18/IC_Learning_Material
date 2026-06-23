@@ -740,6 +740,8 @@ def _build_pptx_impl(specs, out_pptx, total, author="J.C", asset_dir="", templat
             if cap:
                 fig_no += 1
                 _txt(sl, (6.0, 6.48, 6.85, 0.5), [f"图 {fig_no}. {cap}"], sizes=[12], colors=[MUTED_C], align=PP_ALIGN.CENTER)
+            if s.get("credit"):              # 文献插图来源标注（恰当处）
+                _txt(sl, (6.0, 6.98, 6.85, 0.3), ["来源：" + s["credit"]], sizes=[9], colors=[MUTED_C], align=PP_ALIGN.RIGHT)
         elif k == "table":
             _table(sl, s)
         elif k == "chart":
@@ -1052,6 +1054,8 @@ def build_previews(specs, outdir, total, asset_dir="", page_label=PAGE_LABEL):
             if cap:
                 fig_no += 1
                 _mtext(ax, 6.0 + 6.85 / 2.0, 6.62, f"图 {fig_no}. {cap}", fs=11, color="#" + MUTED_C, ha="center")
+            if s.get("credit"):
+                _mtext(ax, 12.85, 7.02, "来源：" + s["credit"], fs=9, color="#" + MUTED_C, ha="right")
         elif k == "table":
             _ptable(ax, s)
         elif k == "chart":
