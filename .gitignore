@@ -3,7 +3,7 @@
 _BiliKit/
 Courses/
 # 无关的个人文档
-highlights.docx
+local-doc
 
 # Python 缓存
 __pycache__/
