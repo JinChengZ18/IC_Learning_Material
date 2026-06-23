@@ -41,38 +41,6 @@ def f01_position():
     return T.save(fig, OUT, "f01_position")
 
 
-# F02 为什么重要（4:3）----------------------------------------------------- #
-def f02_why():
-    fig, ax = T.canvas(9.2, 6.8)
-    # 左：修改成本曲线
-    ox, oy, pw, ph = 1.0, 0.9, 3.9, 5.4
-    T.line(ax, ox, oy, ox, oy + ph + 0.15, color=T.INK2, lw=2)
-    T.line(ax, ox, oy, ox + pw + 0.15, oy, color=T.INK2, lw=2)
-    ax.text(ox - 0.05, oy + ph + 0.42, "修改成本", ha="center", color=T.INK, fontsize=H2, fontweight="bold")
-    stages = ["FP", "Place", "CTS", "Route", "Signoff"]
-    xs = [ox + 0.35 + i * (pw - 0.45) / 4 for i in range(5)]
-    ys = [oy + v for v in (0.5, 1.55, 2.8, 4.1, 5.1)]
-    ax.fill_between(xs, [oy] * 5, ys, color=T.ROSE_L, zorder=1)
-    ax.plot(xs, ys, color=T.ROSE, lw=3.4, zorder=3, solid_capstyle="round")
-    for xx, yy in zip(xs, ys):
-        ax.plot([xx], [yy], "o", color=T.ROSE, ms=9, zorder=4, mec="white", mew=1.4)
-    for i, xx in enumerate(xs):
-        ax.text(xx, oy - 0.3, stages[i], ha="center", color=T.INK2, fontsize=CAP - 0.5)
-    T.annotate(ax, (xs[0], ys[0] + 0.05), (xs[0] + 0.45, ys[0] + 1.2), "改在此\n≈ 免费", color=T.TEAL_D, rad=-0.2, fs=CAP)
-    T.annotate(ax, (xs[4], ys[4]), (xs[4] - 1.9, ys[4] + 0.3), "改在此\n≈ 重来", color=T.ROSE_D, rad=0.25, fs=CAP)
-    # 右：PPA 三角（上）+ 三类代价卡（下）
-    cx, cy, r = 7.1, 5.2, 1.25
-    ax.fill([cx, cx - r, cx + r], [cy + r, cy - r * 0.85, cy - r * 0.85], color=T.BLUE_L, ec=T.BLUE, lw=1.8, zorder=2)
-    T.tag(ax, cx, cy + r + 0.28, "Performance", role="logic", fs=CAP - 0.5)
-    T.tag(ax, cx - r + 0.1, cy - r * 0.85 - 0.28, "Power", role="power", fs=CAP - 0.5)
-    T.tag(ax, cx + r - 0.1, cy - r * 0.85 - 0.28, "Area", role="memory", fs=CAP - 0.5)
-    ax.text(cx, cy - r * 0.05, "PPA\n权衡", ha="center", va="center", color=T.INK, fontsize=H2, fontweight="bold", zorder=3)
-    costs = [("利用率高 → 拥塞", "io"), ("宏乱放 → 时序差", "power"), ("PG 不足 → IR/EM", "clock")]
-    for i, (t, role) in enumerate(costs):
-        T.infocard(ax, 5.3, 2.45 - i * 0.78, 3.7, 0.66, t, role=role, title_fs=CAP)
-    return T.save(fig, OUT, "f02_why")
-
-
 # F03 芯片几何（~1:1）----------------------------------------------------- #
 def _pads(ax, x, y, s, n, dep, gap=0.12):
     plh = (s - gap * (n + 1)) / n
@@ -108,62 +76,6 @@ def f03_geometry():
         T.infocard(ax, lx, 5.5 - i * 1.15, 2.35, 1.0, t, d, role=role, title_fs=BODY, detail_fs=CAP - 1)
     ax.text(0.5, 0.18, "利用率 = (Σ单元+Σ宏)/Core ≈ 0.5–0.8   ·   长宽比 H/W ≈ 1 最均衡", ha="left", color=T.MUTED, fontsize=CAP - 0.5)
     return T.save(fig, OUT, "f03_geometry")
-
-
-# F04 利用率与长宽比（4:3）------------------------------------------------ #
-def _fill_core(ax, x, y, s, density, color):
-    cell, gap = 0.34, 0.11
-    cols = int((s - gap) / (cell + gap))
-    target = int(cols * cols * density)
-    k = 0
-    for r in range(cols):
-        for c in range(cols):
-            if k >= target:
-                return
-            T.rect(ax, x + gap + c * (cell + gap), y + gap + r * (cell + gap), cell, cell, fc=color, ec="none", z=3, rounding=0.04)
-            k += 1
-
-
-def f04_util():
-    fig, ax = T.canvas(9, 6.8)
-    ax.text(0.5, 6.45, "利用率 Utilization", ha="left", color=T.INK, fontsize=H2, fontweight="bold")
-    T.rect(ax, 0.5, 3.5, 2.5, 2.5, fc=T.WHITE, ec=T.BLUE, lw=2.0, z=2)
-    _fill_core(ax, 0.5, 3.5, 2.5, 0.45, T.BLUE_L)
-    ax.text(1.75, 3.15, "≈ 50% 宽松", ha="center", va="top", color=T.BLUE_D, fontsize=BODY, fontweight="bold")
-    T.rect(ax, 3.2, 3.5, 2.5, 2.5, fc=T.WHITE, ec=T.ROSE, lw=2.0, z=2)
-    _fill_core(ax, 3.2, 3.5, 2.5, 0.85, T.ROSE_L)
-    ax.text(4.45, 3.15, "≈ 85% 拥塞", ha="center", va="top", color=T.ROSE_D, fontsize=BODY, fontweight="bold")
-    # 右：长宽比（瘦高 vs 方正）
-    ax.text(6.0, 6.45, "长宽比 H/W", ha="left", color=T.TEAL_D, fontsize=H2, fontweight="bold")
-    T.rect(ax, 6.2, 3.5, 0.75, 2.5, fc=T.SLATE_L, ec=T.MUTED, lw=1.8, z=2)
-    ax.text(6.57, 3.15, "瘦高·差", ha="center", va="top", color=T.INK2, fontsize=CAP)
-    T.rect(ax, 7.4, 4.25, 1.4, 1.4, fc=T.TEAL_L, ec=T.TEAL, lw=2.0, z=2)
-    ax.text(8.1, 3.9, "方正·推荐", ha="center", va="top", color=T.TEAL_D, fontsize=CAP, fontweight="bold")
-    T.infocard(ax, 0.5, 1.0, 8.3, 1.5, "利用率两个口径",
-               "Total = (Σ单元+Σ宏)/Core      Effective = Σ单元/(Core − blockage − halo)", role="neutral", title_fs=BODY, detail_fs=CAP)
-    return T.save(fig, OUT, "f04_util")
-
-
-# F05 行 / site / 翻转供电轨（4:3）---------------------------------------- #
-def f05_rows():
-    fig, ax = T.canvas(9, 6.8)
-    x0, x1 = 1.0, 6.4
-    rows, rh, y = 4, 1.05, 2.2
-    for i in range(rows):
-        yy = y + i * rh
-        T.rect(ax, x0, yy, x1 - x0, rh, fc=(T.SLATE_L if i % 2 == 0 else T.WHITE), ec=T.LINE, lw=1.0, z=2)
-        ax.text(x1 + 0.2, yy + rh / 2, f"Row {i}·{'翻转 FS' if i % 2 else '正放 R0'}", ha="left", va="center", color=T.INK2, fontsize=CAP)
-        for c in range(4):
-            T.rect(ax, x0 + 0.45 + c * 1.28, yy + 0.17, 0.95, rh - 0.34, fc=T.BLUE_L, ec=T.BLUE, lw=1.0, z=3, rounding=0.05)
-    for i in range(rows + 1):
-        yy = y + i * rh
-        col = T.AMBER if i % 2 == 0 else T.INK
-        T.line(ax, x0 - 0.3, yy, x1, yy, color=col, lw=3.2, z=4)
-        ax.text(x0 - 0.42, yy, "VDD" if i % 2 == 0 else "VSS", ha="right", va="center", color=col, fontsize=CAP, fontweight="bold")
-    ax.text(x0, y - 0.32, "↑ site 栅格（行内最小放置单位，LEF 定义）", ha="left", color=T.MUTED, fontsize=CAP - 0.5)
-    T.infocard(ax, 0.6, 0.45, 7.8, 1.05,
-               "翻转共享供电轨", "相邻行镜像翻转(FS) → 同名轨落行边界、被两行共享 → 条数减半、面积省", role="power", title_fs=BODY, detail_fs=CAP)
-    return T.save(fig, OUT, "f05_rows")
 
 
 # F06 宏摆放原则（4:3）---------------------------------------------------- #
@@ -211,33 +123,6 @@ def f07_halo():
     return T.save(fig, OUT, "f07_halo")
 
 
-# F08 电源网格（4:3）------------------------------------------------------ #
-def f08_power():
-    fig, ax = T.canvas(9.4, 6.8)
-    cx, cy, cw, ch = 0.4, 0.5, 5.2, 5.8
-    T.rect(ax, cx, cy, cw, ch, fc=T.WHITE, ec=T.INK2, lw=1.6, z=1)
-    T.rect(ax, cx + 0.16, cy + 0.16, cw - 0.32, ch - 0.32, fc="none", ec=T.AMBER, lw=4.5, z=3)
-    T.rect(ax, cx + 0.45, cy + 0.45, cw - 0.9, ch - 0.9, fc="none", ec=T.INK, lw=4.5, z=3)
-    x0, x1 = cx + 0.45, cx + cw - 0.45
-    y0, y1 = cy + 0.45, cy + ch - 0.45
-    vx = [x0 + (i + 1) * (x1 - x0) / 6 for i in range(5)]
-    hy = [y0 + (j + 1) * (y1 - y0) / 5 for j in range(4)]
-    for i, xx in enumerate(vx):
-        T.line(ax, xx, y0, xx, y1, color=T.AMBER if i % 2 == 0 else T.INK, lw=2.6, z=2)
-    for j, yy in enumerate(hy):
-        T.line(ax, x0, yy, x1, yy, color=T.INK if j % 2 == 0 else T.AMBER, lw=2.2, z=2)
-    for xx in vx:
-        for yy in hy:
-            ax.plot([xx], [yy], "o", color=T.ROSE, ms=4, zorder=5)
-    bx = cx + cw + 0.4
-    pw = 9.4 - bx - 0.3
-    layers = [("Power Ring 环", "power"), ("Power Stripe 条", "power"), ("Power Mesh 网", "neutral"),
-              ("Std-cell Rail M1", "neutral"), ("via 连接层", "io")]
-    for i, (t, role) in enumerate(layers):
-        T.infocard(ax, bx, 5.55 - i * 1.16, pw, 0.98, t, role=role, title_fs=BODY)
-    return T.save(fig, OUT, "f08_power")
-
-
 # F09 IR drop 与 EM（4:3）------------------------------------------------- #
 def f09_irem():
     fig, ax = T.canvas(9.4, 6.6)
@@ -269,51 +154,6 @@ def f09_irem():
     return T.save(fig, OUT, "f09_irem")
 
 
-# F10 多电压域（4:3）------------------------------------------------------ #
-def f10_mv():
-    fig, ax = T.canvas(9.4, 6.6)
-    T.rect(ax, 0.4, 1.2, 3.7, 4.0, fc=T.BLUE_L, ec=T.BLUE, lw=1.6, z=1, rounding=0.12)
-    T.rect(ax, 5.3, 1.2, 3.7, 4.0, fc=T.VIOLET_L, ec=T.VIOLET, lw=1.6, z=1, rounding=0.12)
-    ax.text(2.25, 4.9, "Domain A · always-on", ha="center", color=T.BLUE_D, fontsize=BODY, fontweight="bold")
-    ax.text(7.15, 4.9, "Domain B · switchable", ha="center", color=T.VIOLET_D, fontsize=BODY, fontweight="bold")
-    la = T.node(ax, 0.8, 2.7, 1.9, 1.4, "Logic A", role="logic", z=4, fs=BODY)
-    T.node(ax, 0.8, 1.4, 1.9, 1.0, "Always-on Buf", role="neutral", z=4, fs=CAP - 1)
-    lb = T.node(ax, 6.7, 2.7, 1.9, 1.4, "Logic B", role="clock", z=4, fs=BODY)
-    T.node(ax, 6.7, 1.4, 1.9, 1.0, "Retention FF", role="neutral", z=4, fs=CAP - 1)
-    ls = T.node(ax, 4.2, 2.85, 1.0, 1.05, "LS", role="io", z=5, fs=BODY)
-    isoc = T.node(ax, 5.28, 2.85, 1.0, 1.05, "ISO", role="memory", z=5, fs=BODY)
-    T.arrow(ax, la["right"], ls["left"], color=T.INK, lw=2.2)
-    T.arrow(ax, ls["right"], isoc["left"], color=T.INK, lw=2.2)
-    T.arrow(ax, isoc["right"], lb["left"], color=T.INK, lw=2.2)
-    psw = T.node(ax, 5.3, 5.3, 2.4, 0.85, "Power Switch", role="power", z=5, fs=CAP)
-    T.arrow(ax, psw["bottom"], (7.15, 5.2), color=T.AMBER, lw=2.2)
-    ax.text(4.7, 0.55, "UPF：power_domain · isolation · level_shifter · retention", ha="center", color=T.MUTED, fontsize=CAP - 0.5)
-    return T.save(fig, OUT, "f10_mv")
-
-
-# F11 时序预算（4:3）------------------------------------------------------ #
-def f11_budget():
-    fig, ax = T.canvas(9, 6.4)
-    a = T.node(ax, 0.5, 3.6, 2.7, 2.0, "Block A", sub="partition", role="memory", variant="outline", z=3, fs=H2, sub_fs=CAP - 1)
-    b = T.node(ax, 5.8, 3.6, 2.7, 2.0, "Block B", sub="partition", role="memory", variant="outline", z=3, fs=H2, sub_fs=CAP - 1)
-    T.rect(ax, 0.3, 3.2, 8.4, 3.0, fc="none", ec=T.LINE, lw=1.4, ls=(0, (4, 3)), z=1)
-    ax.text(4.5, 5.95, "Top 顶层", ha="center", color=T.INK2, fontsize=CAP)
-    T.arrow(ax, a["right"], (b["x"], 4.6), color=T.BLUE, lw=2.6)
-    ax.text(4.5, 4.85, "跨块路径", ha="center", color=T.BLUE_D, fontsize=CAP, fontweight="bold")
-    ax.text(4.5, 4.0, "各块并行实现\n各自满足预算", ha="center", va="center", color=T.INK2, fontsize=CAP, linespacing=1.5)
-    by, bh, bx0, bx1 = 1.5, 0.85, 0.5, 8.5
-    segs = [("Block A\n0.8", T.TEAL, 0.34), ("if 0.2", T.AMBER, 0.12), ("Top 0.4", T.BLUE, 0.18), ("if 0.2", T.AMBER, 0.12), ("Block B\n0.8", T.TEAL, 0.24)]
-    x = bx0
-    for label, col, frac in segs:
-        w = (bx1 - bx0) * frac
-        T.rect(ax, x, by, w, bh, fc=col, ec=T.WHITE, lw=1.5, z=3)
-        ax.text(x + w / 2, by + bh / 2, label, ha="center", va="center", color=T.WHITE, fontsize=CAP - 1, fontweight="bold", zorder=4)
-        x += w
-    ax.text(bx0, by + bh + 0.3, "整条路径预算 2.0 ns 按层级切分（含接口 / feedthrough 余量）", ha="left", color=T.INK2, fontsize=CAP)
-    ax.text(bx0, 0.95, "→ 顶层与各块并行收敛、可复用", ha="left", color=T.MUTED, fontsize=CAP)
-    return T.save(fig, OUT, "f11_budget")
-
-
 # F12 输入 / 输出（~1:1，纵向）-------------------------------------------- #
 def f12_io():
     fig, ax = T.canvas(7.6, 7)
@@ -329,42 +169,6 @@ def f12_io():
     T.arrow(ax, (3.3, 4.0), eng["left"], color=T.LINE, lw=1.6, scale=12)
     T.arrow(ax, eng["bottom"], (3.85, 2.95), color=T.INK2, lw=2.0, rad=-0.1)
     return T.save(fig, OUT, "f12_io")
-
-
-# F13 IO/Pad 与 Bump（4:3）------------------------------------------------ #
-def f13_iopad():
-    fig, ax = T.canvas(8.6, 6)
-    ax.text(2.2, 5.6, "Wire-bond 引线键合", ha="center", color=T.INK, fontsize=H2, fontweight="bold")
-    dx, dy, s = 0.5, 1.3, 3.3
-    T.rect(ax, dx, dy, s, s, fc=T.WHITE, ec=T.INK2, lw=2, z=1)
-    _pads(ax, dx, dy, s, 6, 0.32)
-    ax.text(dx + s / 2, dy + s / 2, "die", ha="center", va="center", color=T.MUTED, fontsize=BODY)
-    ax.text(2.2, 0.85, "IO Pad 沿四周排成 Pad Ring", ha="center", color=T.INK2, fontsize=CAP)
-    ax.text(6.4, 5.6, "Flip-Chip 倒装焊", ha="center", color=T.INK, fontsize=H2, fontweight="bold")
-    fx, fy = 4.7, 1.3
-    T.rect(ax, fx, fy, s, s, fc=T.WHITE, ec=T.INK2, lw=2, z=1)
-    for r in range(5):
-        for c in range(5):
-            ax.plot([fx + 0.55 + c * 0.55], [fy + 0.55 + r * 0.55], "o", color=T.ROSE, ms=9, zorder=3)
-    ax.text(6.4, 0.85, "信号经 Bump 面阵列引出（常配 RDL）", ha="center", color=T.INK2, fontsize=CAP)
-    return T.save(fig, OUT, "f13_iopad")
-
-
-# F14 电源门控 header / footer（~1:1 纵向）-------------------------------- #
-def f14_gating():
-    fig, ax = T.canvas(6.6, 6.8)
-    cx = 2.5
-    T.node(ax, cx - 1.4, 5.75, 2.8, 0.8, "VDD 真实电源", role="power", variant="soft", fs=BODY)
-    T.node(ax, cx - 1.4, 4.55, 2.8, 0.8, "Header（PMOS）", role="power", fs=BODY)
-    ax.text(cx + 1.55, 4.95, "→ VVDD", ha="left", color=T.AMBER_D, fontsize=CAP)
-    T.node(ax, cx - 1.6, 2.6, 3.2, 1.5, "可关断逻辑", role="clock", fs=H2)
-    T.node(ax, cx - 1.4, 1.35, 2.8, 0.8, "Footer（NMOS）", role="memory", fs=BODY)
-    ax.text(cx + 1.55, 1.75, "→ VVSS", ha="left", color=T.TEAL_D, fontsize=CAP)
-    T.node(ax, cx - 1.4, 0.3, 2.8, 0.8, "VSS 真实地", role="neutral", fs=BODY)
-    for y0, y1 in [(5.75, 5.35), (4.55, 4.1), (2.6, 2.15), (1.35, 1.1)]:
-        T.arrow(ax, (cx, y0), (cx, y1), color=T.MUTED, lw=1.8, scale=12)
-    ax.text(5.0, 3.35, "header\n更常用\n(漏电好)", ha="center", va="center", color=T.MUTED, fontsize=CAP)
-    return T.save(fig, OUT, "f14_gating")
 
 
 # F15 Floorplan 迭代闭环（~1:1）------------------------------------------ #
@@ -442,36 +246,10 @@ def f17_hier():
     return T.save(fig, OUT, "f17_hier")
 
 
-# F18 电源网格与宏摆放（4:3）---------------------------------------------- #
-def f18_pgmacro():
-    fig, ax = T.canvas(9.0, 6.4)
-    dx, dy, s = 0.5, 0.7, 5.2
-    T.rect(ax, dx, dy, s, s, fc=T.WHITE, ec=T.INK2, lw=2.0, z=1)
-    n = 9
-    pl = (s - 0.12 * (n + 1)) / n
-    for i in range(n):
-        p = dx + 0.12 + i * (pl + 0.12)
-        for yy in (dy, dy + s - 0.3):
-            T.rect(ax, p, yy, pl, 0.3, fc=T.AMBER_L, ec=T.AMBER, lw=0.9, z=3)
-    ax.text(dx + s / 2, dy + s + 0.12, "电源 pad 环（VDD/VSS）", ha="center", va="bottom", color=T.AMBER_D, fontsize=CAP, fontweight="bold")
-    # 高功耗宏：靠近边界 pad、彼此拉开
-    T.node(ax, dx + 0.55, dy + 0.6, 1.5, 1.5, "高功耗\nMacro", role="memory", fs=CAP, z=4)
-    T.node(ax, dx + s - 2.05, dy + s - 2.1, 1.5, 1.5, "高功耗\nMacro", role="memory", fs=CAP, z=4)
-    ax.text(dx + s / 2, dy + s / 2, "Std-Cell", ha="center", va="center", color=T.MUTED, fontsize=CAP)
-    # IR 热点示意（远离 pad 的中心）
-    ax.add_patch(__import__("matplotlib").patches.Circle((dx + s * 0.5, dy + s * 0.5), 0.55, fc=T.ROSE_L, ec=T.ROSE, lw=1.4, ls=(0, (3, 2)), zorder=2))
-    bx = dx + s + 0.4
-    cards = [("靠近边界电源 pad", "io"), ("高功耗宏彼此拉开", "power"),
-             ("宏通道留给 PG/via/时钟", "neutral"), ("pad·宏·网格一起迭代", "logic")]
-    for i, (t, role) in enumerate(cards):
-        T.infocard(ax, bx, 5.1 - i * 1.18, 9.0 - bx - 0.3, 1.0, t, role=role, title_fs=BODY)
-    return T.save(fig, OUT, "f18_pgmacro")
-
-
 def main():
-    figs = [f01_position, f02_why, f03_geometry, f04_util, f05_rows, f06_macro,
-            f07_halo, f08_power, f09_irem, f10_mv, f11_budget, f12_io,
-            f13_iopad, f14_gating, f15_loop, f16_uniquify, f17_hier, f18_pgmacro]
+    figs = [f01_position, f03_geometry, f06_macro,
+            f07_halo, f09_irem, f12_io,
+            f15_loop, f16_uniquify, f17_hier]
     print("Output:", OUT)
     for fn in figs:
         print("  saved:", os.path.basename(fn()))
