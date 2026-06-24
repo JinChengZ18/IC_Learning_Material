@@ -257,33 +257,35 @@ MONO = "monospace"
 
 # F20 发展脉络时间轴（4:3）---------------------------------------------------- #
 def f20_devthread():
-    fig, ax = T.canvas(9.8, 7.2)
-    ax.text(0.4, 6.92, "布图规划算法 · 发展脉络", ha="left", va="center",
+    """发展脉络时间轴：五个阶段，卡片上下交替、纵向分开，避免拥挤。"""
+    fig, ax = T.canvas(10.6, 6.6)
+    ax.text(0.4, 6.3, "布图规划算法 · 发展脉络", ha="left", va="center",
             color=T.INK, fontsize=H2, fontweight="bold")
-    # 主时间轴（居中，上下各留一排卡片）
-    ax0, ax1, ay = 0.7, 9.3, 3.85
+    ax0, ax1, ay = 0.55, 10.1, 3.45
     T.line(ax, ax0, ay, ax1, ay, color=T.INK2, lw=2.6, z=2)
-    T.arrow(ax, (ax1 - 0.5, ay), (ax1 + 0.02, ay), color=T.INK2, lw=2.6, scale=16, z=2)
-    CH = 1.6   # 卡片高
+    T.arrow(ax, (ax1 - 0.45, ay), (ax1 + 0.02, ay), color=T.INK2, lw=2.6, scale=16, z=2)
+    CH = 1.38   # 卡片高
     stages = [
-        ("早期构造法", "1980s", "矩形对偶 · mincut · 切片嵌入", "memory", 1.65),
-        ("切片 + 模拟退火", "1986", "slicing tree · Polish · Stockmeyer · WongLiu", "logic", 3.65),
-        ("非切片表示", "1995-2005", "SP · Btree · TCG · mosaic · Otree", "power", 5.85),
-        ("现代 floorplan", "2000s-", "固定轮廓 · slack · 解析法 · 工业原型", "io", 8.05),
+        ("早期构造法", "1980s", "矩形对偶 · mincut · 切片嵌入", "memory"),
+        ("切片 + 模拟退火", "1986", "切片树 · Polish · Stockmeyer", "logic"),
+        ("非切片表示", "1995–2005", "SP · B*-tree · TCG · O-tree", "power"),
+        ("现代布图", "2000s", "固定轮廓 · slack · 解析法 · aware", "io"),
+        ("工业布图 / 原型", "工业", "prototyping · 层次预算 · 可行性", "clock"),
     ]
-    for i, (name, yr, body, role, x) in enumerate(stages):
+    n = len(stages)
+    cw = 1.82
+    xs = [ax0 + (i + 0.5) * (ax1 - ax0) / n for i in range(n)]
+    for i, ((name, yr, body, role), x) in enumerate(zip(stages, xs)):
         col = T.MAIN[role]
-        ax.add_patch(_Circle((x, ay), 0.13, fc=col, ec=T.WHITE, lw=1.6, zorder=5))
+        ax.add_patch(_Circle((x, ay), 0.12, fc=col, ec=T.WHITE, lw=1.6, zorder=6))
         up = (i % 2 == 0)
-        # 年份标在轴上、朝向卡片的反侧，避开连接线
-        ax.text(x, ay + (-0.38 if up else 0.28), yr, ha="center",
-                va=("top" if up else "bottom"), color=col, fontsize=CAP, fontweight="bold", zorder=5)
-        cy = ay + 0.62 if up else ay - 0.62 - CH
-        T.line(ax, x, ay + (0.16 if up else -0.16), x, cy + (CH if up else 0.0), color=col, lw=1.4, z=3)
-        cw = 2.15
+        ax.text(x, ay + (-0.32 if up else 0.30), yr, ha="center",
+                va=("top" if up else "bottom"), color=col, fontsize=CAP - 1, fontweight="bold", zorder=6)
+        cy = ay + 0.56 if up else ay - 0.56 - CH
+        T.line(ax, x, ay + (0.14 if up else -0.14), x, cy + (CH if up else 0.0), color=col, lw=1.4, z=3)
         T.infocard(ax, x - cw / 2, cy, cw, CH, name, body, role=role,
-                   highlight=True, title_fs=BODY, detail_fs=CAP - 2)
-    ax.text(0.4, 0.25, "目标演化：最小面积 + 线长  →  固定轮廓内可行 + 拥塞 / 时序 / 功耗协同",
+                   highlight=True, title_fs=BODY - 1, detail_fs=CAP - 2)
+    ax.text(0.4, 0.22, "目标演化：最小面积 + 线长  →  固定轮廓内可行 + 拥塞 / 时序 / 功耗协同",
             ha="left", color=T.MUTED, fontsize=CAP - 1)
     return T.save(fig, OUT, "f20_devthread")
 
@@ -315,12 +317,13 @@ def f21_slicing():
     blk(vx + (bx + bw - vx) * 0.5, midY + (hUp - midY) * 0.5, "5", "memory")
     blk(bx + bw * 0.25, by + bh * 0.25, "3", "power")
     blk(bx + bw * 0.75, by + bh * 0.25, "4", "power")
-    ax.text(bx, by - 0.32, "切片布图（每刀贯穿子区域）", ha="left", color=T.INK2, fontsize=CAP)
-    # 横向小图例（一行），置于切片图与 Polish 条之间，避开两者
-    T.line(ax, bx + 0.05, 1.3, bx + 0.35, 1.3, color=T.ROSE, lw=3.0, z=5)
-    ax.text(bx + 0.45, 1.3, "H 横割（上下）", ha="left", va="center", color=T.ROSE_D, fontsize=CAP - 1, zorder=5)
-    T.line(ax, bx + 2.25, 1.3, bx + 2.55, 1.3, color=T.AMBER_D, lw=3.0, z=5)
-    ax.text(bx + 2.65, 1.3, "V 竖割（左右）", ha="left", va="center", color=T.AMBER_D, fontsize=CAP - 1, zorder=5)
+    ax.text(bx, by - 0.2, "切片布图（每刀贯穿子区域）", ha="left", va="top", color=T.INK2, fontsize=CAP)
+    # 横向小图例（一行），落在切片图说明之下、Polish 条之上，三者纵向分开避免拥挤
+    leg_y = 1.12
+    T.line(ax, bx + 0.05, leg_y, bx + 0.35, leg_y, color=T.ROSE, lw=3.0, z=5)
+    ax.text(bx + 0.45, leg_y, "H 横割（上下）", ha="left", va="center", color=T.ROSE_D, fontsize=CAP - 1, zorder=5)
+    T.line(ax, bx + 2.25, leg_y, bx + 2.55, leg_y, color=T.AMBER_D, lw=3.0, z=5)
+    ax.text(bx + 2.65, leg_y, "V 竖割（左右）", ha="left", va="center", color=T.AMBER_D, fontsize=CAP - 1, zorder=5)
 
     # ---- 右：slicing tree ----  root H( V(1, H(2,5)), V(3,4) )
     tx0 = 5.2
@@ -365,63 +368,58 @@ def f21_slicing():
 
 # F22 Stockmeyer 形状曲线合并（4:3）---------------------------------------- #
 def f22_shapecurve():
-    """两子块的阶梯形状曲线 → H 割竖加(高相加) / V 割横加(宽相加)。
-    三个面板共用同一坐标比例(S)，便于直接对比；面板标题在顶部、小图示在标题下。"""
-    fig, ax = T.canvas(9.8, 6.2)
-    ax.text(0.4, 5.9, "Stockmeyer 形状曲线合并（soft / 可旋转块面积最优）",
+    """Stockmeyer 形状曲线合并（对齐 Handbook Fig 9.4/9.5）：形状曲线是**非增阶梯**（宽增则高减）；
+    V 割左右并排 → 宽相加，H 割上下叠放 → 高相加。左：两输入曲线；中 / 右：输入(灰细) + 合并结果(粗)。"""
+    fig, ax = T.canvas(10.2, 5.9)
+    ax.text(0.4, 5.6, "Stockmeyer 形状曲线合并（软块 / 可旋转块面积最优）",
             ha="left", va="center", color=T.INK, fontsize=H2, fontweight="bold")
-    S = 0.82           # 统一坐标比例（数据单位 → 英寸）
-    AXLEN = 3.4        # 坐标轴长度（数据单位）
-    PY = 0.7           # 三个面板的统一底边 y
+    S, AXLEN, PY = 0.45, 6.0, 0.78
+    oxs = [0.6, 3.85, 7.1]
 
     def panel(ox, title, tcol):
-        T.line(ax, ox, PY, ox + AXLEN * S, PY, color=T.INK2, lw=1.6, z=3)        # w 轴
-        T.line(ax, ox, PY, ox, PY + AXLEN * S, color=T.INK2, lw=1.6, z=3)        # h 轴
-        ax.text(ox + AXLEN * S + 0.02, PY - 0.05, "w", ha="left", va="top", color=T.INK2, fontsize=CAP - 1, zorder=3)
-        ax.text(ox - 0.08, PY + AXLEN * S, "h", ha="right", va="center", color=T.INK2, fontsize=CAP - 1, zorder=3)
-        ax.text(ox, 4.85, title, ha="left", va="center", color=tcol, fontsize=CAP, fontweight="bold", zorder=3)
+        T.line(ax, ox, PY, ox + AXLEN * S, PY, color=T.INK2, lw=1.5, z=3)
+        T.line(ax, ox, PY, ox, PY + AXLEN * S, color=T.INK2, lw=1.5, z=3)
+        ax.text(ox + AXLEN * S + 0.05, PY, "w", ha="left", va="center", color=T.INK2, fontsize=CAP - 1, zorder=3)
+        ax.text(ox - 0.06, PY + AXLEN * S, "h", ha="right", va="center", color=T.INK2, fontsize=CAP - 1, zorder=3)
+        ax.text(ox, 4.78, title, ha="left", va="center", color=tcol, fontsize=CAP, fontweight="bold", zorder=3)
 
-    def staircase(ox, pts, col, lw=2.8):
-        pts = sorted(set(pts))
-        for k, (w, h) in enumerate(pts):
-            X, Y = ox + w * S, PY + h * S
-            if k > 0:
-                pw, ph = ox + pts[k - 1][0] * S, PY + pts[k - 1][1] * S
-                T.line(ax, pw, ph, X, ph, color=col, lw=lw, z=4)   # 水平段
-                T.line(ax, X, ph, X, Y, color=col, lw=lw, z=4)     # 下台阶
-            ax.add_patch(_Circle((X, Y), 0.06, fc=col, ec=T.WHITE, lw=0.8, zorder=6))
+    def stair(ox, pts, col, lw=2.6, dot=True, z=4):
+        pts = sorted(pts)   # 按宽升序（高降序）→ 非增阶梯
+        for k in range(1, len(pts)):
+            (pw, ph), (w, h) = pts[k - 1], pts[k]
+            X0, Y0, X, Y = ox + pw * S, PY + ph * S, ox + w * S, PY + h * S
+            T.line(ax, X0, Y0, X, Y0, color=col, lw=lw, z=z)   # 水平段（沿上一台阶高度向右）
+            T.line(ax, X, Y0, X, Y, color=col, lw=lw, z=z)     # 竖直下台阶
+        if dot:
+            for (w, h) in pts:
+                ax.add_patch(_Circle((ox + w * S, PY + h * S), 0.07, fc=col, ec=T.WHITE, lw=0.8, zorder=z + 2))
 
-    A = [(0.7, 1.9), (1.3, 1.1)]      # 子块 u1 的两个朝向 (w,h)
-    B = [(0.9, 1.7), (1.5, 0.9)]      # 子块 u2 的两个朝向
-    # ---- 左：两子曲线 ----
-    o1x = 0.85
-    panel(o1x, "两子块曲线 C(u1), C(u2)", T.INK)
-    staircase(o1x, A, T.MAIN["logic"])
-    staircase(o1x, B, T.MAIN["memory"])
-    ax.text(o1x + A[1][0] * S + 0.18, PY + A[1][1] * S, "u1", color=T.BLUE_D, fontsize=CAP - 1, fontweight="bold", zorder=6)
-    ax.text(o1x + B[1][0] * S + 0.18, PY + B[1][1] * S, "u2", color=T.TEAL_D, fontsize=CAP - 1, fontweight="bold", zorder=6)
+    C1 = [(1, 3), (2, 2), (3, 1)]   # 子块 u1 的形状曲线
+    C2 = [(1, 2), (2, 1)]           # 子块 u2 的形状曲线
+    Vc = [(2, 3), (3, 2), (5, 1)]   # V 割：每对 (w1+w2, max h) 取 Pareto
+    Hc = [(1, 5), (2, 3), (3, 2)]   # H 割：每对 (max w, h1+h2) 取 Pareto
 
-    # ---- 中：V 割 —— 宽相加 ----
-    o2x = 4.05
-    panel(o2x, "V 割：宽相加 (w1+w2)", T.AMBER_D)
-    Vc = [(a[0] + b[0], max(a[1], b[1])) for a, b in zip(A, B)]
-    Vc.append((A[0][0] + B[1][0], max(A[0][1], B[1][1])))
-    staircase(o2x, Vc, T.MAIN["power"])
-    # 小图示：两块并排（置于面板标题上方，避开标题文字）
-    T.rect(ax, o2x + 2.55, 5.4, 0.4, 0.46, fc=T.BLUE_L, ec=T.BLUE, lw=1.3, z=5)
-    T.rect(ax, o2x + 2.97, 5.4, 0.44, 0.42, fc=T.TEAL_L, ec=T.TEAL, lw=1.3, z=5)
+    panel(oxs[0], "两子块曲线 C(u1) · C(u2)", T.INK)
+    stair(oxs[0], C1, T.MAIN["logic"])
+    stair(oxs[0], C2, T.MAIN["memory"])
+    ax.text(oxs[0] + C1[0][0] * S - 0.02, PY + C1[0][1] * S + 0.22, "u1", color=T.BLUE_D, fontsize=CAP - 1, fontweight="bold", zorder=7)
+    ax.text(oxs[0] + C2[-1][0] * S + 0.12, PY + C2[-1][1] * S, "u2", color=T.TEAL_D, fontsize=CAP - 1, fontweight="bold", zorder=7)
 
-    # ---- 右：H 割 —— 高相加 ----
-    o3x = 7.25
-    panel(o3x, "H 割：高相加 (h1+h2)", T.ROSE_D)
-    Hc = [(max(a[0], b[0]), a[1] + b[1]) for a, b in zip(A, B)]
-    Hc.append((max(A[1][0], B[0][0]), A[1][1] + B[0][1]))
-    staircase(o3x, Hc, T.MAIN["io"])
-    # 小图示：两块上下叠（置于面板标题上方）
-    T.rect(ax, o3x + 1.95, 5.66, 0.46, 0.32, fc=T.TEAL_L, ec=T.TEAL, lw=1.3, z=5)
-    T.rect(ax, o3x + 1.95, 5.32, 0.46, 0.32, fc=T.BLUE_L, ec=T.BLUE, lw=1.3, z=5)
+    panel(oxs[1], "V 割：左右并排 → 宽相加", T.AMBER_D)
+    stair(oxs[1], C1, T.LINE, lw=1.4, dot=False, z=3)
+    stair(oxs[1], C2, T.LINE, lw=1.4, dot=False, z=3)
+    stair(oxs[1], Vc, T.MAIN["power"], lw=3.0)
+    T.rect(ax, oxs[1] + 1.66, 4.02, 0.42, 0.5, fc=T.BLUE_L, ec=T.BLUE, lw=1.3, z=5)
+    T.rect(ax, oxs[1] + 2.08, 4.02, 0.46, 0.46, fc=T.TEAL_L, ec=T.TEAL, lw=1.3, z=5)
 
-    ax.text(0.4, 0.2, "自底向上合并 Pareto 阶梯曲线；父曲线每段记所选割向 → 取面积最小点回溯定形",
+    panel(oxs[2], "H 割：上下叠放 → 高相加", T.ROSE_D)
+    stair(oxs[2], C1, T.LINE, lw=1.4, dot=False, z=3)
+    stair(oxs[2], C2, T.LINE, lw=1.4, dot=False, z=3)
+    stair(oxs[2], Hc, T.MAIN["io"], lw=3.0)
+    T.rect(ax, oxs[2] + 1.85, 4.3, 0.5, 0.34, fc=T.TEAL_L, ec=T.TEAL, lw=1.3, z=5)
+    T.rect(ax, oxs[2] + 1.85, 3.96, 0.5, 0.34, fc=T.BLUE_L, ec=T.BLUE, lw=1.3, z=5)
+
+    ax.text(0.4, 0.22, "形状曲线非增（宽增则高减）；沿切片树自底向上合并，取根曲线上面积最小点回溯定形（Shi：O(m log m)）",
             ha="left", color=T.MUTED, fontsize=CAP - 1)
     return T.save(fig, OUT, "f22_shapecurve")
 

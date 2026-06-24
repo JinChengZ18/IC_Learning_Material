@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-06-25T06:45:19.949291</dc:date>
+    <dc:date>2026-06-25T07:16:05.359290</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -35,7 +35,7 @@ L 682.56 538.56
 L 682.56 5.76 
 L 5.76 5.76 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #ffffff"/>
+" clip-path="url(#peae09d52ad)" style="fill: #ffffff"/>
    </g>
    <g id="patch_3">
     <path d="M 41.76 416.16 
@@ -43,7 +43,7 @@ L 329.76 416.16
 L 329.76 84.96 
 L 41.76 84.96 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #ffffff; stroke: #3a4252; stroke-width: 2; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #ffffff; stroke: #3a4252; stroke-width: 2; stroke-linejoin: miter"/>
    </g>
    <g id="patch_4">
     <path d="M 47.52 516.96 
@@ -56,53 +56,53 @@ Q 41.76 466.56 41.76 472.32
 L 41.76 511.2 
 Q 41.76 516.96 47.52 516.96 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #edf0f4; stroke: #c7cdd6; stroke-width: 1.2; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #edf0f4; stroke: #c7cdd6; stroke-width: 1.2; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="34.56" y="36.192422" transform="rotate(-0 34.56 36.192422)">切片布图 · 切片树 · Polish 表达式</text>
    </g>
    <g id="text_2">
-    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #3a4252" x="41.76" y="439.2" transform="rotate(-0 41.76 439.2)">切片布图（每刀贯穿子区域）</text>
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #3a4252" x="41.76" y="442.550625" transform="rotate(-0 41.76 442.550625)">切片布图（每刀贯穿子区域）</text>
    </g>
    <g id="line2d_1">
     <path d="M 524.16 120.24 
 L 452.16 154.08 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_2">
     <path d="M 524.16 120.24 
 L 603.36 154.08 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_3">
     <path d="M 452.16 203.04 
 L 405.36 242.64 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_4">
     <path d="M 452.16 203.04 
 L 502.56 240.48 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_5">
     <path d="M 502.56 289.44 
 L 470.16 325.44 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_6">
     <path d="M 502.56 289.44 
 L 534.96 325.44 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_7">
     <path d="M 603.36 203.04 
 L 578.16 242.64 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="line2d_8">
     <path d="M 603.36 203.04 
 L 635.76 242.64 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #3a4252; stroke-width: 1.6; stroke-linecap: round"/>
    </g>
    <g id="text_3">
     <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #3a4252" x="387.36" y="398.16" transform="rotate(-0 387.36 398.16)">内部节点=割（V/H） · 叶=模块</text>
@@ -110,22 +110,22 @@ L 635.76 242.64
    <g id="line2d_9">
     <path d="M 41.76 250.56 
 L 329.76 250.56 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #be1e1e; stroke-width: 2.4; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #be1e1e; stroke-width: 2.4; stroke-linecap: round"/>
    </g>
    <g id="line2d_10">
     <path d="M 162.72 250.56 
 L 162.72 84.96 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #7e2e07; stroke-width: 2.2; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #7e2e07; stroke-width: 2.2; stroke-linecap: round"/>
    </g>
    <g id="line2d_11">
     <path d="M 162.72 167.76 
 L 329.76 167.76 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #be1e1e; stroke-width: 2; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #be1e1e; stroke-width: 2; stroke-linecap: round"/>
    </g>
    <g id="line2d_12">
     <path d="M 185.76 416.16 
 L 185.76 250.56 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #7e2e07; stroke-width: 2.2; stroke-linecap: round"/>
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #7e2e07; stroke-width: 2.2; stroke-linecap: round"/>
    </g>
    <g id="text_4">
     <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="57.6" y="496.441641" transform="rotate(-0 57.6 496.441641)">Polish =</text>
@@ -152,20 +152,20 @@ L 185.76 250.56
     <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #d14e0a" x="257.76" y="338.592422" transform="rotate(-0 257.76 338.592422)">4</text>
    </g>
    <g id="line2d_13">
-    <path d="M 45.36 444.96 
-L 66.96 444.96 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #be1e1e; stroke-width: 3; stroke-linecap: round"/>
+    <path d="M 45.36 457.92 
+L 66.96 457.92 
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #be1e1e; stroke-width: 3; stroke-linecap: round"/>
    </g>
    <g id="text_12">
-    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e1414" x="74.16" y="448.815469" transform="rotate(-0 74.16 448.815469)">H 横割（上下）</text>
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e1414" x="74.16" y="461.775469" transform="rotate(-0 74.16 461.775469)">H 横割（上下）</text>
    </g>
    <g id="line2d_14">
-    <path d="M 203.76 444.96 
-L 225.36 444.96 
-" clip-path="url(#pc0ebe0afdd)" style="fill: none; stroke: #7e2e07; stroke-width: 3; stroke-linecap: round"/>
+    <path d="M 203.76 457.92 
+L 225.36 457.92 
+" clip-path="url(#peae09d52ad)" style="fill: none; stroke: #7e2e07; stroke-width: 3; stroke-linecap: round"/>
    </g>
    <g id="text_13">
-    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="232.56" y="448.815469" transform="rotate(-0 232.56 448.815469)">V 竖割（左右）</text>
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="232.56" y="461.775469" transform="rotate(-0 232.56 461.775469)">V 竖割（左右）</text>
    </g>
    <g id="patch_5">
     <path d="M 524.16 120.24 
@@ -178,7 +178,7 @@ C 502.259367 83.040685 499.68 89.267828 499.68 95.76
 C 499.68 102.252172 502.259367 108.479315 506.850026 113.069974 
 C 511.440685 117.660633 517.667828 120.24 524.16 120.24 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #be1e1e; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #be1e1e; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 452.16 203.04 
@@ -191,7 +191,7 @@ C 430.259367 165.840685 427.68 172.067828 427.68 178.56
 C 427.68 185.052172 430.259367 191.279315 434.850026 195.869974 
 C 439.440685 200.460633 445.667828 203.04 452.16 203.04 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #d14e0a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #d14e0a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
    </g>
    <g id="patch_7">
     <path d="M 603.36 203.04 
@@ -204,7 +204,7 @@ C 581.459367 165.840685 578.88 172.067828 578.88 178.56
 C 578.88 185.052172 581.459367 191.279315 586.050026 195.869974 
 C 590.640685 200.460633 596.867828 203.04 603.36 203.04 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #d14e0a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #d14e0a; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
    </g>
    <g id="patch_8">
     <path d="M 388.08 287.28 
@@ -217,7 +217,7 @@ Q 383.04 242.64 383.04 247.68
 L 383.04 282.24 
 Q 383.04 287.28 388.08 287.28 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #d4c2e5; stroke: #46196b; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #d4c2e5; stroke: #46196b; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_9">
     <path d="M 502.56 289.44 
@@ -230,7 +230,7 @@ C 480.659367 252.240685 478.08 258.467828 478.08 264.96
 C 478.08 271.452172 480.659367 277.679315 485.250026 282.269974 
 C 489.840685 286.860633 496.067828 289.44 502.56 289.44 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #be1e1e; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #be1e1e; stroke: #ffffff; stroke-width: 1.5; stroke-linejoin: miter"/>
    </g>
    <g id="patch_10">
     <path d="M 452.88 370.08 
@@ -243,7 +243,7 @@ Q 447.84 325.44 447.84 330.48
 L 447.84 365.04 
 Q 447.84 370.08 452.88 370.08 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_11">
     <path d="M 517.68 370.08 
@@ -256,7 +256,7 @@ Q 512.64 325.44 512.64 330.48
 L 512.64 365.04 
 Q 512.64 370.08 517.68 370.08 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_12">
     <path d="M 560.88 287.28 
@@ -269,7 +269,7 @@ Q 555.84 242.64 555.84 247.68
 L 555.84 282.24 
 Q 555.84 287.28 560.88 287.28 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="patch_13">
     <path d="M 618.48 287.28 
@@ -282,7 +282,7 @@ Q 613.44 242.64 613.44 247.68
 L 613.44 282.24 
 Q 613.44 287.28 618.48 287.28 
 z
-" clip-path="url(#pc0ebe0afdd)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.6; stroke-linejoin: miter"/>
+" clip-path="url(#peae09d52ad)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_14">
     <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #ffffff" x="524.16" y="100.441641" transform="rotate(-0 524.16 100.441641)">H</text>
@@ -314,7 +314,7 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="pc0ebe0afdd">
+  <clipPath id="peae09d52ad">
    <rect x="5.76" y="5.76" width="676.8" height="532.8"/>
   </clipPath>
  </defs>
