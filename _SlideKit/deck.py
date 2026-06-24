@@ -110,16 +110,28 @@ def _txt(slide, box, lines, sizes=None, colors=None, bolds=None, monos=None,
         p.space_after = Pt(space)
         if line_sp:
             p.line_spacing = line_sp
-        for seg, em in _emph_segs(ln):             # 内联强调 **重点** → 加粗 + 强调色
+        for seg, em in _emph_segs(ln):             # 行内强调：1=加粗+橙(强调)，2=普通加粗(无标红)，0=常规
             r = p.add_run(); r.text = seg
-            _set_font(r, size=sizes[i], color=(ACCENT if em else colors[i]), bold=(em or bolds[i]), mono=monos[i])
+            _set_font(r, size=sizes[i], color=(ACCENT if em == 1 else colors[i]),
+                      bold=(em != 0 or bolds[i]), mono=monos[i])
     return tb
 
 
 def _emph_segs(line):
-    """把 '**重点**' 解析成 [(文本, 是否强调)] 多段；无标记则单段。供 _txt 生成加粗 + 强调色 run。"""
-    segs = [(p, i % 2 == 1) for i, p in enumerate(str(line).split("**"))]
-    return [s for s in segs if s[0]] or [("", False)]
+    """行内强调解析 → [(文本, 强调码)]：**重点**=强调(加粗+橙, 码1)、__重点__=普通加粗(无标红, 码2)、其余=常规(码0)。
+    普通加粗 `__…__` 专用于总分式结构里强化视觉分割（如 1.5 各分点的术语头），不抢中心短句的橙色强调。
+    先按 ** 切强调段，再在非强调段里按 __ 切普通加粗段（内容受控、标记成对，不跨段嵌套）。"""
+    out = []
+    for k, chunk in enumerate(str(line).split("**")):
+        if not chunk:
+            continue
+        if k % 2 == 1:                      # ** 之间 → 强调（加粗 + 橙）
+            out.append((chunk, 1))
+        else:                               # 非强调段：再切 __普通加粗__
+            for j, part in enumerate(chunk.split("__")):
+                if part:
+                    out.append((part, 2 if j % 2 == 1 else 0))
+    return out or [("", 0)]
 
 
 def _bar(slide, x, t, w, h, color):
@@ -430,7 +442,7 @@ def _style_cell(cell, text, size=12, color=INK_C, bold=False, fill="FFFFFF", ali
 _TBL_X, _TBL_W = 0.7, 11.95     # 表格左缘 / 全宽
 _TBL_TOP = 1.78                 # 内容起始 y（标题/副标题之下）——正文从左上角开始
 _TBL_BOTTOM = 6.95             # 内容底线：表格 + 说明须落在此线之上
-_NOTE_FS = 13.5                # 说明字号（正文体，非脚注）
+_NOTE_FS = 14                  # 说明字号（与 split 正文 14 一致，非脚注）
 _NOTE_LH = 0.33                # 说明行高（英寸/行）——与预览端折行一致
 _NOTE_GAP = 0.18              # 说明与其下表格之间的间距
 
@@ -965,7 +977,7 @@ def _mmissing(ax, path, box):
 def _wrap(s, maxu):
     """按显示宽度折行（CJK≈1，ASCII≈0.55 单位），让预览贴近 pptx 的自动换行。
     连续 ASCII 字母/数字成"词"整体折行，不拆词（与 PowerPoint 的按词换行一致）。"""
-    s = str(s).replace("**", "")               # 内联强调标记仅 pptx 渲染；预览去掉标记（以 PowerPoint 为准）
+    s = str(s).replace("**", "").replace("__", "")   # 行内强调标记(**强调** / __普通加粗__)仅 pptx 渲染；预览去标记（以 PowerPoint 为准）
     toks, i, n = [], 0, len(s)
     while i < n:
         if s[i].isascii() and s[i].isalnum():
