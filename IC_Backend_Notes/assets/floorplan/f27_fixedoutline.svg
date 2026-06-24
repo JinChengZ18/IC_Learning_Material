@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="702.72pt" height="457.92pt" viewBox="0 0 702.72 457.92" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-06-25T06:45:20.511904</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 457.92 
+L 702.72 457.92 
+L 702.72 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 5.76 452.16 
+L 696.96 452.16 
+L 696.96 5.76 
+L 5.76 5.76 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 41.76 380.16 
+L 164.16 380.16 
+L 164.16 99.36 
+L 41.76 99.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #ffffff; stroke: #3a4252; stroke-width: 2; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 315.36 380.16 
+L 639.36 380.16 
+L 639.36 99.36 
+L 315.36 99.36 
+L 315.36 380.16 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: none; stroke-dasharray: 15.6,7.8; stroke-dashoffset: 0; stroke: #7e2e07; stroke-width: 2.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="34.56" y="32.9175" transform="rotate(-0 34.56 32.9175)">经典最小面积  vs  固定轮廓 floorplanning</text>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2c0e48" x="41.76" y="56.16" transform="rotate(-0 41.76 56.16)">经典：最小面积（外形自由）</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #6b7280" x="102.96" y="403.2" transform="rotate(-0 102.96 403.2)">面积最小但 15×6</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="315.36" y="56.16" transform="rotate(-0 315.36 56.16)">固定轮廓：塞进给定 outline + 用 slack 引导</text>
+   </g>
+   <g id="patch_5">
+    <path d="M 570.96 369.36 
+L 628.56 369.36 
+L 628.56 290.16 
+L 570.96 290.16 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: url(#hd91438fd66); stroke: #c7cdd6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="34.56" y="430.56" transform="rotate(-0 34.56 430.56)">slack = 左下压实 vs 右上压实的位置差；把零-slack（关键路径）块挪到高-slack 块旁 → 收进轮廓</text>
+   </g>
+   <g id="patch_6">
+    <path d="M 57.6 372.96 
+L 148.32 372.96 
+Q 156.96 372.96 156.96 364.32 
+L 156.96 295.2 
+Q 156.96 286.56 148.32 286.56 
+L 57.6 286.56 
+Q 48.96 286.56 48.96 295.2 
+L 48.96 364.32 
+Q 48.96 372.96 57.6 372.96 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #d4c2e5; stroke: #46196b; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 57.6 279.36 
+L 90.72 279.36 
+Q 99.36 279.36 99.36 270.72 
+L 99.36 208.8 
+Q 99.36 200.16 90.72 200.16 
+L 57.6 200.16 
+Q 48.96 200.16 48.96 208.8 
+L 48.96 270.72 
+Q 48.96 279.36 57.6 279.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 115.2 279.36 
+L 148.32 279.36 
+Q 156.96 279.36 156.96 270.72 
+L 156.96 208.8 
+Q 156.96 200.16 148.32 200.16 
+L 115.2 200.16 
+Q 106.56 200.16 106.56 208.8 
+L 106.56 270.72 
+Q 106.56 279.36 115.2 279.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 57.6 192.96 
+L 148.32 192.96 
+Q 156.96 192.96 156.96 184.32 
+L 156.96 115.2 
+Q 156.96 106.56 148.32 106.56 
+L 57.6 106.56 
+Q 48.96 106.56 48.96 115.2 
+L 48.96 184.32 
+Q 48.96 192.96 57.6 192.96 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #e6adad; stroke: #be1e1e; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 334.8 369.36 
+L 439.92 369.36 
+Q 448.56 369.36 448.56 360.72 
+L 448.56 262.8 
+Q 448.56 254.16 439.92 254.16 
+L 334.8 254.16 
+Q 326.16 254.16 326.16 262.8 
+L 326.16 360.72 
+Q 326.16 369.36 334.8 369.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #d4c2e5; stroke: #46196b; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 464.4 369.36 
+L 529.92 369.36 
+Q 538.56 369.36 538.56 360.72 
+L 538.56 298.8 
+Q 538.56 290.16 529.92 290.16 
+L 464.4 290.16 
+Q 455.76 290.16 455.76 298.8 
+L 455.76 360.72 
+Q 455.76 369.36 464.4 369.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 334.8 243.36 
+L 425.52 243.36 
+Q 434.16 243.36 434.16 234.72 
+L 434.16 122.4 
+Q 434.16 113.76 425.52 113.76 
+L 334.8 113.76 
+Q 326.16 113.76 326.16 122.4 
+L 326.16 234.72 
+Q 326.16 243.36 334.8 243.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 453.6 275.76 
+L 544.32 275.76 
+Q 552.96 275.76 552.96 267.12 
+L 552.96 122.4 
+Q 552.96 113.76 544.32 113.76 
+L 453.6 113.76 
+Q 444.96 113.76 444.96 122.4 
+L 444.96 267.12 
+Q 444.96 275.76 453.6 275.76 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #e6adad; stroke: #be1e1e; stroke-width: 1.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 12px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #6b7280" transform="translate(584.145 325.817625)">white</text>
+    <text style="font-size: 12px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; fill: #6b7280" transform="translate(583.502813 340.31175)">space</text>
+   </g>
+   <g id="text_7">
+    <g id="patch_14">
+     <path d="M 28.041406 97.371797 
+L 177.878594 97.371797 
+Q 182.038594 97.371797 182.038594 93.211797 
+L 182.038594 79.588203 
+Q 182.038594 75.428203 177.878594 75.428203 
+L 28.041406 75.428203 
+Q 23.881406 75.428203 23.881406 79.588203 
+L 23.881406 93.211797 
+Q 23.881406 97.371797 28.041406 97.371797 
+z
+" style="fill: #e6adad; stroke: #be1e1e; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #7e1414" x="102.96" y="89.980078" transform="rotate(-0 102.96 89.980078)">装不进 10×10（不可行）</text>
+   </g>
+   <g id="text_8">
+    <g id="patch_15">
+     <path d="M 533.007109 131.931797 
+L 608.912891 131.931797 
+Q 613.072891 131.931797 613.072891 127.771797 
+L 613.072891 114.148203 
+Q 613.072891 109.988203 608.912891 109.988203 
+L 533.007109 109.988203 
+Q 528.847109 109.988203 528.847109 114.148203 
+L 528.847109 127.771797 
+Q 528.847109 131.931797 533.007109 131.931797 
+z
+" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #7e2e07" x="570.96" y="124.540078" transform="rotate(-0 570.96 124.540078)">目标 outline</text>
+   </g>
+   <g id="patch_16">
+    <path d="M 544.018503 329.76 
+Q 552.95865 329.76 561.898797 329.76 
+" clip-path="url(#p40ad34c27c)" style="fill: none; stroke: #7e1414; stroke-width: 2.2; stroke-linecap: round"/>
+    <path d="M 549.218503 332.36 
+L 544.018503 329.76 
+L 549.218503 327.16 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #7e1414; stroke: #7e1414; stroke-width: 2.2; stroke-linecap: round"/>
+    <path d="M 556.698797 327.16 
+L 561.898797 329.76 
+L 556.698797 332.36 
+z
+" clip-path="url(#p40ad34c27c)" style="fill: #7e1414; stroke: #7e1414; stroke-width: 2.2; stroke-linecap: round"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #7e1414" x="552.96" y="311.04" transform="rotate(-0 552.96 311.04)">slack</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p40ad34c27c">
+   <rect x="5.76" y="5.76" width="691.2" height="446.4"/>
+  </clipPath>
+ </defs>
+ <defs>
+  <pattern id="hd91438fd66" patternUnits="userSpaceOnUse" x="0" y="0" width="72" height="72">
+   <rect x="0" y="0" width="73" height="73" fill="#edf0f4"/>
+   <path d="M -36 36 
+L 36 -36 
+M -33 39 
+L 39 -33 
+M -30 42 
+L 42 -30 
+M -27 45 
+L 45 -27 
+M -24 48 
+L 48 -24 
+M -21 51 
+L 51 -21 
+M -18 54 
+L 54 -18 
+M -15 57 
+L 57 -15 
+M -12 60 
+L 60 -12 
+M -9 63 
+L 63 -9 
+M -6 66 
+L 66 -6 
+M -3 69 
+L 69 -3 
+M 0 72 
+L 72 0 
+M 3 75 
+L 75 3 
+M 6 78 
+L 78 6 
+M 9 81 
+L 81 9 
+M 12 84 
+L 84 12 
+M 15 87 
+L 87 15 
+M 18 90 
+L 90 18 
+M 21 93 
+L 93 21 
+M 24 96 
+L 96 24 
+M 27 99 
+L 99 27 
+M 30 102 
+L 102 30 
+M 33 105 
+L 105 33 
+M 36 108 
+L 108 36 
+" style="fill: #c7cdd6; stroke: #c7cdd6; stroke-width: 1.0; stroke-linecap: butt; stroke-linejoin: miter"/>
+  </pattern>
+ </defs>
+</svg>

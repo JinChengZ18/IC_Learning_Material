@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="717.12pt" height="529.92pt" viewBox="0 0 717.12 529.92" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-06-25T06:45:19.854724</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 529.92 
+L 717.12 529.92 
+L 717.12 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 5.76 524.16 
+L 711.36 524.16 
+L 711.36 5.76 
+L 5.76 5.76 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #ffffff"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 56.16 246.96 
+L 675.36 246.96 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #3a4252; stroke-width: 2.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 642.362695 246.96 
+Q 658.082703 246.96 670.895822 246.96 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #3a4252; stroke-width: 2.6; stroke-linecap: round"/>
+    <path d="M 664.495822 243.76 
+L 670.895822 246.96 
+L 664.495822 250.16 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #3a4252; stroke: #3a4252; stroke-width: 2.6; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 54.36 202.32 
+L 194.76 202.32 
+Q 201.96 202.32 201.96 195.12 
+L 201.96 94.32 
+Q 201.96 87.12 194.76 87.12 
+L 54.36 87.12 
+Q 47.16 87.12 47.16 94.32 
+L 47.16 195.12 
+Q 47.16 202.32 54.36 202.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #9fe2d4; stroke: #0b7d72; stroke-width: 2.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 198.36 406.8 
+L 338.76 406.8 
+Q 345.96 406.8 345.96 399.6 
+L 345.96 298.8 
+Q 345.96 291.6 338.76 291.6 
+L 198.36 291.6 
+Q 191.16 291.6 191.16 298.8 
+L 191.16 399.6 
+Q 191.16 406.8 198.36 406.8 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #d4c2e5; stroke: #46196b; stroke-width: 2.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 356.76 202.32 
+L 497.16 202.32 
+Q 504.36 202.32 504.36 195.12 
+L 504.36 94.32 
+Q 504.36 87.12 497.16 87.12 
+L 356.76 87.12 
+Q 349.56 87.12 349.56 94.32 
+L 349.56 195.12 
+Q 349.56 202.32 356.76 202.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #f6cd9e; stroke: #d14e0a; stroke-width: 2.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 515.16 406.8 
+L 655.56 406.8 
+Q 662.76 406.8 662.76 399.6 
+L 662.76 298.8 
+Q 662.76 291.6 655.56 291.6 
+L 515.16 291.6 
+Q 507.96 291.6 507.96 298.8 
+L 507.96 399.6 
+Q 507.96 406.8 515.16 406.8 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #e6adad; stroke: #be1e1e; stroke-width: 2.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="34.56" y="31.152422" transform="rotate(-0 34.56 31.152422)">布图规划算法 · 发展脉络</text>
+   </g>
+   <g id="line2d_2">
+    <path d="M 124.56 235.44 
+L 124.56 87.12 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #0b7d72; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_2">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="68.76" y="115.589375" transform="rotate(-0 68.76 115.589375)">早期构造法</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #084a43" x="68.76" y="146.351875" transform="rotate(-0 68.76 146.351875)">矩形对偶 ·</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #084a43" x="68.76" y="163.511875" transform="rotate(-0 68.76 163.511875)">mincut · 切片</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #084a43" x="68.76" y="180.671875" transform="rotate(-0 68.76 180.671875)">嵌入</text>
+   </g>
+   <g id="line2d_3">
+    <path d="M 268.56 258.48 
+L 268.56 406.8 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #46196b; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 14.095969px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="212.76" y="308.627965" transform="rotate(-0 212.76 308.627965)">切片 + 模拟</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 14.095969px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="212.76" y="327.234645" transform="rotate(-0 212.76 327.234645)">退火</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 10.779271px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2c0e48" x="212.76" y="352.742131" transform="rotate(-0 212.76 352.742131)">slicing tree</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 10.779271px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2c0e48" x="212.76" y="366.970768" transform="rotate(-0 212.76 366.970768)">· Polish ·</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 10.779271px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2c0e48" x="212.76" y="381.199405" transform="rotate(-0 212.76 381.199405)">Stockmeyer ·</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 10.779271px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #2c0e48" x="212.76" y="395.365725" transform="rotate(-0 212.76 395.365725)">WongLiu</text>
+   </g>
+   <g id="line2d_4">
+    <path d="M 426.96 235.44 
+L 426.96 87.12 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #d14e0a; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="371.16" y="115.589375" transform="rotate(-0 371.16 115.589375)">非切片表示</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="371.16" y="146.351875" transform="rotate(-0 371.16 146.351875)">SP · Btree ·</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="371.16" y="163.511875" transform="rotate(-0 371.16 163.511875)">TCG · mosaic</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e2e07" x="371.16" y="180.671875" transform="rotate(-0 371.16 180.671875)">· Otree</text>
+   </g>
+   <g id="line2d_5">
+    <path d="M 585.36 258.48 
+L 585.36 406.8 
+" clip-path="url(#pf7306ca391)" style="fill: none; stroke: #be1e1e; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 16.338154px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="529.56" y="310.420311" transform="rotate(-0 529.56 310.420311)">现代</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 16.338154px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="529.56" y="332.193454" transform="rotate(-0 529.56 332.193454)">floorplan</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 12.493882px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e1414" x="529.56" y="361.551524" transform="rotate(-0 529.56 361.551524)">固定轮廓 ·</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 12.493882px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e1414" x="529.56" y="378.043448" transform="rotate(-0 529.56 378.043448)">slack · 解析法</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 12.493882px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #7e1414" x="529.56" y="394.535373" transform="rotate(-0 529.56 394.535373)">· 工业原型</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="34.56" y="506.16" transform="rotate(-0 34.56 506.16)">目标演化：最小面积 + 线长  →  固定轮廓内可行 + 拥塞 / 时序 / 功耗协同</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 124.56 256.32 
+C 127.042301 256.32 129.423268 255.333771 131.178519 253.578519 
+C 132.933771 251.823268 133.92 249.442301 133.92 246.96 
+C 133.92 244.477699 132.933771 242.096732 131.178519 240.341481 
+C 129.423268 238.586229 127.042301 237.6 124.56 237.6 
+C 122.077699 237.6 119.696732 238.586229 117.941481 240.341481 
+C 116.186229 242.096732 115.2 244.477699 115.2 246.96 
+C 115.2 249.442301 116.186229 251.823268 117.941481 253.578519 
+C 119.696732 255.333771 122.077699 256.32 124.56 256.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #0b7d72; stroke: #ffffff; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #0b7d72" x="124.56" y="286.310625" transform="rotate(-0 124.56 286.310625)">1980s</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 268.56 256.32 
+C 271.042301 256.32 273.423268 255.333771 275.178519 253.578519 
+C 276.933771 251.823268 277.92 249.442301 277.92 246.96 
+C 277.92 244.477699 276.933771 242.096732 275.178519 240.341481 
+C 273.423268 238.586229 271.042301 237.6 268.56 237.6 
+C 266.077699 237.6 263.696732 238.586229 261.941481 240.341481 
+C 260.186229 242.096732 259.2 244.477699 259.2 246.96 
+C 259.2 249.442301 260.186229 251.823268 261.941481 253.578519 
+C 263.696732 255.333771 266.077699 256.32 268.56 256.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #46196b; stroke: #ffffff; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_23">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #46196b" x="268.56" y="223.071094" transform="rotate(-0 268.56 223.071094)">1986</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 426.96 256.32 
+C 429.442301 256.32 431.823268 255.333771 433.578519 253.578519 
+C 435.333771 251.823268 436.32 249.442301 436.32 246.96 
+C 436.32 244.477699 435.333771 242.096732 433.578519 240.341481 
+C 431.823268 238.586229 429.442301 237.6 426.96 237.6 
+C 424.477699 237.6 422.096732 238.586229 420.341481 240.341481 
+C 418.586229 242.096732 417.6 244.477699 417.6 246.96 
+C 417.6 249.442301 418.586229 251.823268 420.341481 253.578519 
+C 422.096732 255.333771 424.477699 256.32 426.96 256.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #d14e0a; stroke: #ffffff; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_24">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #d14e0a" x="426.96" y="286.310625" transform="rotate(-0 426.96 286.310625)">1995-2005</text>
+   </g>
+   <g id="patch_11">
+    <path d="M 585.36 256.32 
+C 587.842301 256.32 590.223268 255.333771 591.978519 253.578519 
+C 593.733771 251.823268 594.72 249.442301 594.72 246.96 
+C 594.72 244.477699 593.733771 242.096732 591.978519 240.341481 
+C 590.223268 238.586229 587.842301 237.6 585.36 237.6 
+C 582.877699 237.6 580.496732 238.586229 578.741481 240.341481 
+C 576.986229 242.096732 576 244.477699 576 246.96 
+C 576 249.442301 576.986229 251.823268 578.741481 253.578519 
+C 580.496732 255.333771 582.877699 256.32 585.36 256.32 
+z
+" clip-path="url(#pf7306ca391)" style="fill: #be1e1e; stroke: #ffffff; stroke-width: 1.6; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_25">
+    <text style="font-weight: 700; font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #be1e1e" x="585.36" y="223.071094" transform="rotate(-0 585.36 223.071094)">2000s-</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pf7306ca391">
+   <rect x="5.76" y="5.76" width="705.6" height="518.4"/>
+  </clipPath>
+ </defs>
+</svg>
