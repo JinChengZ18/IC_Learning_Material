@@ -144,7 +144,8 @@ def _title_block(slide, title, sub, accent=PRIMARY, chapter=None):
     # 左侧主色竖条 + 全宽细分隔线已下放到版式（母版）上，这里只填每页不同的标题文本
     _txt(slide, (0.85, 0.42, 9.2, 0.8), [title], sizes=[28], bolds=[True], colors=[INK_C])
     if sub:
-        _txt(slide, (0.87, 1.18, 9.2, 0.5), [sub], sizes=[14], colors=[SUB_C])
+        # 副标题占满全宽（与 1.6" 分隔线同跨 0.85..12.70），单行容纳长 sub；高 0.32 + wrap=False 保证一行不下探越线
+        _txt(slide, (0.87, 1.18, 11.85, 0.32), [sub], sizes=[14], colors=[SUB_C], wrap=False)
     if chapter:                              # 右上角章节面包屑（现代结构感）
         _txt(slide, (9.35, 0.55, 3.35, 0.4), [chapter], sizes=[12], bolds=[True], colors=[PRIMARY], align=PP_ALIGN.RIGHT)
 

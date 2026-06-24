@@ -232,7 +232,7 @@ SPECS = [
     split("3.2 时序预算与 ILM", "顶层约束映射到模块边界", "ext_block_floorplan_parsac_ccbysa.png", [
         P("**芯片级约束（chip-level constraints）必须映射成模块级约束（block-level constraints）**。例如顶层某输入到模块的路径预算为 1.5 ns，模块实现时就要在模块边界建立对应的输入延迟（input delay）、输出延迟（output delay）、时钟不确定性（clock uncertainty）、负载（load）与驱动单元（driving cell）等约束。"),
         P("**预算合理**时，各模块独立收敛后全芯片才容易收敛；预算不合理时，单个模块看似通过，全芯片仍可能失败。"),
-        P("接口逻辑模型（Interface Logic Model，ILM）保留模块边界附近与接口时序相关的逻辑、隐藏内部细节；抽取时序模型（Extracted Timing Model，ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析**更快、更可控**。"),
+        P("**接口逻辑模型（Interface Logic Model，ILM）**保留模块边界附近与接口时序相关的逻辑、隐藏内部细节；抽取时序模型（Extracted Timing Model，ETM）也提供模块的抽象时序模型。二者都让全芯片时序分析**更快、更可控**。"),
     ], figs_v=True, figs=[
         fg("ext_pdflow_parsac_ccbysa.png", "物理设计流程：分区 → 层次化布图 → … → 时序收敛", "PARSAC · arXiv:2405.05495 · CC BY-SA 4.0"),
         fg("ext_block_floorplan_parsac_ccbysa.png", "层次化分块布图：块边界 b1–b11 + B*-tree", "PARSAC · arXiv:2405.05495 · CC BY-SA 4.0"),
@@ -254,7 +254,7 @@ SPECS = [
              "4.5 电源 / 地布线方式", "4.6 电源网格创建", "4.7 电源网格与宏摆放"]),
     split("4.1 电源规划：功耗与可靠性", "电源规划（Power Planning）：PDN 不只是连上 VDD/GND", "ext_pdn_bitfury_ccby.jpg", [
         P("电源规划（Power Planning）要解决的**不只是「连上 VDD/GND」**，它同时关系到动态功耗（dynamic power）、静态漏电（static leakage）、IR 压降、电压跌落（voltage drop）、电迁移（electromigration）与自热磨损（self-heating wearout）。"),
-        L("电源分布网络（Power Distribution Network，PDN）需要："),
+        L("**电源分布网络（Power Distribution Network，PDN）**需要："),
         B("把电流从焊盘 / 凸点送到晶体管，保持稳定、低噪声的电压"),
         B("提供平均和峰值功耗需求，为信号提供返回路径"),
         B("避免电迁移和自热磨损，合理占用芯片面积与布线资源"),
@@ -268,7 +268,7 @@ SPECS = [
         P("可见**细而长的低层电源线无法单独供电**，必须用更宽、更厚、更高层、多路径、多过孔的结构。"),
     ], caption="静态 IR 压降颜色图 + 热点掩码", credit="WACA-UNet, Seo et al. · arXiv:2507.19197 · CC BY 4.0"),
     split("4.3 电迁移 EM", "长期电流密度能不能扛住", "f09_irem.png", [
-        L("电迁移（EM）是**电流长期流过导体、电子动量推动金属原子迁移**，可能导致："),
+        L("**电迁移（EM）**是**电流长期流过导体、电子动量推动金属原子迁移**，可能导致："),
         B("开路（open）：单根线上形成空洞（void）"),
         B("短路（short）：相邻线之间桥接（bridging）"),
         B("RC 改变：即使没开 / 不短路，也可能造成性能退化"),
@@ -283,7 +283,7 @@ SPECS = [
         ["更多电源条带", "提供更多电流路径", "增加信号拥塞"],
         ["更多过孔阵列", "降低垂直连接电阻与 EM 风险", "占用局部布线资源"],
         ["更靠近电源焊盘", "缩短供电路径", "可能牺牲数据流"],
-    ], note="电源线越强，IR / EM 风险越低，但信号布线资源越紧张。所以一个好的电源分布网络（PDN）要让电源轨尽量宽、尽量厚、尽量多路径，但**不能把信号布线资源全部吃光**。"),
+    ], note="电源线越强，IR / EM 风险越低，但信号布线资源越紧张。所以一个好的**电源分布网络（PDN）**要让电源轨尽量宽、尽量厚、尽量多路径，但**不能把信号布线资源全部吃光**。"),
     tbl("4.5 电源 / 地布线方式", "自上而下的六种结构：从电源焊盘 / 凸点到标准单元供电轨", ["结构", "作用"], [
         ["电源焊盘 / 凸点（power pads / bumps）", "从封装引入 VDD/VSS"],
         ["电源环（power ring）", "围绕芯片 / 核心区 / hard IP 的主干环"],
@@ -357,7 +357,7 @@ SPECS = [
         "IDESA / EPFL — Digital IC design tutorials.",
         "Cadence Innovus / Synopsys ICC2 / Fusion Compiler User Guides（命令与流程参考）.",
     ]},
-    {"kind": "refs", "title": "图片来源 Image Credits", "sub": "全部开放许可（CC0/CC BY/CC BY-SA/PD），经来源页核验署名；arXiv 图 DOI = 10.48550/arXiv.<编号>，期刊图另附 DOI", "accent": PRIMARY, "refs": [
+    {"kind": "refs", "title": "图片来源 Image Credits", "sub": "全部开放许可（CC0/CC BY/CC BY-SA/PD），署名经来源页核验", "accent": PRIMARY, "refs": [
         "图 1.1 486 die — Smial, CC BY 3.0；晶圆 — A. Kübelbeck, CC BY-SA 3.0.",
         "图 2.1 i9-13900K die — Fritzchens Fritz / JmsDoug, CC0.",
         "图 2.2 拥塞形成 — Hu et al., arXiv:2603.11075；热力图 — Tsai et al., arXiv:2510.15872（CC BY 4.0）.",
