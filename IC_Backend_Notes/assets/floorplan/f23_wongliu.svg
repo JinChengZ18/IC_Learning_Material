@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="708.02375pt" height="443.52pt" viewBox="0 0 708.02375 443.52" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-06-25T06:45:20.130260</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 443.52 
+L 708.02375 443.52 
+L 708.02375 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 5.76 437.76 
+L 696.96 437.76 
+L 696.96 5.76 
+L 5.76 5.76 
+z
+" clip-path="url(#pc1de95bcca)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 47.52 424.8 
+L 684 424.8 
+Q 689.76 424.8 689.76 419.04 
+L 689.76 385.92 
+Q 689.76 380.16 684 380.16 
+L 47.52 380.16 
+Q 41.76 380.16 41.76 385.92 
+L 41.76 419.04 
+Q 41.76 424.8 47.52 424.8 
+z
+" clip-path="url(#pc1de95bcca)" style="fill: #edf0f4; stroke: #c7cdd6; stroke-width: 1.2; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 19px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #1a1f2b" x="34.56" y="32.861094" transform="rotate(-0 34.56 32.861094)">Wong–Liu 模拟退火 · 三种移动</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 15px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #3a4252" x="34.56" y="63.36" transform="rotate(-0 34.56 63.36)">状态 = 规范化 Polish 串；代价 = 面积 A + λ·线长 W</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #46196b" x="138.96" y="128.415469" transform="rotate(-0 138.96 128.415469)">换相邻模块</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="138.96" y="172.780078" transform="rotate(-0 138.96 172.780078)">前:</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="178.56" y="173.363672" transform="rotate(-0 178.56 173.363672)">1</text>
+   </g>
+   <g id="text_6">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="198.72" y="173.416797" transform="rotate(-0 198.72 173.416797)">2</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="218.88" y="173.416797" transform="rotate(-0 218.88 173.416797)">3</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="239.04" y="173.363672" transform="rotate(-0 239.04 173.363672)">V</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="259.2" y="173.363672" transform="rotate(-0 259.2 173.363672)">H</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="279.36" y="173.363672" transform="rotate(-0 279.36 173.363672)">4</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="299.52" y="173.363672" transform="rotate(-0 299.52 173.363672)">V</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="416.16" y="172.780078" transform="rotate(-0 416.16 172.780078)">后:</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="455.76" y="173.363672" transform="rotate(-0 455.76 173.363672)">1</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="475.92" y="173.416797" transform="rotate(-0 475.92 173.416797)">3</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="496.08" y="173.416797" transform="rotate(-0 496.08 173.416797)">2</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="516.24" y="173.363672" transform="rotate(-0 516.24 173.363672)">V</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="536.4" y="173.363672" transform="rotate(-0 536.4 173.363672)">H</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="556.56" y="173.363672" transform="rotate(-0 556.56 173.363672)">4</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="576.72" y="173.363672" transform="rotate(-0 576.72 173.363672)">V</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #d14e0a" x="138.96" y="229.215469" transform="rotate(-0 138.96 229.215469)">补一段割链 V—H</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="138.96" y="273.580078" transform="rotate(-0 138.96 273.580078)">前:</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="178.56" y="274.163672" transform="rotate(-0 178.56 274.163672)">1</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="198.72" y="274.163672" transform="rotate(-0 198.72 274.163672)">2</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="218.88" y="274.163672" transform="rotate(-0 218.88 274.163672)">3</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="239.04" y="274.163672" transform="rotate(-0 239.04 274.163672)">V</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="259.2" y="274.163672" transform="rotate(-0 259.2 274.163672)">H</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="279.36" y="274.163672" transform="rotate(-0 279.36 274.163672)">4</text>
+   </g>
+   <g id="text_28">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="299.52" y="274.216797" transform="rotate(-0 299.52 274.216797)">V</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="416.16" y="273.580078" transform="rotate(-0 416.16 273.580078)">后:</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="455.76" y="274.163672" transform="rotate(-0 455.76 274.163672)">1</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="475.92" y="274.163672" transform="rotate(-0 475.92 274.163672)">2</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="496.08" y="274.163672" transform="rotate(-0 496.08 274.163672)">3</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="516.24" y="274.163672" transform="rotate(-0 516.24 274.163672)">V</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="536.4" y="274.163672" transform="rotate(-0 536.4 274.163672)">H</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="556.56" y="274.163672" transform="rotate(-0 556.56 274.163672)">4</text>
+   </g>
+   <g id="text_36">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="576.72" y="274.216797" transform="rotate(-0 576.72 274.216797)">H</text>
+   </g>
+   <g id="text_37">
+    <text style="font-weight: 700; font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #be1e1e" x="138.96" y="330.015469" transform="rotate(-0 138.96 330.015469)">换相邻 模块与割</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="138.96" y="374.380078" transform="rotate(-0 138.96 374.380078)">前:</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="178.56" y="374.963672" transform="rotate(-0 178.56 374.963672)">1</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="198.72" y="374.963672" transform="rotate(-0 198.72 374.963672)">2</text>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="218.88" y="374.963672" transform="rotate(-0 218.88 374.963672)">3</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="239.04" y="374.963672" transform="rotate(-0 239.04 374.963672)">V</text>
+   </g>
+   <g id="text_43">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="259.2" y="375.016797" transform="rotate(-0 259.2 375.016797)">H</text>
+   </g>
+   <g id="text_44">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="279.36" y="375.016797" transform="rotate(-0 279.36 375.016797)">4</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="299.52" y="374.963672" transform="rotate(-0 299.52 374.963672)">V</text>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 13px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #6b7280" x="416.16" y="374.380078" transform="rotate(-0 416.16 374.380078)">后:</text>
+   </g>
+   <g id="text_47">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="455.76" y="374.963672" transform="rotate(-0 455.76 374.963672)">1</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="475.92" y="374.963672" transform="rotate(-0 475.92 374.963672)">2</text>
+   </g>
+   <g id="text_49">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="496.08" y="374.963672" transform="rotate(-0 496.08 374.963672)">3</text>
+   </g>
+   <g id="text_50">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="516.24" y="374.963672" transform="rotate(-0 516.24 374.963672)">V</text>
+   </g>
+   <g id="text_51">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="536.4" y="375.016797" transform="rotate(-0 536.4 375.016797)">4</text>
+   </g>
+   <g id="text_52">
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #7e1414" x="556.56" y="375.016797" transform="rotate(-0 556.56 375.016797)">H</text>
+   </g>
+   <g id="text_53">
+    <text style="font-size: 17px; font-family: 'Consolas', 'Cascadia Mono', 'Courier New', 'DejaVu Sans Mono', monospace; text-anchor: start; fill: #1a1f2b" x="576.72" y="374.963672" transform="rotate(-0 576.72 374.963672)">V</text>
+   </g>
+   <g id="text_54">
+    <text style="font-size: 14px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: start; fill: #3a4252" x="59.76" y="406.335469" transform="rotate(-0 59.76 406.335469)">M1/M2 必得规范化串；M3 可能破坏 → 反复选直到结果规范化。变化仅触及局部子树 → 代价增量重算</text>
+   </g>
+   <g id="text_55">
+    <g id="patch_4">
+     <path d="M 63.7775 138.907734 
+L 91.7425 138.907734 
+Q 97.1825 138.907734 97.1825 133.467734 
+L 97.1825 115.652266 
+Q 97.1825 110.212266 91.7425 110.212266 
+L 63.7775 110.212266 
+Q 58.3375 110.212266 58.3375 115.652266 
+L 58.3375 133.467734 
+Q 58.3375 138.907734 63.7775 138.907734 
+z
+" style="fill: #b6ccf2; stroke: #1e50c8; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #15307a" x="77.76" y="129.241641" transform="rotate(-0 77.76 129.241641)">M1</text>
+   </g>
+   <g id="text_56">
+    <g id="patch_5">
+     <path d="M 63.7775 239.707734 
+L 91.7425 239.707734 
+Q 97.1825 239.707734 97.1825 234.267734 
+L 97.1825 216.452266 
+Q 97.1825 211.012266 91.7425 211.012266 
+L 63.7775 211.012266 
+Q 58.3375 211.012266 58.3375 216.452266 
+L 58.3375 234.267734 
+Q 58.3375 239.707734 63.7775 239.707734 
+z
+" style="fill: #b6ccf2; stroke: #1e50c8; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #15307a" x="77.76" y="230.041641" transform="rotate(-0 77.76 230.041641)">M2</text>
+   </g>
+   <g id="text_57">
+    <g id="patch_6">
+     <path d="M 63.7775 340.507734 
+L 91.7425 340.507734 
+Q 97.1825 340.507734 97.1825 335.067734 
+L 97.1825 317.252266 
+Q 97.1825 311.812266 91.7425 311.812266 
+L 63.7775 311.812266 
+Q 58.3375 311.812266 58.3375 317.252266 
+L 58.3375 335.067734 
+Q 58.3375 340.507734 63.7775 340.507734 
+z
+" style="fill: #b6ccf2; stroke: #1e50c8; stroke-width: 1.3; stroke-linejoin: miter"/>
+    </g>
+    <text style="font-weight: 700; font-size: 17px; font-family: 'Microsoft YaHei', 'Microsoft YaHei UI', 'SimHei', 'Segoe UI', 'DejaVu Sans', sans-serif; text-anchor: middle; fill: #15307a" x="77.76" y="330.841641" transform="rotate(-0 77.76 330.841641)">M3</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pc1de95bcca">
+   <rect x="5.76" y="5.76" width="691.2" height="432"/>
+  </clipPath>
+ </defs>
+</svg>
